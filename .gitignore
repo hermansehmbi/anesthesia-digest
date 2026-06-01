@@ -3,6 +3,8 @@ __pycache__/
 preview_*.html
 podcast.mp3
 podcast_script.txt
+*.mp3
+*_script.txt
 articles_cache.json
 moc_tracker.xlsx
 .env

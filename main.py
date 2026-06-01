@@ -55,20 +55,32 @@ def run_digest(preview=False):
 
     logger.info(f"Total: {len(all_articles)} articles, {len(all_pods)} podcast eps")
 
-    # API mode: generate audio podcast
+    # Cache the full set first so Saturday's weekly review sees everything.
+    _cache_articles(all_articles)
+
+    # Digest email shows a tight selection: 1 article per journal (open
+    # access preferred, else most recent), capped at 10 total.
+    selected = select_digest_articles(all_articles, per_journal=1, max_total=10)
+    logger.info(f"Selected {len(selected)} articles for the digest email")
+
+    # API mode: generate audio podcast from the same selection so the audio
+    # summary matches the articles shown in the email.
     has_audio = False
     audio_file = None
-    if MODE == "api" and all_articles:
+    if MODE == "api" and selected:
         try:
             from podcast_generator import generate_podcast
-            audio_file = generate_podcast(all_articles, output_path="podcast.mp3")
+            audio_name = f"Anesthesia_Digest_{datetime.now().strftime('%Y_%m_%d')}.mp3"
+            audio_file = generate_podcast(selected, output_path=audio_name)
             has_audio = audio_file is not None
         except Exception as e:
             logger.error(f"Podcast generation failed: {e}")
 
     # Build and send
-    subject, html = build_digest_email(all_articles, all_pods, bonus, has_audio=has_audio)
-    _cache_articles(all_articles)
+    audio_filename = Path(audio_file).name if audio_file else None
+    subject, html = build_digest_email(selected, all_pods, bonus,
+                                       has_audio=has_audio,
+                                       audio_filename=audio_filename)
 
     attachments = [audio_file] if audio_file else []
     if preview:
@@ -143,6 +155,34 @@ def run_monthly(preview=False):
     else:
         send_email(RECIPIENT_EMAIL, subject, html, SENDER_EMAIL,
                    attachments=[MOC_FILE])
+
+
+# ── Selection ──────────────────────────────────────────────────────────────
+
+def select_digest_articles(articles: list, per_journal: int = 1,
+                           max_total: int = 10) -> list:
+    """Pick the best articles for the digest email.
+
+    One article per journal (open access preferred, then most recent), then
+    order journals by impact factor and cap at ``max_total``.
+    """
+    by_journal = {}
+    for a in articles:
+        by_journal.setdefault(a["journal_abbr"], []).append(a)
+
+    selected = []
+    for arts in by_journal.values():
+        # Sort so open-access comes first, then the most recent date.
+        ranked = sorted(
+            arts,
+            key=lambda a: (a["is_open_access"], a.get("date") or datetime.min),
+            reverse=True,
+        )
+        selected.extend(ranked[:per_journal])
+
+    # Highest-impact journals fill the limited slots first.
+    selected.sort(key=lambda a: a["impact_factor"], reverse=True)
+    return selected[:max_total]
 
 
 # ── Cache ────────────────────────────────────────────────────────────────────
