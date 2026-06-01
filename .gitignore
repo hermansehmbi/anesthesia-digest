@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+preview_*.html
+podcast.mp3
+podcast_script.txt
+articles_cache.json
+moc_tracker.xlsx
+.env

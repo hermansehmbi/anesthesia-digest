@@ -1,0 +1,240 @@
+"""
+Anesthesia Journal Digest — Email Builder
+==========================================
+HTML email templates for all three email types.
+"""
+
+from datetime import datetime, timedelta
+
+
+def build_digest_email(articles: list, podcasts: list, bonus_podcasts: list,
+                       has_audio: bool = False) -> tuple[str, str]:
+    """Build Monday/Thursday digest email. Returns (subject, html)."""
+    today = datetime.now()
+    day_name = today.strftime("%A")
+    date_str = today.strftime("%B %d, %Y")
+
+    subject = f"Anesthesia Digest — {day_name}, {today.strftime('%b %d')}"
+
+    # Group articles by journal, sorted by impact factor
+    by_journal = {}
+    for a in articles:
+        key = a["journal_abbr"]
+        if key not in by_journal:
+            by_journal[key] = {"name": a["journal"], "abbr": key,
+                               "if": a["impact_factor"], "articles": []}
+        by_journal[key]["articles"].append(a)
+    sorted_j = sorted(by_journal.values(), key=lambda j: j["if"], reverse=True)
+
+    total = len(articles)
+    oa_count = sum(1 for a in articles if a["is_open_access"])
+
+    # Audio banner (API mode only)
+    audio_banner = ""
+    if has_audio:
+        audio_banner = """
+    <tr><td style="padding:16px 20px;background:#eaf2f8;border-left:4px solid #2e86c1;">
+        <strong style="color:#1a5276;">🎧 AI Audio Summary attached</strong>
+        <span style="color:#555;font-size:13px;"> — ~7 min podcast covering today's highlights</span>
+    </td></tr>"""
+
+    # Articles
+    articles_html = ""
+    for j in sorted_j:
+        articles_html += f"""
+    <tr><td style="padding:18px 20px 6px 20px;">
+        <h2 style="margin:0;font-size:16px;color:#1a5276;font-family:Georgia,serif;">
+            {j['name']}
+            <span style="font-size:11px;color:#999;font-weight:normal;font-family:Arial,sans-serif;">
+                IF {j['if']}
+            </span>
+        </h2>
+    </td></tr>"""
+        for art in j["articles"]:
+            oa = ' <span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:bold;">OPEN ACCESS</span>' if art["is_open_access"] else ""
+            auth = f'<div style="font-size:11px;color:#777;margin-top:2px;">{art["authors"]}</div>' if art["authors"] else ""
+            abstract = art["abstract"]
+            if len(abstract) > 250:
+                abstract = abstract[:247] + "..."
+            abs_html = f'<div style="font-size:12px;color:#555;margin-top:4px;line-height:1.4;">{abstract}</div>' if abstract else ""
+
+            articles_html += f"""
+    <tr><td style="padding:4px 20px 12px 30px;">
+        <a href="{art['url']}" style="color:#2c3e50;text-decoration:none;font-size:13px;line-height:1.4;font-weight:600;">{art['title']}</a>{oa}
+        {auth}
+        <div style="font-size:11px;color:#999;margin-top:2px;">{art['date_str']}</div>
+        {abs_html}
+    </td></tr>"""
+
+    if not articles:
+        articles_html = '<tr><td style="padding:20px;color:#999;font-style:italic;">No new articles since the last digest. This can happen between journal issues.</td></tr>'
+
+    # Podcasts
+    pods_html = ""
+    all_pods = podcasts + bonus_podcasts
+    if all_pods:
+        pods_html = '<tr><td style="padding:18px 20px 6px;"><h2 style="margin:0;font-size:16px;color:#1a5276;font-family:Georgia,serif;">🎧 Journal Podcast Episodes</h2></td></tr>'
+        for ep in all_pods:
+            src = f" — {ep['journal_abbr']}" if ep.get('journal_abbr') else ""
+            dur = f" · {ep['duration']}" if ep.get('duration') else ""
+            pods_html += f"""
+    <tr><td style="padding:4px 20px 10px 30px;">
+        <a href="{ep['url']}" style="color:#2c3e50;text-decoration:none;font-size:13px;font-weight:600;">🎙️ {ep['title']}</a>
+        <div style="font-size:11px;color:#999;">{ep['podcast_name']}{src}{dur} · {ep['date_str']}</div>
+    </td></tr>"""
+
+    html = _wrap(f"""
+    <tr><td style="background:linear-gradient(135deg,#1a5276,#2e86c1);padding:24px 20px;text-align:center;">
+        <h1 style="margin:0;color:#fff;font-size:21px;font-family:Georgia,serif;">Anesthesia Journal Digest</h1>
+        <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;">{date_str} · {total} articles · {oa_count} open access</p>
+    </td></tr>
+    {audio_banner}
+    {articles_html}
+    <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
+    {pods_html}""")
+
+    return subject, html
+
+
+def build_saturday_email(articles_this_week: list,
+                         cme_questions: list | None = None) -> tuple[str, str]:
+    """Build Saturday CME email. Returns (subject, html)."""
+    today = datetime.now()
+    week_start = today - timedelta(days=today.weekday())
+    date_str = today.strftime("%B %d, %Y")
+
+    subject = f"Anesthesia Weekly CME — {today.strftime('%b %d')}"
+
+    # Week's highlights
+    highlights = ""
+    if articles_this_week:
+        top = sorted(articles_this_week, key=lambda a: a["impact_factor"], reverse=True)[:10]
+        highlights = """
+    <tr><td style="padding:18px 20px 6px;">
+        <h2 style="margin:0;font-size:16px;color:#1a5276;font-family:Georgia,serif;">📋 This Week's Top Articles</h2>
+        <p style="font-size:12px;color:#999;margin:4px 0 0;">Great candidates for RCPSC Section 2 self-learning credits</p>
+    </td></tr>"""
+        for i, art in enumerate(top, 1):
+            oa = ' <span style="background:#27ae60;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;">OA</span>' if art["is_open_access"] else ""
+            highlights += f"""
+    <tr><td style="padding:3px 20px 6px 30px;font-size:13px;">
+        <strong style="color:#999;">{i}.</strong>
+        <a href="{art['url']}" style="color:#2c3e50;text-decoration:none;font-weight:600;">{art['title']}</a>{oa}
+        <div style="font-size:11px;color:#999;">{art['journal_abbr']} · {art['date_str']}</div>
+    </td></tr>"""
+
+    # CME Questions (API mode only)
+    cme_html = ""
+    if cme_questions:
+        cme_html = """
+    <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
+    <tr><td style="padding:18px 20px 6px;">
+        <h2 style="margin:0;font-size:16px;color:#1a5276;font-family:Georgia,serif;">🎓 Weekly CME Questions</h2>
+        <p style="font-size:12px;color:#999;margin:4px 0 0;">
+            RCPSC Section 2 (self-learning) & Section 3 (self-assessment) · Answers below
+        </p>
+    </td></tr>"""
+
+        # Questions first
+        for i, q in enumerate(cme_questions, 1):
+            options_html = ""
+            for letter, text in q["options"].items():
+                options_html += f'<div style="margin:3px 0;font-size:13px;"><strong>{letter}.</strong> {text}</div>'
+
+            cme_html += f"""
+    <tr><td style="padding:12px 20px 4px 30px;">
+        <div style="font-size:13px;font-weight:600;color:#2c3e50;line-height:1.4;">Q{i}. {q['question']}</div>
+        <div style="font-size:12px;color:#888;margin-top:2px;margin-bottom:4px;">Source: {q['source_journal']} — 
+            <a href="{q.get('source_url', '#')}" style="color:#2e86c1;">{q['source_article'][:60]}...</a>
+        </div>
+        <div style="padding:6px 12px;background:#f8f9fa;border-radius:4px;">{options_html}</div>
+    </td></tr>"""
+
+        # Answer key
+        cme_html += """
+    <tr><td style="padding:20px 20px 6px;">
+        <h3 style="margin:0;font-size:15px;color:#1a5276;border-top:2px solid #1a5276;padding-top:12px;">
+            Answer Key
+        </h3>
+    </td></tr>"""
+        for i, q in enumerate(cme_questions, 1):
+            cme_html += f"""
+    <tr><td style="padding:4px 20px 10px 30px;">
+        <div style="font-size:13px;"><strong>Q{i}: {q['correct']}</strong></div>
+        <div style="font-size:12px;color:#555;line-height:1.4;margin-top:2px;">{q['rationale']}</div>
+    </td></tr>"""
+
+    # MOC reminder
+    moc_html = f"""
+    <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
+    <tr><td style="padding:16px 20px;background:#f8f9fa;">
+        <strong style="color:#1a5276;font-size:14px;">📊 MOC Tracking</strong>
+        <p style="font-size:12px;color:#555;margin:6px 0 0;line-height:1.5;">
+            Log your self-learning for Royal College MOC. Your Excel tracker is updated monthly.<br>
+            <strong>Section 2:</strong> 2 credits/hour for reading articles ·
+            <strong>Section 3:</strong> 2 credits/hour for self-assessment with feedback
+        </p>
+    </td></tr>"""
+
+    html = _wrap(f"""
+    <tr><td style="background:linear-gradient(135deg,#1a5276,#148f77);padding:24px 20px;text-align:center;">
+        <h1 style="margin:0;color:#fff;font-size:21px;font-family:Georgia,serif;">Weekly CME & Review</h1>
+        <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;">{date_str} · Week of {week_start.strftime('%b %d')}</p>
+    </td></tr>
+    {highlights}
+    {cme_html}
+    {moc_html}""")
+
+    return subject, html
+
+
+def build_monthly_email(articles: list, top5: list) -> tuple[str, str]:
+    """Build 1st-of-month email with top 5 and MOC tracker attached."""
+    today = datetime.now()
+    subject = f"Anesthesia Monthly Digest & MOC Tracker — {today.strftime('%B %Y')}"
+
+    top5_html = ""
+    for i, art in enumerate(top5, 1):
+        oa = " (Open Access)" if art["is_open_access"] else ""
+        abs_short = art["abstract"][:200] + "..." if len(art.get("abstract", "")) > 200 else art.get("abstract", "")
+        top5_html += f"""
+    <tr><td style="padding:6px 20px 14px 30px;">
+        <strong style="color:#999;">{i}.</strong>
+        <a href="{art['url']}" style="color:#2c3e50;text-decoration:none;font-weight:600;font-size:14px;">{art['title']}</a>
+        <div style="font-size:11px;color:#999;margin-top:2px;">{art['journal_abbr']} · IF {art['impact_factor']}{oa}</div>
+        <div style="font-size:12px;color:#555;margin-top:4px;line-height:1.4;">{abs_short}</div>
+    </td></tr>"""
+
+    html = _wrap(f"""
+    <tr><td style="background:linear-gradient(135deg,#1a5276,#7d3c98);padding:24px 20px;text-align:center;">
+        <h1 style="margin:0;color:#fff;font-size:21px;font-family:Georgia,serif;">Monthly Digest & MOC Update</h1>
+        <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;">{today.strftime('%B %Y')} · {len(articles)} articles published across 10 journals</p>
+    </td></tr>
+    <tr><td style="padding:18px 20px 6px;">
+        <h2 style="font-size:16px;color:#1a5276;font-family:Georgia,serif;">Top 5 Articles This Month</h2>
+        <p style="font-size:12px;color:#999;">Ranked by impact factor, open access prioritized</p>
+    </td></tr>
+    {top5_html}
+    <tr><td style="padding:16px 20px;background:#f8f9fa;font-size:13px;color:#555;">
+        Your MOC Excel tracker is attached with this month's entries pre-filled.
+        Fill in your <strong>Hours</strong> and <strong>Credits</strong> for articles you actually read.
+    </td></tr>""")
+
+    return subject, html
+
+
+def _wrap(content: str) -> str:
+    """Wrap content in the standard email shell."""
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f5f6fa;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f6fa;padding:20px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;max-width:600px;width:100%;">
+    {content}
+    <tr><td style="padding:16px;text-align:center;font-size:10px;color:#bbb;background:#f8f9fa;">
+        Anesthesia Journal Digest · Automated via GitHub Actions<br>
+        Covering 10 leading anesthesia journals
+    </td></tr>
+</table></td></tr></table>
+</body></html>"""
