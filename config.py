@@ -17,7 +17,7 @@ MODE = "api"
 # ── Claude API (only needed if MODE = "api") ─────────────────────────────────
 # Set via environment variable ANTHROPIC_API_KEY, or paste here for testing
 ANTHROPIC_API_KEY = ""  # Leave blank; use env var in production
-CLAUDE_MODEL = "claude-sonnet-4-20250514"
+CLAUDE_MODEL = "claude-sonnet-4-6"
 
 # ── Audio Settings (only if MODE = "api") ────────────────────────────────────
 TTS_VOICE = "en-US-AndrewMultilingualNeural"  # Male, clear, professional
