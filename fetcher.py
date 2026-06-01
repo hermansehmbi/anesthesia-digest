@@ -4,6 +4,7 @@ Anesthesia Journal Digest — RSS & Podcast Fetcher
 
 import re
 import feedparser
+import httpx
 import logging
 from datetime import datetime, timedelta
 from typing import Optional
@@ -12,6 +13,13 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 USER_AGENT = "AnesthesiaDigest/1.0 (Academic RSS aggregator)"
+
+# Crossref "polite pool" identifies us by mailto for better reliability.
+try:
+    from config import RECIPIENT_EMAIL as _CR_MAILTO
+except Exception:
+    _CR_MAILTO = "anesthesia-digest@example.com"
+CROSSREF_UA = f"AnesthesiaDigest/1.0 (mailto:{_CR_MAILTO})"
 
 
 def fetch_articles(journal: dict, since_days: int = 4) -> list[dict]:
@@ -59,7 +67,65 @@ def fetch_articles(journal: dict, since_days: int = 4) -> list[dict]:
             })
             seen_urls.add(url)
 
+    # Many publisher RSS feeds (LWW, ScienceDirect, Springer) sit behind
+    # Cloudflare / anti-bot blocks and return 0 entries. Fall back to the
+    # Crossref API, which is a clean JSON endpoint keyed by ISSN.
+    if not articles and journal.get("issn"):
+        logger.info(f"  RSS empty for {journal['abbreviation']}; trying Crossref")
+        articles = _fetch_crossref(journal, since_days)
+
     logger.info(f"  → {len(articles)} articles from {journal['abbreviation']}")
+    return articles
+
+
+def _fetch_crossref(journal: dict, since_days: int) -> list[dict]:
+    """Fetch recent articles from the Crossref REST API by ISSN."""
+    cutoff = datetime.now() - timedelta(days=since_days)
+    params = {
+        "filter": f"from-pub-date:{cutoff.strftime('%Y-%m-%d')}",
+        "sort": "published",
+        "order": "desc",
+        "rows": 60,
+        "select": "title,DOI,author,published,URL,abstract,license",
+    }
+    url = f"https://api.crossref.org/journals/{journal['issn']}/works"
+    try:
+        resp = httpx.get(url, params=params,
+                         headers={"User-Agent": CROSSREF_UA}, timeout=30)
+        resp.raise_for_status()
+        items = resp.json().get("message", {}).get("items", [])
+    except Exception as e:
+        logger.warning(f"  Crossref failed for {journal['abbreviation']}: {e}")
+        return []
+
+    articles = []
+    seen_urls = set()
+    for item in items:
+        pub_date = _crossref_date(item)
+        if pub_date and pub_date < cutoff:
+            continue
+
+        doi = item.get("DOI", "")
+        link = item.get("URL", "") or (f"https://doi.org/{doi}" if doi else "")
+        if not link or link in seen_urls:
+            continue
+
+        title_list = item.get("title") or ["Untitled"]
+        articles.append({
+            "title": _clean(title_list[0]),
+            "authors": _crossref_authors(item),
+            "url": link,
+            "doi": doi,
+            "date": pub_date,
+            "date_str": pub_date.strftime("%Y-%m-%d") if pub_date else "Recent",
+            "abstract": _clean(item.get("abstract", "")),
+            "is_open_access": _crossref_is_oa(item),
+            "journal": journal["name"],
+            "journal_abbr": journal["abbreviation"],
+            "impact_factor": journal["impact_factor"],
+        })
+        seen_urls.add(link)
+
     return articles
 
 
@@ -151,6 +217,38 @@ def _parse_date(entry) -> Optional[datetime]:
                 except ValueError:
                     continue
     return None
+
+
+def _crossref_date(item) -> Optional[datetime]:
+    for field in ["published", "published-online", "published-print", "issued"]:
+        parts = (item.get(field) or {}).get("date-parts", [])
+        if parts and parts[0] and parts[0][0]:
+            y = parts[0][0]
+            m = parts[0][1] if len(parts[0]) > 1 else 1
+            d = parts[0][2] if len(parts[0]) > 2 else 1
+            try:
+                return datetime(y, m, d)
+            except (TypeError, ValueError):
+                continue
+    return None
+
+
+def _crossref_authors(item) -> str:
+    names = []
+    for a in item.get("author", []):
+        full = " ".join(p for p in [a.get("given", ""), a.get("family", "")] if p)
+        if full:
+            names.append(full)
+    if not names:
+        return ""
+    return "; ".join(names[:4]) + (" et al." if len(names) > 4 else "")
+
+
+def _crossref_is_oa(item) -> bool:
+    for lic in item.get("license", []):
+        if "creativecommons.org" in str(lic.get("URL", "")).lower():
+            return True
+    return False
 
 
 def _clean(text: str) -> str:
