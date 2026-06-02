@@ -60,11 +60,64 @@ def publish_episode(audio_file: str, date_obj: datetime | None = None,
     episode_url = f"{base}/{AUDIO_SUBDIR}/{dated_name}"
 
     if push:
-        _git_publish(date_str)
+        _git_publish(f"Publish podcast episode {date_str}")
 
     logger.info(f"Player URL: {player_url}")
     logger.info(f"Direct episode URL: {episode_url}")
     return player_url
+
+
+def publish_cme_quiz(questions: list[dict], date_obj: datetime | None = None,
+                     push: bool = True) -> str | None:
+    """Write the week's interactive quiz to docs/cme/<date>.html, refresh the
+    docs/cme/index.html listing, commit + push, and return the quiz's public
+    GitHub Pages URL.
+    """
+    from config import GITHUB_PAGES_URL, DOCS_DIR
+    from cme_quiz import build_quiz_page, build_quiz_index
+
+    if not questions:
+        logger.warning("No CME questions — skipping quiz publishing")
+        return None
+
+    date_obj = date_obj or datetime.now()
+    date_str = date_obj.strftime("%Y-%m-%d")
+
+    docs = Path(DOCS_DIR)
+    cme_dir = docs / "cme"
+    cme_dir.mkdir(parents=True, exist_ok=True)
+    (docs / ".nojekyll").write_text("", encoding="utf-8")
+
+    page_name = f"{date_str}.html"
+    (cme_dir / page_name).write_text(
+        build_quiz_page(questions, date_obj), encoding="utf-8")
+    logger.info(f"Wrote quiz page docs/cme/{page_name}")
+
+    # Refresh the index from whatever dated quizzes exist.
+    quizzes = _list_quizzes(cme_dir)
+    (cme_dir / "index.html").write_text(
+        build_quiz_index(quizzes), encoding="utf-8")
+    logger.info("Rebuilt docs/cme/index.html")
+
+    base = GITHUB_PAGES_URL.rstrip("/")
+    quiz_url = f"{base}/cme/{page_name}"
+
+    if push:
+        _git_publish(f"Publish CME quiz {date_str}")
+
+    logger.info(f"Quiz URL: {quiz_url}")
+    return quiz_url
+
+
+def _list_quizzes(cme_dir: Path) -> list[tuple[str, str]]:
+    """Return [(YYYY-MM-DD, filename)] for dated quiz pages, newest first."""
+    out = []
+    for page in cme_dir.glob("*.html"):
+        if page.name == "index.html":
+            continue
+        out.append((page.stem, page.name))
+    out.sort(reverse=True)
+    return out
 
 
 def _list_episodes(audio_dir: Path) -> list[tuple[str, str]]:
@@ -77,7 +130,7 @@ def _list_episodes(audio_dir: Path) -> list[tuple[str, str]]:
     return eps
 
 
-def _git_publish(date_str: str):
+def _git_publish(message: str):
     """git add/commit/push the docs folder. Best-effort; logs on failure."""
     try:
         # Identity may be unset in CI; set a sensible default if so.
@@ -96,11 +149,9 @@ def _git_publish(date_str: str):
         if not status.stdout.strip():
             logger.info("No docs changes to publish")
             return
-        subprocess.run(
-            ["git", "commit", "-m", f"Publish podcast episode {date_str}"],
-            check=True)
+        subprocess.run(["git", "commit", "-m", message], check=True)
         subprocess.run(["git", "push"], check=True)
-        logger.info("Pushed podcast episode to GitHub Pages")
+        logger.info(f"Pushed to GitHub Pages: {message}")
     except subprocess.CalledProcessError as e:
         logger.error(f"git publish failed: {e}")
     except Exception as e:

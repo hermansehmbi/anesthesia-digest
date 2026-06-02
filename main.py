@@ -110,19 +110,27 @@ def run_saturday(preview=False):
 
     logger.info(f"Week's articles: {len(week)}")
 
-    # API mode: generate CME questions
+    # API mode: generate 10 CME questions and publish an interactive quiz page.
     cme = None
+    quiz_url = None
     if MODE == "api" and week:
         try:
             from cme_generator import generate_cme_questions
-            cme = generate_cme_questions(week, num_questions=5)
+            cme = generate_cme_questions(week, num_questions=10)
             if cme:
                 # Log CME to MOC tracker
                 log_cme(cme)
+                # Publish the interactive quiz to GitHub Pages.
+                try:
+                    from publisher import publish_cme_quiz
+                    quiz_url = publish_cme_quiz(cme, datetime.now(),
+                                                push=not preview)
+                except Exception as e:
+                    logger.error(f"CME quiz publishing failed: {e}")
         except Exception as e:
             logger.error(f"CME generation failed: {e}")
 
-    subject, html = build_saturday_email(week, cme_questions=cme)
+    subject, html = build_saturday_email(week, cme_questions=cme, quiz_url=quiz_url)
 
     if preview:
         _save(subject, html, "saturday")

@@ -7,7 +7,7 @@ Automated email service covering 10 leading anesthesia journals. Runs free on Gi
 | Day | Email |
 |-----|-------|
 | **Monday & Thursday** | New articles (most clinically relevant one per journal, chosen by Claude), journal podcast cards, and a ~15 min AI **two-host** audio summary played inline via GitHub Pages |
-| **Saturday** | Week's top articles + 5 AI-generated CME questions (RCPSC Section 2 & 3) |
+| **Saturday** | Week's top articles + 10 AI-generated CME questions, plus a button to an interactive online quiz with instant grading, explanations, and a downloadable PDF certificate (RCPSC Section 2 & 3) |
 | **1st of month** | Top 5 monthly articles + MOC Excel tracker attached |
 
 ## Audio summary (two-host podcast)
@@ -26,6 +26,20 @@ branch" → Branch: `main`, folder: `/docs` → Save.** Your player will live at
 > **https://&lt;your-username&gt;.github.io/&lt;repo-name&gt;/**
 
 (The exact URL is derived automatically in the workflow — nothing is hardcoded.)
+
+## Interactive CME quiz (Saturdays)
+
+Each Saturday the digest builds an interactive, mobile-friendly quiz of **10
+single-best-answer** questions from the week's articles and publishes it at a
+dated URL under `docs/cme/`. Readers select answers, press **Submit Test** to get
+their score with the correct answer + explanation revealed under each question
+(nothing is revealed before submit), then can **Download a PDF certificate**
+(built client-side with [jsPDF](https://github.com/parallax/jsPDF)) for their
+RCPSC Section 3 records. The Saturday email shows the questions for preview and
+links straight to that week's quiz. Past quizzes stay live:
+
+> Quiz list: **https://&lt;your-username&gt;.github.io/&lt;repo-name&gt;/cme/**
+> Each week:  **…/cme/YYYY-MM-DD.html**
 
 Requires `ffmpeg` (preinstalled on GitHub Actions; `brew install ffmpeg` locally).
 

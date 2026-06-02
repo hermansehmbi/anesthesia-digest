@@ -134,13 +134,28 @@ def build_digest_email(articles: list, podcasts: list, bonus_podcasts: list,
 
 
 def build_saturday_email(articles_this_week: list,
-                         cme_questions: list | None = None) -> tuple[str, str]:
+                         cme_questions: list | None = None,
+                         quiz_url: str | None = None) -> tuple[str, str]:
     """Build Saturday CME email. Returns (subject, html)."""
     today = datetime.now()
     week_start = today - timedelta(days=today.weekday())
     date_str = today.strftime("%B %d, %Y")
 
     subject = f"Anesthesia Weekly CME — {today.strftime('%b %d')}"
+
+    # Prominent call-to-action linking to the interactive quiz + certificate.
+    quiz_cta = ""
+    if quiz_url:
+        quiz_cta = f"""
+    <tr><td style="padding:18px 20px 4px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#1a5276,#2e86c1);border-radius:12px;">
+        <tr><td style="padding:20px 22px;text-align:center;">
+          <div style="font-size:16px;font-weight:bold;color:#ffffff;font-family:Georgia,serif;">&#127891; Take this week's CME quiz</div>
+          <div style="font-size:12px;color:#cfe3f2;margin:6px 0 14px;line-height:1.4;">10 single-best-answer questions · instant score &amp; explanations · downloadable certificate</div>
+          <a href="{quiz_url}" style="display:inline-block;background:#ffffff;color:#1a5276;text-decoration:none;font-size:14px;font-weight:bold;padding:12px 26px;border-radius:24px;">Take the CME Quiz &amp; Get Certificate &#8594;</a>
+        </td></tr>
+      </table>
+    </td></tr>"""
 
     # Week's highlights
     highlights = ""
@@ -218,6 +233,7 @@ def build_saturday_email(articles_this_week: list,
         <h1 style="margin:0;color:#fff;font-size:21px;font-family:Georgia,serif;">Weekly CME & Review</h1>
         <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;">{date_str} · Week of {week_start.strftime('%b %d')}</p>
     </td></tr>
+    {quiz_cta}
     {highlights}
     {cme_html}
     {moc_html}""")
