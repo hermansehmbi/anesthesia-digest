@@ -259,18 +259,26 @@ async def _synth_all(turns, tmpdir, voice_a, voice_b, rate):
 
 
 def _mix_music(narration, AudioSegment):
-    """Crossfade ~3s of intro music in, fade outro music in at the end."""
-    from config import INTRO_MUSIC, OUTRO_MUSIC, MUSIC_DUCK_DB, INTRO_MUSIC_MS
+    """Play intro music solo for 5-7s, crossfade into the hosts, then after the
+    hosts finish crossfade into the outro and let it play solo for 5-7s.
+
+    Music sits -12 dB under the voices; all transitions are smooth fades.
+    """
+    from config import (INTRO_MUSIC, OUTRO_MUSIC, MUSIC_DUCK_DB,
+                        INTRO_SOLO_MS, OUTRO_SOLO_MS, MUSIC_CROSSFADE_MS)
 
     final = narration
 
     intro_path = Path(INTRO_MUSIC)
     if intro_path.exists():
         try:
+            xf = min(MUSIC_CROSSFADE_MS, len(final))
             intro = AudioSegment.from_file(intro_path) + MUSIC_DUCK_DB
-            intro_clip = intro[:INTRO_MUSIC_MS].fade_in(800).fade_out(1200)
-            final = intro_clip.append(final, crossfade=min(1000, len(intro_clip)))
-            logger.info("Mixed in intro music")
+            # Clip = solo portion + the overlap that crossfades into the voices,
+            # so the listener hears INTRO_SOLO_MS of music before anyone speaks.
+            intro_clip = intro[:INTRO_SOLO_MS + xf].fade_in(1200)
+            final = intro_clip.append(final, crossfade=xf)
+            logger.info(f"Mixed in intro music (~{INTRO_SOLO_MS/1000:.0f}s solo)")
         except Exception as e:
             logger.warning(f"Intro music skipped: {e}")
     else:
@@ -279,10 +287,13 @@ def _mix_music(narration, AudioSegment):
     outro_path = Path(OUTRO_MUSIC)
     if outro_path.exists():
         try:
+            xf = min(MUSIC_CROSSFADE_MS, len(final))
             outro = AudioSegment.from_file(outro_path) + MUSIC_DUCK_DB
-            outro_clip = outro[:6000].fade_in(1500).fade_out(2500)
-            final = final.append(outro_clip, crossfade=min(1500, len(final)))
-            logger.info("Mixed in outro music")
+            # Overlap crossfades from the last words into the music, then the
+            # music plays solo for OUTRO_SOLO_MS before fading out.
+            outro_clip = outro[:OUTRO_SOLO_MS + xf].fade_out(2000)
+            final = final.append(outro_clip, crossfade=xf)
+            logger.info(f"Mixed in outro music (~{OUTRO_SOLO_MS/1000:.0f}s solo)")
         except Exception as e:
             logger.warning(f"Outro music skipped: {e}")
     else:

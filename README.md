@@ -23,7 +23,9 @@ The MP3 is published to `docs/audio/` and played inline on a styled GitHub Pages
 player. **Enable it once:** repo **Settings → Pages → Source: "Deploy from a
 branch" → Branch: `main`, folder: `/docs` → Save.** Your player will live at:
 
-> **https://hermansehmbi.github.io/anesthesia-digest/**
+> **https://&lt;your-username&gt;.github.io/&lt;repo-name&gt;/**
+
+(The exact URL is derived automatically in the workflow — nothing is hardcoded.)
 
 Requires `ffmpeg` (preinstalled on GitHub Actions; `brew install ffmpeg` locally).
 
@@ -91,9 +93,21 @@ claude
 
 Then tell Claude Code:
 
-> First, open config.py and change RECIPIENT_EMAIL and SENDER_EMAIL to my-email@gmail.com (use your actual email). Then create a GitHub repo called anesthesia-digest, push all these files, and help me add three GitHub Secrets: GMAIL_ADDRESS, GMAIL_APP_PASSWORD, and ANTHROPIC_API_KEY.
+> Create a GitHub repo called anesthesia-digest, push all these files, and help me add four GitHub Secrets: `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD`, `ANTHROPIC_API_KEY`, and `RECIPIENT_EMAIL`.
 
 Claude Code will walk you through each step.
+
+**No personal info lives in the code.** Your email addresses come entirely from
+GitHub Secrets:
+
+| Secret | Used for |
+|--------|----------|
+| `RECIPIENT_EMAIL` | where the digest is sent |
+| `GMAIL_ADDRESS` | the sending Gmail account (also used as the `From`) |
+| `GMAIL_APP_PASSWORD` | Gmail app password (never your real password) |
+| `ANTHROPIC_API_KEY` | Claude API key for the podcast + CME questions |
+
+To run locally instead, export them as environment variables in your shell.
 
 ### Step 5 — Test It
 

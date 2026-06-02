@@ -2,12 +2,18 @@
 Anesthesia Journal Digest — Configuration
 ==========================================
 10 leading anesthesia journals. Nothing else.
+
+No personal info is hardcoded here. Email addresses are read from environment
+variables / GitHub Secrets so this repo is safe to make public.
 """
 
+import os
+
 # ── Your Settings ────────────────────────────────────────────────────────────
-RECIPIENT_EMAIL = "you@example.com"     # ← Replace with your email
-SENDER_EMAIL    = "you@example.com"     # ← Usually the same
-TIMEZONE        = "America/Toronto"            # Eastern Time (Ontario)
+# Set these as environment variables (locally) or GitHub Secrets (in CI).
+RECIPIENT_EMAIL = os.environ.get("RECIPIENT_EMAIL", "")
+SENDER_EMAIL    = os.environ.get("SENDER_EMAIL", os.environ.get("GMAIL_ADDRESS", ""))
+TIMEZONE        = os.environ.get("TIMEZONE", "America/Toronto")  # Eastern Time
 
 # ── Mode ─────────────────────────────────────────────────────────────────────
 # "free"  → article links + podcast links + MOC tracker only
@@ -15,8 +21,9 @@ TIMEZONE        = "America/Toronto"            # Eastern Time (Ontario)
 MODE = "api"
 
 # ── Claude API (only needed if MODE = "api") ─────────────────────────────────
-# Set via environment variable ANTHROPIC_API_KEY, or paste here for testing
-ANTHROPIC_API_KEY = ""  # Leave blank; use env var in production
+# ALWAYS read from the ANTHROPIC_API_KEY environment variable / GitHub Secret.
+# Never paste a key here — this repo is public. Kept only as an empty fallback.
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 CLAUDE_MODEL = "claude-sonnet-4-6"
 
 # ── Audio Settings (only if MODE = "api") ────────────────────────────────────
@@ -34,11 +41,15 @@ PODCAST_WORD_TARGET = 2600
 INTRO_MUSIC = "assets/intro_music.mp3"
 OUTRO_MUSIC = "assets/outro_music.mp3"
 MUSIC_DUCK_DB = -12             # Lower music this many dB so it sits under voices
-INTRO_MUSIC_MS = 3000           # ~3 seconds of intro before voices come in
+INTRO_SOLO_MS = 6000            # Intro plays SOLO this long before the hosts start
+OUTRO_SOLO_MS = 6000            # Outro plays SOLO this long after the hosts finish
+MUSIC_CROSSFADE_MS = 1200       # Smooth crossfade between music and voices
 
 # ── GitHub Pages (inline podcast playback) ───────────────────────────────────
-# Project Pages served from the /docs folder on the main branch.
-GITHUB_PAGES_URL = "https://hermansehmbi.github.io/anesthesia-digest"
+# Project Pages served from the /docs folder on the main branch. The full URL
+# is read from the environment so no username is hardcoded — the GitHub Actions
+# workflow derives it automatically from the repo context.
+GITHUB_PAGES_URL = os.environ.get("GITHUB_PAGES_URL", "")
 DOCS_DIR = "docs"
 AUDIO_SUBDIR = "audio"
 

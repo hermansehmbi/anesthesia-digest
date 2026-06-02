@@ -15,3 +15,6 @@ moc_tracker.xlsx
 # Your local music files (add your own — see assets/README.md).
 assets/intro_music.mp3
 assets/outro_music.mp3
+
+# macOS
+.DS_Store

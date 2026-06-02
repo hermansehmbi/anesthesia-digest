@@ -6,7 +6,9 @@ styled HTML player at docs/index.html that plays the latest episode, then
 commits and pushes so it is served from GitHub Pages.
 
 GitHub Pages URL (project site, served from /docs on main):
-    https://hermansehmbi.github.io/anesthesia-digest/
+    https://<your-username>.github.io/<repo-name>/
+The exact URL is read from the GITHUB_PAGES_URL environment variable, which the
+GitHub Actions workflow derives automatically from the repo context.
 """
 
 import shutil
