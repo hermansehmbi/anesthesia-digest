@@ -8,3 +8,10 @@ podcast_script.txt
 articles_cache.json
 moc_tracker.xlsx
 .env
+
+# Published podcast episodes ARE tracked so GitHub Pages can serve them.
+!docs/audio/*.mp3
+
+# Your local music files (add your own — see assets/README.md).
+assets/intro_music.mp3
+assets/outro_music.mp3

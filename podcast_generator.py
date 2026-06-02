@@ -1,12 +1,18 @@
 """
-Anesthesia Journal Digest — AI Podcast Generator
-==================================================
-Uses Claude API to write a podcast script, then Edge TTS to generate audio.
-Total cost: ~$0.01-0.03 per episode (Claude API only; Edge TTS is free).
+Anesthesia Journal Digest — AI Two-Host Podcast Generator
+==========================================================
+1. Claude API writes a natural two-host conversation (Host A + Host B),
+   NotebookLM-style, covering ALL of today's selected articles.
+2. Edge TTS renders Host A with one voice and Host B with another.
+3. pydub stitches the segments in order and mixes in intro / outro music.
+
+Cost: ~$0.01-0.04 per episode (Claude API only; Edge TTS is free).
+Requires ffmpeg on the system PATH (GitHub Actions has it; `brew install
+ffmpeg` on a Mac).
 """
 
 import os
-import json
+import re
 import asyncio
 import logging
 import tempfile
@@ -17,89 +23,107 @@ logger = logging.getLogger(__name__)
 
 
 def generate_podcast(articles: list, output_path: str = "podcast.mp3") -> str | None:
-    """
-    Generate a 5-10 minute audio podcast from today's articles.
+    """Generate a ~15-minute two-host audio podcast from today's articles.
 
     Args:
-        articles: List of article dicts from fetcher
-        output_path: Where to save the MP3
+        articles: List of article dicts from the fetcher/selector.
+        output_path: Where to save the final MP3.
 
     Returns:
-        Path to MP3 file, or None if generation failed
+        Path to the MP3 file, or None if generation failed.
     """
     if not articles:
         logger.warning("No articles to generate podcast from")
         return None
 
-    # Step 1: Generate the script via Claude API
-    script = _generate_script(articles)
-    if not script:
+    # Step 1: two-host script as an ordered list of (speaker, text) turns.
+    turns = _generate_script(articles)
+    if not turns:
         return None
 
-    # Save script for reference
+    # Save a readable transcript for reference.
     script_path = output_path.replace(".mp3", "_script.txt")
-    Path(script_path).write_text(script, encoding="utf-8")
-    logger.info(f"Script saved: {script_path} ({len(script.split())} words)")
+    transcript = "\n\n".join(f"{'Host A' if s == 'A' else 'Host B'}: {t}"
+                             for s, t in turns)
+    Path(script_path).write_text(transcript, encoding="utf-8")
+    word_count = len(transcript.split())
+    logger.info(f"Script saved: {script_path} ({word_count} words, {len(turns)} turns)")
 
-    # Step 2: Convert to audio via Edge TTS
-    audio_path = _text_to_speech(script, output_path)
-    return audio_path
+    # Step 2 + 3: synthesize each turn and stitch with music.
+    return _render_audio(turns, output_path)
 
 
-def _generate_script(articles: list) -> str | None:
-    """Call Claude API to generate a conversational podcast script."""
+# ── Script generation ────────────────────────────────────────────────────────
+
+def _generate_script(articles: list) -> list[tuple[str, str]] | None:
+    """Call Claude to write a two-host conversational script.
+
+    Returns an ordered list of (speaker, text) tuples where speaker is "A"/"B".
+    """
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
     if not api_key:
         from config import ANTHROPIC_API_KEY
         api_key = ANTHROPIC_API_KEY
-
     if not api_key:
         logger.error("No ANTHROPIC_API_KEY found. Set it as an environment variable.")
         return None
 
-    from config import CLAUDE_MODEL, PODCAST_MINUTES_TARGET
+    from config import CLAUDE_MODEL, PODCAST_WORD_TARGET
 
-    # Prepare article summaries for the prompt
-    article_briefs = []
-    for i, art in enumerate(articles[:15], 1):  # Cap at 15 articles
+    # Use up to 10 articles — the script must cover ALL of them.
+    articles = articles[:10]
+    briefs = []
+    for i, art in enumerate(articles, 1):
         brief = f"{i}. [{art['journal_abbr']}] {art['title']}"
         if art.get("authors"):
             brief += f"\n   Authors: {art['authors']}"
         if art.get("abstract"):
-            brief += f"\n   Abstract: {art['abstract'][:300]}"
+            brief += f"\n   Abstract: {art['abstract'][:500]}"
         if art.get("is_open_access"):
-            brief += "\n   [OPEN ACCESS]"
-        article_briefs.append(brief)
+            brief += "\n   [OPEN ACCESS — free full text]"
+        briefs.append(brief)
+    articles_text = "\n\n".join(briefs)
+    n = len(articles)
 
-    articles_text = "\n\n".join(article_briefs)
-    word_target = PODCAST_MINUTES_TARGET * 140  # ~140 words per minute for narration
+    prompt = f"""You are writing the script for "Anesthesia Digest," a two-host \
+audio podcast for practicing anesthesiologists, in the natural, conversational \
+style of NotebookLM's Audio Overviews. Today is \
+{datetime.now().strftime('%A, %B %d, %Y')}.
 
-    prompt = f"""You are a host of "Anesthesia Digest," a short daily audio podcast for practicing anesthesiologists. 
-Write a podcast script for today's episode ({datetime.now().strftime('%A, %B %d, %Y')}).
+There are TWO hosts:
+- Host A (warm, leads the discussion, sets up each topic)
+- Host B (curious, asks sharp follow-up questions, adds clinical color)
 
-TARGET LENGTH: {word_target} words (approximately {PODCAST_MINUTES_TARGET} minutes when read aloud).
+TARGET LENGTH: about {PODCAST_WORD_TARGET} words total. This is important — it \
+needs to fill roughly 15 minutes of listening. Do not stop short.
 
-ARTICLES TO COVER:
+ARTICLES TO COVER (there are {n} — you MUST cover ALL {n}):
 {articles_text}
 
-INSTRUCTIONS:
-- Write in first person as a single narrator (no "Host A / Host B" format)
-- Open with a brief, warm greeting: "Welcome to Anesthesia Digest for [date]..."
-- Cover the 4-6 most interesting/impactful articles in depth
-- For each article: explain what the researchers found, why it matters clinically, and any practice implications
-- Mention the journal name so listeners can look it up
-- Mention if an article is open access (listeners can read the full text for free)
-- Use conversational, accessible language — like explaining to a colleague over coffee
-- Briefly mention remaining articles at the end ("Also worth noting from this week...")
-- Close with "That's your Anesthesia Digest for today. Until next time."
-- Do NOT include stage directions, sound effects, or [brackets]
-- Write the FULL script, ready to be read aloud as-is
+HOW TO WRITE IT:
+- Open with a short, friendly two-host intro: greet the listener, say the date,
+  and tease what's in today's episode.
+- Then walk through EVERY one of the {n} articles in turn. Spend a real
+  back-and-forth of roughly 60-90 seconds on each — NOT a passing mention.
+  For each: name the journal, explain what was studied, what they found, why it
+  matters at the bedside, and any caveats. Note when an article is open access.
+- Make it a genuine conversation: banter, follow-up questions, reactions
+  ("Oh, that's interesting — so does that change what you'd do?"), natural
+  transitions between articles ("Speaking of airways, the next one...").
+- Use accessible, collegial language — two anesthesiologists talking shop.
+- Close with a brief two-host sign-off.
 
-Write only the script text, nothing else."""
+FORMAT — this is critical. Output ONLY dialogue lines, each on its own line,
+each beginning with exactly "A:" or "B:" and nothing else. No narration, no
+stage directions, no markdown, no section headers, no brackets. Example:
+
+A: Welcome to Anesthesia Digest for today, I'm here with my co-host...
+B: Great to be here. We've got a packed episode...
+
+Write the full script now."""
 
     try:
         import httpx
-
         response = httpx.post(
             "https://api.anthropic.com/v1/messages",
             headers={
@@ -109,49 +133,177 @@ Write only the script text, nothing else."""
             },
             json={
                 "model": CLAUDE_MODEL,
-                "max_tokens": 4096,
+                "max_tokens": 8192,
                 "messages": [{"role": "user", "content": prompt}],
             },
-            timeout=60,
+            timeout=120,
         )
         response.raise_for_status()
         data = response.json()
-
-        script = ""
-        for block in data.get("content", []):
-            if block.get("type") == "text":
-                script += block["text"]
-
-        if not script:
+        text = "".join(b.get("text", "") for b in data.get("content", [])
+                       if b.get("type") == "text")
+        if not text.strip():
             logger.error("Claude API returned empty response")
             return None
-
-        logger.info(f"Script generated: {len(script.split())} words")
-        return script.strip()
-
+        turns = _parse_turns(text)
+        if not turns:
+            logger.error("Could not parse any A:/B: turns from the script")
+            return None
+        logger.info(f"Script generated: {len(turns)} turns, "
+                    f"{len(text.split())} words")
+        return turns
     except Exception as e:
         logger.error(f"Claude API call failed: {e}")
         return None
 
 
-def _text_to_speech(text: str, output_path: str) -> str | None:
-    """Convert text to speech using Edge TTS (free, no API key needed)."""
+def _parse_turns(text: str) -> list[tuple[str, str]]:
+    """Parse 'A:'/'B:' (or 'Host A:') prefixed lines into ordered turns.
+
+    Consecutive lines without a new speaker tag are appended to the current
+    turn so wrapped paragraphs stay intact.
+    """
+    turns: list[list] = []
+    speaker_re = re.compile(r"^\s*(?:host\s*)?([AB])\s*[:\-]\s*(.*)$", re.IGNORECASE)
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        m = speaker_re.match(line)
+        if m:
+            speaker = m.group(1).upper()
+            turns.append([speaker, m.group(2).strip()])
+        elif turns:
+            turns[-1][1] += " " + line
+    # Drop empty turns and collapse whitespace.
+    out = []
+    for speaker, body in turns:
+        body = re.sub(r"\s+", " ", body).strip()
+        if body:
+            out.append((speaker, body))
+    return out
+
+
+# ── Audio rendering ──────────────────────────────────────────────────────────
+
+def _render_audio(turns: list[tuple[str, str]], output_path: str) -> str | None:
+    """Synthesize each turn with its host voice and stitch with music."""
     try:
-        import edge_tts
+        import edge_tts  # noqa: F401
     except ImportError:
         logger.error("edge_tts not installed. Run: pip install edge-tts")
         return None
 
-    from config import TTS_VOICE
+    try:
+        from pydub import AudioSegment
+    except ImportError:
+        logger.warning("pydub/ffmpeg not available — falling back to single file")
+        return _render_single_voice(turns, output_path)
 
-    async def _generate():
-        communicate = edge_tts.Communicate(text, TTS_VOICE, rate="-5%")
-        await communicate.save(output_path)
+    from config import HOST_A_VOICE, HOST_B_VOICE, TTS_RATE
+
+    tmpdir = Path(tempfile.mkdtemp(prefix="anes_pod_"))
+    try:
+        segment_files = asyncio.run(
+            _synth_all(turns, tmpdir, HOST_A_VOICE, HOST_B_VOICE, TTS_RATE)
+        )
+        segment_files = [f for f in segment_files if f]
+        if not segment_files:
+            logger.error("No audio segments were produced")
+            return None
+
+        gap = AudioSegment.silent(duration=180)  # natural beat between turns
+        narration = AudioSegment.empty()
+        for i, f in enumerate(segment_files):
+            seg = AudioSegment.from_file(f)
+            narration += seg
+            if i < len(segment_files) - 1:
+                narration += gap
+
+        final = _mix_music(narration, AudioSegment)
+        final.export(output_path, format="mp3")
+        size_mb = Path(output_path).stat().st_size / (1024 * 1024)
+        dur_min = len(final) / 60000
+        logger.info(f"Audio generated: {output_path} "
+                    f"({size_mb:.1f} MB, ~{dur_min:.1f} min)")
+        return output_path
+    except Exception as e:
+        logger.error(f"Audio rendering failed: {e}")
+        return None
+    finally:
+        for p in tmpdir.glob("*"):
+            try:
+                p.unlink()
+            except OSError:
+                pass
+        try:
+            tmpdir.rmdir()
+        except OSError:
+            pass
+
+
+async def _synth_all(turns, tmpdir, voice_a, voice_b, rate):
+    """Render every turn to its own MP3 file (sequentially, in order)."""
+    import edge_tts
+    files = []
+    for i, (speaker, body) in enumerate(turns):
+        voice = voice_a if speaker == "A" else voice_b
+        out = tmpdir / f"seg_{i:03d}.mp3"
+        try:
+            await edge_tts.Communicate(body, voice, rate=rate).save(str(out))
+            files.append(out)
+        except Exception as e:
+            logger.warning(f"TTS failed for turn {i} ({speaker}): {e}")
+            files.append(None)
+    return files
+
+
+def _mix_music(narration, AudioSegment):
+    """Crossfade ~3s of intro music in, fade outro music in at the end."""
+    from config import INTRO_MUSIC, OUTRO_MUSIC, MUSIC_DUCK_DB, INTRO_MUSIC_MS
+
+    final = narration
+
+    intro_path = Path(INTRO_MUSIC)
+    if intro_path.exists():
+        try:
+            intro = AudioSegment.from_file(intro_path) + MUSIC_DUCK_DB
+            intro_clip = intro[:INTRO_MUSIC_MS].fade_in(800).fade_out(1200)
+            final = intro_clip.append(final, crossfade=min(1000, len(intro_clip)))
+            logger.info("Mixed in intro music")
+        except Exception as e:
+            logger.warning(f"Intro music skipped: {e}")
+    else:
+        logger.info(f"No intro music at {INTRO_MUSIC} (optional)")
+
+    outro_path = Path(OUTRO_MUSIC)
+    if outro_path.exists():
+        try:
+            outro = AudioSegment.from_file(outro_path) + MUSIC_DUCK_DB
+            outro_clip = outro[:6000].fade_in(1500).fade_out(2500)
+            final = final.append(outro_clip, crossfade=min(1500, len(final)))
+            logger.info("Mixed in outro music")
+        except Exception as e:
+            logger.warning(f"Outro music skipped: {e}")
+    else:
+        logger.info(f"No outro music at {OUTRO_MUSIC} (optional)")
+
+    return final
+
+
+def _render_single_voice(turns, output_path) -> str | None:
+    """Fallback when pydub is unavailable: one voice, no music, single file."""
+    import edge_tts
+    from config import TTS_VOICE, TTS_RATE
+
+    script = " ".join(body for _, body in turns)
+
+    async def _go():
+        await edge_tts.Communicate(script, TTS_VOICE, rate=TTS_RATE).save(output_path)
 
     try:
-        asyncio.run(_generate())
-        size_mb = Path(output_path).stat().st_size / (1024 * 1024)
-        logger.info(f"Audio generated: {output_path} ({size_mb:.1f} MB)")
+        asyncio.run(_go())
+        logger.info(f"Audio generated (single-voice fallback): {output_path}")
         return output_path
     except Exception as e:
         logger.error(f"Edge TTS failed: {e}")

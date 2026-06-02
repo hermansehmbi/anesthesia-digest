@@ -21,6 +21,7 @@ from config import (
     MODE, INITIAL_LOOKBACK_DAYS,
 )
 from fetcher import fetch_articles, fetch_podcast_episodes, fetch_bonus_podcasts
+from article_selector import select_digest_articles
 from email_builder import build_digest_email, build_saturday_email, build_monthly_email
 from email_sender import send_email
 from moc_tracker import log_articles, log_cme, update_summary, MOC_FILE
@@ -58,35 +59,40 @@ def run_digest(preview=False):
     # Cache the full set first so Saturday's weekly review sees everything.
     _cache_articles(all_articles)
 
-    # Digest email shows a tight selection: 1 article per journal (open
-    # access preferred, else most recent), capped at 10 total.
+    # Digest email shows a tight selection: the single most clinically relevant
+    # article per journal (chosen by Claude), capped at 10 total.
     selected = select_digest_articles(all_articles, per_journal=1, max_total=10)
     logger.info(f"Selected {len(selected)} articles for the digest email")
 
-    # API mode: generate audio podcast from the same selection so the audio
-    # summary matches the articles shown in the email.
+    # API mode: generate the two-host audio podcast from the same selection so
+    # the audio summary matches the articles shown in the email, then publish
+    # it to GitHub Pages for inline playback.
     has_audio = False
-    audio_file = None
+    podcast_url = None
     if MODE == "api" and selected:
         try:
             from podcast_generator import generate_podcast
             audio_name = f"Anesthesia_Digest_{datetime.now().strftime('%Y_%m_%d')}.mp3"
             audio_file = generate_podcast(selected, output_path=audio_name)
-            has_audio = audio_file is not None
+            if audio_file:
+                from publisher import publish_episode
+                # In preview mode, build the docs/ files but don't push.
+                podcast_url = publish_episode(audio_file, datetime.now(),
+                                              push=not preview)
+                has_audio = podcast_url is not None
         except Exception as e:
-            logger.error(f"Podcast generation failed: {e}")
+            logger.error(f"Podcast generation/publishing failed: {e}")
 
-    # Build and send
-    audio_filename = Path(audio_file).name if audio_file else None
+    # Build and send. The podcast is played inline via GitHub Pages, so the MP3
+    # is no longer attached to the email.
     subject, html = build_digest_email(selected, all_pods, bonus,
                                        has_audio=has_audio,
-                                       audio_filename=audio_filename)
+                                       podcast_url=podcast_url)
 
-    attachments = [audio_file] if audio_file else []
     if preview:
         _save(subject, html, "digest")
     else:
-        send_email(RECIPIENT_EMAIL, subject, html, SENDER_EMAIL, attachments=attachments)
+        send_email(RECIPIENT_EMAIL, subject, html, SENDER_EMAIL)
 
 
 def run_saturday(preview=False):
@@ -155,34 +161,6 @@ def run_monthly(preview=False):
     else:
         send_email(RECIPIENT_EMAIL, subject, html, SENDER_EMAIL,
                    attachments=[MOC_FILE])
-
-
-# ── Selection ──────────────────────────────────────────────────────────────
-
-def select_digest_articles(articles: list, per_journal: int = 1,
-                           max_total: int = 10) -> list:
-    """Pick the best articles for the digest email.
-
-    One article per journal (open access preferred, then most recent), then
-    order journals by impact factor and cap at ``max_total``.
-    """
-    by_journal = {}
-    for a in articles:
-        by_journal.setdefault(a["journal_abbr"], []).append(a)
-
-    selected = []
-    for arts in by_journal.values():
-        # Sort so open-access comes first, then the most recent date.
-        ranked = sorted(
-            arts,
-            key=lambda a: (a["is_open_access"], a.get("date") or datetime.min),
-            reverse=True,
-        )
-        selected.extend(ranked[:per_journal])
-
-    # Highest-impact journals fill the limited slots first.
-    selected.sort(key=lambda a: a["impact_factor"], reverse=True)
-    return selected[:max_total]
 
 
 # ── Cache ────────────────────────────────────────────────────────────────────

@@ -23,6 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    # Needed so the digest run can commit the published podcast episode +
+    # player page to /docs and push it for GitHub Pages.
+    permissions:
+      contents: write
+
     env:
       GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
       GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
@@ -37,6 +42,11 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Configure git for publishing
+        run: |
+          git config user.name "Anesthesia Digest Bot"
+          git config user.email "anesthesia-digest@users.noreply.github.com"
 
       - name: Restore article cache
         uses: actions/cache@v4

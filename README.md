@@ -6,9 +6,26 @@ Automated email service covering 10 leading anesthesia journals. Runs free on Gi
 
 | Day | Email |
 |-----|-------|
-| **Monday & Thursday** | New articles (open access flagged), journal podcast links, AI audio summary (~7 min MP3 attached) |
+| **Monday & Thursday** | New articles (most clinically relevant one per journal, chosen by Claude), journal podcast cards, and a ~15 min AI **two-host** audio summary played inline via GitHub Pages |
 | **Saturday** | Week's top articles + 5 AI-generated CME questions (RCPSC Section 2 & 3) |
 | **1st of month** | Top 5 monthly articles + MOC Excel tracker attached |
+
+## Audio summary (two-host podcast)
+
+Each digest generates a NotebookLM-style **two-host conversation** (Host A =
+`en-US-AndrewMultilingualNeural`, Host B = `en-US-AvaMultilingualNeural`),
+covering all of the day's selected articles with real back-and-forth. It targets
+~2600 words at +25% playback rate ≈ 15 minutes. Optional intro/outro music is
+mixed in from `assets/intro_music.mp3` and `assets/outro_music.mp3` (see
+[`assets/README.md`](assets/README.md) — drop royalty-free CC0 MP3s there).
+
+The MP3 is published to `docs/audio/` and played inline on a styled GitHub Pages
+player. **Enable it once:** repo **Settings → Pages → Source: "Deploy from a
+branch" → Branch: `main`, folder: `/docs` → Save.** Your player will live at:
+
+> **https://hermansehmbi.github.io/anesthesia-digest/**
+
+Requires `ffmpeg` (preinstalled on GitHub Actions; `brew install ffmpeg` locally).
 
 ## Journals
 
@@ -113,6 +130,6 @@ Change in `config.py` → `MODE`.
 
 **Empty emails?** Normal for the first run if between journal issues. The `INITIAL_LOOKBACK_DAYS = 30` setting pulls the last month to start. Reduce to `4` after 2-3 weeks.
 
-**Audio not attached?** Check that `ANTHROPIC_API_KEY` is set in GitHub Secrets.
+**No audio / player empty?** Check that `ANTHROPIC_API_KEY` is set in GitHub Secrets, that GitHub Pages is enabled (Settings → Pages → `/docs` on `main`), and that the workflow has `permissions: contents: write` (already set) so it can push the episode.
 
 **Email not arriving?** Check GitHub Actions for errors (red ❌). Verify Gmail App Password in Secrets. Check spam folder.

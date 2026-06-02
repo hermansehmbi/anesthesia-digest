@@ -20,9 +20,27 @@ ANTHROPIC_API_KEY = ""  # Leave blank; use env var in production
 CLAUDE_MODEL = "claude-sonnet-4-6"
 
 # ── Audio Settings (only if MODE = "api") ────────────────────────────────────
-TTS_VOICE = "en-US-AndrewMultilingualNeural"  # Male, clear, professional
-TTS_VOICE_ALT = "en-US-AvaMultilingualNeural" # Female alternative
-PODCAST_MINUTES_TARGET = 7  # Aim for ~7 min (roughly 1000 words)
+# Two-host NotebookLM-style conversation. Host A = male, Host B = female.
+HOST_A_VOICE = "en-US-AndrewMultilingualNeural"  # Host A — male, warm
+HOST_B_VOICE = "en-US-AvaMultilingualNeural"     # Host B — female, bright
+TTS_VOICE = HOST_A_VOICE        # Back-compat single-voice fallback
+TTS_VOICE_ALT = HOST_B_VOICE
+TTS_RATE = "+25%"               # Faster playback → ~15 min listening time
+# ~2600 words at +25% speed ≈ 15 minutes of actual listening time.
+PODCAST_MINUTES_TARGET = 15
+PODCAST_WORD_TARGET = 2600
+
+# ── Music / Mixing (assets/intro_music.mp3, assets/outro_music.mp3) ──────────
+INTRO_MUSIC = "assets/intro_music.mp3"
+OUTRO_MUSIC = "assets/outro_music.mp3"
+MUSIC_DUCK_DB = -12             # Lower music this many dB so it sits under voices
+INTRO_MUSIC_MS = 3000           # ~3 seconds of intro before voices come in
+
+# ── GitHub Pages (inline podcast playback) ───────────────────────────────────
+# Project Pages served from the /docs folder on the main branch.
+GITHUB_PAGES_URL = "https://hermansehmbi.github.io/anesthesia-digest"
+DOCS_DIR = "docs"
+AUDIO_SUBDIR = "audio"
 
 # ── Initial Run Settings ─────────────────────────────────────────────────────
 # For the first few weeks, pull from older issues so emails aren't empty.
