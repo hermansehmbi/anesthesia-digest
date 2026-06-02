@@ -78,9 +78,11 @@ Generate EXACTLY {num_questions} single-best-answer multiple-choice questions. F
    the bedside for a community anesthesiologist.
 3. Provide exactly 4 options (A-D) with ONE clearly correct answer and three plausible
    distractors. Avoid "all/none of the above".
-4. Write a thorough explanation of 5 to 10 lines (sentences): explain clearly WHY the correct
-   answer is right, then briefly why each of the other three options is wrong, and tie it back
-   to the clinical takeaway. This is the teaching point — make it substantive.
+4. Write a full-paragraph explanation of ABOUT 10 LINES (roughly 8-12 sentences, ~120-160
+   words). Explain clearly WHY the correct answer is right with clinical reasoning, then
+   address EACH of the other three options individually and explain why each is wrong, and
+   finish with the practical bedside takeaway. This is the teaching point — make it thorough
+   and substantive, not a couple of sentences.
 5. Reference the source article.
 
 RESPOND IN THIS EXACT JSON FORMAT (no markdown, no backticks, just raw JSON):
@@ -94,7 +96,7 @@ RESPOND IN THIS EXACT JSON FORMAT (no markdown, no backticks, just raw JSON):
       "D": "Option text"
     }},
     "correct": "B",
-    "rationale": "The correct answer is B because... Option A is incorrect because... Option C is wrong because... Option D does not apply because... Clinically, this means...",
+    "rationale": "A full paragraph of about 10 lines. The correct answer is B because <clinical reasoning>. Option A is incorrect because... Option C is wrong because... Option D does not apply because... <continue the reasoning>... The practical bedside takeaway is that...",
     "source_article": "Title of the source article",
     "source_journal": "BJA",
     "source_url": "https://..."

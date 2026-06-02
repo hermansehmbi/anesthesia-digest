@@ -11,6 +11,7 @@ The exact URL is read from the GITHUB_PAGES_URL environment variable, which the
 GitHub Actions workflow derives automatically from the repo context.
 """
 
+import re
 import shutil
 import logging
 import subprocess
@@ -74,7 +75,7 @@ def publish_cme_quiz(questions: list[dict], date_obj: datetime | None = None,
     GitHub Pages URL.
     """
     from config import GITHUB_PAGES_URL, DOCS_DIR
-    from cme_quiz import build_quiz_page, build_quiz_index
+    from cme_quiz import build_quiz_page, build_quiz_index, build_cert_preview
 
     if not questions:
         logger.warning("No CME questions — skipping quiz publishing")
@@ -99,6 +100,10 @@ def publish_cme_quiz(questions: list[dict], date_obj: datetime | None = None,
         build_quiz_index(quizzes), encoding="utf-8")
     logger.info("Rebuilt docs/cme/index.html")
 
+    # Keep the certificate-design preview in sync with the current design.
+    (cme_dir / "cert-preview.html").write_text(
+        build_cert_preview(), encoding="utf-8")
+
     base = GITHUB_PAGES_URL.rstrip("/")
     quiz_url = f"{base}/cme/{page_name}"
 
@@ -109,13 +114,19 @@ def publish_cme_quiz(questions: list[dict], date_obj: datetime | None = None,
     return quiz_url
 
 
+_DATED_QUIZ_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.html$")
+
+
 def _list_quizzes(cme_dir: Path) -> list[tuple[str, str]]:
-    """Return [(YYYY-MM-DD, filename)] for dated quiz pages, newest first."""
+    """Return [(YYYY-MM-DD, filename)] for dated quiz pages, newest first.
+
+    Only ``YYYY-MM-DD.html`` files count — helper pages like index.html,
+    cert-preview.html, or sample.html are ignored.
+    """
     out = []
     for page in cme_dir.glob("*.html"):
-        if page.name == "index.html":
-            continue
-        out.append((page.stem, page.name))
+        if _DATED_QUIZ_RE.match(page.name):
+            out.append((page.stem, page.name))
     out.sort(reverse=True)
     return out
 

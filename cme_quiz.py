@@ -3,15 +3,21 @@ Anesthesia Journal Digest — Interactive CME Quiz Page Builder
 ==============================================================
 Builds a self-contained, mobile-friendly HTML quiz page from the week's CME
 questions. The page:
-  - shows all questions with selectable options,
+  - shows all questions with selectable options (large, readable type),
   - reveals nothing until the user clicks "Submit Test",
   - on submit, grades the test, shows the score, and reveals the correct answer
-    + explanation under each question,
-  - offers a "Download Certificate" button that builds a PDF with jsPDF (CDN).
+    + a full-paragraph explanation under each question,
+  - takes the participant's full name + credentials, then builds a classical,
+    formal PDF certificate with jsPDF (CDN): timestamped, with a unique
+    certificate ID and an auditable verification code.
 
-Also builds the docs/cme/index.html listing of recent quizzes.
+Also builds docs/cme/index.html (quiz listing) and docs/cme/cert-preview.html
+(a standalone certificate-design preview with sample data).
 
-No server needed — everything runs client-side and is served from GitHub Pages.
+Everything runs client-side and is served statically from GitHub Pages.
+
+Templates use %%TOKEN%% placeholders filled by str.replace (NOT str.format), so
+the embedded CSS/JS braces are left untouched.
 """
 
 import json
@@ -25,8 +31,7 @@ def build_quiz_page(questions: list[dict], date_obj: datetime) -> str:
     iso_date = date_obj.strftime("%Y-%m-%d")
     total = len(questions)
 
-    # The questions are embedded as JSON for the client-side grader. We only
-    # send what the page needs (correct letter + explanation + source).
+    # Only what the client grader needs (correct letter + explanation + source).
     quiz_data = []
     for q in questions:
         quiz_data.append({
@@ -38,7 +43,7 @@ def build_quiz_page(questions: list[dict], date_obj: datetime) -> str:
         })
     quiz_json = json.dumps(quiz_data)
 
-    # Build the static question markup (no answers exposed in the DOM/text).
+    # Static question markup (no answers exposed in the visible DOM).
     questions_html = ""
     for i, q in enumerate(questions):
         opts_html = ""
@@ -53,14 +58,6 @@ def build_quiz_page(questions: list[dict], date_obj: datetime) -> str:
           <span class="opt-text">{html.escape(text)}</span>
         </label>"""
 
-        src_bits = []
-        if q.get("source_journal"):
-            src_bits.append(html.escape(q["source_journal"]))
-        if q.get("source_article"):
-            src_bits.append(html.escape(q["source_article"]))
-        src_label = " — ".join(src_bits)
-        src_url = html.escape(q.get("source_url", "") or "#")
-
         questions_html += f"""
     <section class="question" id="card{i}" data-index="{i}">
       <div class="qnum">Question {i + 1} <span class="of">of {total}</span></div>
@@ -70,21 +67,18 @@ def build_quiz_page(questions: list[dict], date_obj: datetime) -> str:
       <div class="result" id="result{i}" hidden></div>
     </section>"""
 
-    return _PAGE_TEMPLATE.format(
-        pretty_date=pretty_date,
-        iso_date=iso_date,
-        total=total,
-        questions_html=questions_html,
-        quiz_json=quiz_json,
-    )
+    page = _PAGE_TEMPLATE
+    page = page.replace("%%PRETTY_DATE%%", pretty_date)
+    page = page.replace("%%ISO_DATE%%", iso_date)
+    page = page.replace("%%TOTAL%%", str(total))
+    page = page.replace("%%QUESTIONS_HTML%%", questions_html)
+    page = page.replace("%%QUIZ_JSON%%", quiz_json)
+    page = page.replace("%%CERT_JS%%", _CERT_JS)
+    return page
 
 
 def build_quiz_index(quizzes: list[tuple[str, str]]) -> str:
-    """Build docs/cme/index.html listing recent quizzes.
-
-    Args:
-        quizzes: [(YYYY-MM-DD, filename)] — newest first.
-    """
+    """Build docs/cme/index.html listing recent quizzes (newest first)."""
     items = ""
     for iso_date, filename in quizzes:
         try:
@@ -97,96 +91,252 @@ def build_quiz_index(quizzes: list[tuple[str, str]]) -> str:
         )
     if not items:
         items = '      <li class="empty">No quizzes published yet.</li>\n'
+    return _INDEX_TEMPLATE.replace("%%ITEMS%%", items)
 
-    return _INDEX_TEMPLATE.format(items=items)
+
+def build_cert_preview() -> str:
+    """Standalone page that renders the certificate with sample data on click."""
+    return _CERT_PREVIEW_TEMPLATE.replace("%%CERT_JS%%", _CERT_JS)
 
 
-# ── Templates ────────────────────────────────────────────────────────────────
-# Note: literal CSS/JS braces are doubled so str.format() leaves them intact.
+# ── Shared certificate JavaScript (classical / formal design) ────────────────
+# Pure client-side. Drawn with jsPDF primitives. Used by both the quiz page and
+# the certificate preview page so the design stays in one place.
 
-_PAGE_TEMPLATE = """<!DOCTYPE html>
+_CERT_JS = r"""
+function ad2(n){ return ('0' + n).slice(-2); }
+
+// FNV-1a 32-bit hash -> short uppercase base36 code (deterministic & auditable).
+function adHash(str){
+  var h = 0x811c9dc5 >>> 0;
+  for (var i = 0; i < str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return ('0000000' + h.toString(36).toUpperCase()).slice(-7);
+}
+
+function makeCertId(d){
+  var rnd = Math.floor(Math.random() * 0x10000).toString(16).toUpperCase();
+  rnd = ('000' + rnd).slice(-4);
+  return 'AD-' + d.getFullYear() + ad2(d.getMonth() + 1) + ad2(d.getDate()) + '-' + rnd;
+}
+
+function adVerCode(name, ymd, score, total, certId){
+  return adHash(name + '|' + ymd + '|' + score + '/' + total + '|' + certId);
+}
+
+function drawCorners(doc, x1, y1, x2, y2, color){
+  doc.setDrawColor(color[0], color[1], color[2]);
+  doc.setLineWidth(1);
+  var s = 26, o = 44;
+  var pts = [[x1+o,y1+o,1,1],[x2-o,y1+o,-1,1],[x1+o,y2-o,1,-1],[x2-o,y2-o,-1,-1]];
+  for (var i = 0; i < pts.length; i++){
+    var px = pts[i][0], py = pts[i][1], dx = pts[i][2], dy = pts[i][3];
+    doc.line(px, py, px + dx * s, py);
+    doc.line(px, py, px, py + dy * s);
+    doc.circle(px, py, 2.2, 'F');
+    doc.circle(px + dx * s, py, 1.4, 'F');
+    doc.circle(px, py + dy * s, 1.4, 'F');
+  }
+}
+
+function drawSeal(doc, cx, cy, gold, wax){
+  // Rosette of petals, then a stamped disc with initials.
+  doc.setFillColor(wax[0], wax[1], wax[2]);
+  var R = 30;
+  for (var a = 0; a < 360; a += 24){
+    var r = a * Math.PI / 180;
+    var x1 = cx + Math.cos(r) * R,            y1 = cy + Math.sin(r) * R;
+    var x2 = cx + Math.cos(r + 0.27) * (R*0.66), y2 = cy + Math.sin(r + 0.27) * (R*0.66);
+    var x3 = cx + Math.cos(r - 0.27) * (R*0.66), y3 = cy + Math.sin(r - 0.27) * (R*0.66);
+    doc.triangle(x1, y1, x2, y2, x3, y3, 'F');
+  }
+  doc.setFillColor(wax[0], wax[1], wax[2]);
+  doc.circle(cx, cy, R * 0.72, 'F');
+  doc.setDrawColor(gold[0], gold[1], gold[2]);
+  doc.setLineWidth(1.3); doc.circle(cx, cy, R * 0.72, 'S');
+  doc.setLineWidth(0.7); doc.circle(cx, cy, R * 0.55, 'S');
+  doc.setFont('times', 'bold'); doc.setFontSize(12); doc.setTextColor(255, 246, 236);
+  doc.text('AD', cx, cy - 1, {align:'center'});
+  doc.setFontSize(6); doc.text('SECTION 3', cx, cy + 9, {align:'center'});
+}
+
+// opts: {name, score, total, completedAt(Date), certId?, verCode?}
+// Returns {certId, verCode}. Builds and downloads the PDF.
+function generateCertificate(opts){
+  var ns = window.jspdf || {};
+  var JsPDF = ns.jsPDF;
+  if (!JsPDF){ alert('Certificate library failed to load. Check your internet connection and try again.'); return null; }
+
+  var name  = (opts.name || '').trim();
+  var score = opts.score, total = opts.total;
+  var now   = opts.completedAt || new Date();
+  var certId = opts.certId || makeCertId(now);
+  var ymd = now.getFullYear() + '-' + ad2(now.getMonth() + 1) + '-' + ad2(now.getDate());
+  var pct = Math.round(score / total * 100);
+  var ver = opts.verCode || adVerCode(name, ymd, score, total, certId);
+  var dateStr = now.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
+  var timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+  var stamp = dateStr + ' at ' + timeStr;
+
+  var doc = new JsPDF({orientation:'landscape', unit:'pt', format:'letter'});
+  var W = doc.internal.pageSize.getWidth();
+  var H = doc.internal.pageSize.getHeight();
+  var navy = [26,82,118], gold = [176,141,87], ink = [44,62,80], wax = [140,32,32];
+
+  // Parchment background
+  doc.setFillColor(252, 250, 244); doc.rect(0, 0, W, H, 'F');
+
+  // Decorative double border
+  doc.setDrawColor(navy[0], navy[1], navy[2]); doc.setLineWidth(4);
+  doc.rect(24, 24, W - 48, H - 48);
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1.4);
+  doc.rect(34, 34, W - 68, H - 68);
+  drawCorners(doc, 24, 24, W - 24, H - 24, gold);
+
+  // Title + flourish
+  doc.setFont('times', 'bold'); doc.setFontSize(34); doc.setTextColor(navy[0], navy[1], navy[2]);
+  doc.text('CME Completion Certificate', W / 2, 108, {align:'center'});
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1);
+  doc.line(W / 2 - 160, 122, W / 2 + 160, 122);
+  doc.circle(W / 2 - 168, 122, 2, 'F'); doc.circle(W / 2 + 168, 122, 2, 'F');
+
+  doc.setFont('times', 'italic'); doc.setFontSize(16); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Anesthesia Journal Digest — Weekly CME', W / 2, 148, {align:'center'});
+
+  doc.setFont('times', 'normal'); doc.setFontSize(13);
+  doc.text('This is to certify that', W / 2, 192, {align:'center'});
+
+  doc.setFont('times', 'bold'); doc.setFontSize(26); doc.setTextColor(navy[0], navy[1], navy[2]);
+  doc.text(name || '—', W / 2, 226, {align:'center'});
+  var nameW = Math.min(460, Math.max(220, doc.getTextWidth(name || '—') + 70));
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(0.8);
+  doc.line(W / 2 - nameW / 2, 236, W / 2 + nameW / 2, 236);
+
+  doc.setFont('times', 'normal'); doc.setFontSize(13); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text("has completed a " + total + "-question self-assessment based on this week's", W / 2, 266, {align:'center'});
+  doc.text('featured open-access anesthesia literature, achieving a score of', W / 2, 284, {align:'center'});
+
+  doc.setFont('times', 'bold'); doc.setFontSize(20); doc.setTextColor(30, 110, 70);
+  doc.text(score + ' / ' + total + '    (' + pct + '%)', W / 2, 314, {align:'center'});
+
+  doc.setFont('times', 'normal'); doc.setFontSize(12); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Completed: ' + stamp, W / 2, 340, {align:'center'});
+
+  drawSeal(doc, W / 2, 388, gold, wax);
+
+  // Certificate ID + verification (monospace, bottom-left)
+  doc.setFont('courier', 'normal'); doc.setFontSize(10); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Certificate ID:  ' + certId, 72, H - 74);
+  doc.text('Verification:    ' + ver,  72, H - 60);
+
+  // Disclaimer (bottom-center)
+  doc.setFont('times', 'italic'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
+  var disc = 'Anesthesia Digest is an automated, AI-generated educational service delivering weekly summaries of open-access anesthesia literature. This certificate reflects self-assessment completion and is suitable for RCPSC Section 3 self-learning records. Not affiliated with any journal or accrediting body.';
+  var lines = doc.splitTextToSize(disc, W - 180);
+  doc.text(lines, W / 2, H - 42, {align:'center'});
+
+  doc.save('CME_Certificate_' + certId + '.pdf');
+  return {certId: certId, verCode: ver};
+}
+"""
+
+
+# ── Page templates ───────────────────────────────────────────────────────────
+
+_PAGE_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anesthesia Digest — Weekly CME ({pretty_date})</title>
+<title>Anesthesia Digest — Weekly CME (%%PRETTY_DATE%%)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  :root {{ --navy:#1a5276; --blue:#2e86c1; --green:#1e8449; --red:#c0392b;
-          --bg:#f4f6f9; --card:#ffffff; --line:#e3e8ee; }}
-  * {{ box-sizing:border-box; }}
-  body {{ margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-         background:var(--bg); color:#2c3e50; line-height:1.5; }}
-  header {{ background:linear-gradient(135deg,var(--navy),var(--blue)); color:#fff;
-           padding:26px 20px; text-align:center; }}
-  header h1 {{ margin:0; font-size:21px; font-family:Georgia,serif; }}
-  header p {{ margin:6px 0 0; font-size:13px; opacity:.9; }}
-  main {{ max-width:760px; margin:0 auto; padding:18px 16px 60px; }}
-  .intro {{ background:#eef5fb; border:1px solid #d6e6f5; border-radius:10px;
-           padding:14px 16px; font-size:13px; color:#34516b; margin-bottom:18px; }}
-  .question {{ background:var(--card); border:1px solid var(--line); border-radius:12px;
-             padding:18px 18px 16px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,.04); }}
-  .qnum {{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
-          color:var(--blue); }}
-  .qnum .of {{ color:#9bb1c4; font-weight:600; }}
-  .qtext {{ font-size:15px; font-weight:600; margin:6px 0 14px; }}
-  .option {{ display:flex; align-items:flex-start; gap:10px; padding:11px 12px;
-            border:1px solid var(--line); border-radius:9px; margin:8px 0; cursor:pointer;
-            transition:background .12s,border-color .12s; }}
-  .option:hover {{ background:#f7fafd; }}
-  .option input {{ margin-top:3px; flex:none; }}
-  .opt-letter {{ font-weight:700; color:var(--navy); flex:none; }}
-  .opt-text {{ font-size:14px; }}
-  .option.correct {{ border-color:var(--green); background:#eafaf1; }}
-  .option.incorrect {{ border-color:var(--red); background:#fdedec; }}
-  .result {{ margin-top:12px; padding:12px 14px; border-radius:9px; font-size:13.5px;
-            line-height:1.55; }}
-  .result.right {{ background:#eafaf1; border:1px solid #abe2c1; }}
-  .result.wrong {{ background:#fdedec; border:1px solid #f3b7b1; }}
-  .result .verdict {{ font-weight:700; display:block; margin-bottom:4px; }}
-  .result .src {{ display:block; margin-top:8px; font-size:12px; color:#5b6b7a; }}
-  .result .src a {{ color:var(--blue); }}
-  .actions {{ position:sticky; bottom:0; background:linear-gradient(180deg,rgba(244,246,249,0),var(--bg) 30%);
-             padding:16px 0 8px; text-align:center; }}
-  button {{ font:inherit; border:none; border-radius:24px; padding:13px 26px; font-weight:700;
-           font-size:15px; cursor:pointer; }}
-  .btn-submit {{ background:var(--blue); color:#fff; }}
-  .btn-submit:disabled {{ background:#9bb9d1; cursor:default; }}
-  .btn-cert {{ background:var(--green); color:#fff; margin-left:8px; }}
-  .scorebar {{ display:none; background:var(--navy); color:#fff; border-radius:12px;
-              padding:16px 18px; text-align:center; margin-bottom:18px; }}
-  .scorebar .pct {{ font-size:30px; font-weight:800; }}
-  .scorebar .detail {{ font-size:13px; opacity:.9; margin-top:2px; }}
-  .namebox {{ display:none; margin-top:12px; }}
-  .namebox input {{ font:inherit; padding:9px 12px; border-radius:8px; border:1px solid var(--line);
-                   width:230px; max-width:80%; }}
-  .warn {{ color:var(--red); font-size:13px; margin-top:10px; display:none; }}
-  footer {{ text-align:center; font-size:11px; color:#9bb1c4; padding:24px 16px 40px; }}
-  footer a {{ color:#9bb1c4; }}
-  @media (max-width:520px) {{ .btn-cert {{ margin:10px 0 0; }} .actions button {{ width:100%; }} }}
+  :root { --navy:#1a5276; --blue:#2e86c1; --green:#1e8449; --red:#c0392b;
+          --bg:#f4f6f9; --card:#ffffff; --line:#e3e8ee; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         background:var(--bg); color:#2c3e50; font-size:16px; line-height:1.6; }
+  header { background:linear-gradient(135deg,var(--navy),var(--blue)); color:#fff;
+           padding:28px 20px; text-align:center; }
+  header h1 { margin:0; font-size:25px; font-family:Georgia,serif; }
+  header p { margin:8px 0 0; font-size:15px; opacity:.92; }
+  main { max-width:780px; margin:0 auto; padding:18px 16px 70px; }
+  .intro { background:#eef5fb; border:1px solid #d6e6f5; border-radius:10px;
+           padding:16px 18px; font-size:15px; color:#34516b; margin-bottom:20px; }
+  .question { background:var(--card); border:1px solid var(--line); border-radius:12px;
+             padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .qnum { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+          color:var(--blue); }
+  .qnum .of { color:#9bb1c4; font-weight:600; }
+  .qtext { font-size:18px; font-weight:600; margin:8px 0 16px; line-height:1.5; }
+  .option { display:flex; align-items:flex-start; gap:12px; padding:13px 14px;
+            border:1px solid var(--line); border-radius:9px; margin:9px 0; cursor:pointer;
+            transition:background .12s,border-color .12s; }
+  .option:hover { background:#f7fafd; }
+  .option input { margin-top:4px; flex:none; width:18px; height:18px; }
+  .opt-letter { font-weight:700; color:var(--navy); flex:none; font-size:16px; }
+  .opt-text { font-size:16px; }
+  .option.correct { border-color:var(--green); background:#eafaf1; }
+  .option.incorrect { border-color:var(--red); background:#fdedec; }
+  .result { margin-top:14px; padding:14px 16px; border-radius:9px; font-size:15.5px;
+            line-height:1.65; }
+  .result.right { background:#eafaf1; border:1px solid #abe2c1; }
+  .result.wrong { background:#fdedec; border:1px solid #f3b7b1; }
+  .result .verdict { font-weight:700; display:block; margin-bottom:6px; font-size:16px; }
+  .result .src { display:block; margin-top:10px; font-size:13.5px; color:#5b6b7a; }
+  .result .src a { color:var(--blue); }
+  .actions { position:sticky; bottom:0; background:linear-gradient(180deg,rgba(244,246,249,0),var(--bg) 32%);
+             padding:18px 0 10px; text-align:center; }
+  button { font:inherit; border:none; border-radius:26px; padding:15px 30px; font-weight:700;
+           font-size:16px; cursor:pointer; }
+  .btn-submit { background:var(--blue); color:#fff; }
+  .btn-submit:disabled { background:#9bb9d1; cursor:default; }
+  .btn-cert { background:var(--green); color:#fff; margin-left:8px; }
+  .scorebar { display:none; background:var(--navy); color:#fff; border-radius:12px;
+              padding:18px 20px; text-align:center; margin-bottom:20px; }
+  .scorebar .pct { font-size:34px; font-weight:800; }
+  .scorebar .detail { font-size:15px; opacity:.92; margin-top:2px; }
+  .namebox { display:none; margin-top:16px; }
+  .namebox label { display:block; font-size:14px; opacity:.92; margin-bottom:7px; }
+  .namebox input { font:inherit; font-size:16px; padding:12px 14px; border-radius:8px;
+                   border:1px solid var(--line); width:340px; max-width:86%; color:#2c3e50; }
+  .certinfo { display:none; margin-top:12px; font-size:13px; opacity:.92; font-family:monospace; }
+  .warn { color:var(--red); font-size:15px; margin-top:12px; display:none; }
+  footer { text-align:center; font-size:12.5px; color:#9bb1c4; padding:26px 16px 44px; }
+  footer a { color:#9bb1c4; }
+  @media (max-width:520px) {
+    .qtext { font-size:17px; }
+    .btn-cert { margin:10px 0 0; }
+    .actions button { width:100%; }
+    .namebox input { width:100%; max-width:100%; }
+  }
 </style>
 </head>
 <body>
   <header>
     <h1>&#127891; Anesthesia Digest — Weekly CME</h1>
-    <p>{pretty_date} · {total} single-best-answer questions</p>
+    <p>%%PRETTY_DATE%% · %%TOTAL%% single-best-answer questions</p>
   </header>
   <main>
     <div class="scorebar" id="scorebar">
       <div class="pct" id="scorePct">0%</div>
       <div class="detail" id="scoreDetail"></div>
       <div class="namebox" id="namebox">
-        <input type="text" id="participant" placeholder="Type your name for the certificate">
+        <label for="participant">Enter your full name &amp; credentials for the certificate</label>
+        <input type="text" id="participant" placeholder="e.g. Dr. Jane Smith, MD, FRCPC" autocomplete="name">
       </div>
+      <div class="certinfo" id="certinfo"></div>
     </div>
 
     <div class="intro">
-      Answer all {total} questions, then press <strong>Submit Test</strong> to see your score
+      Answer all %%TOTAL%% questions, then press <strong>Submit Test</strong> to see your score
       and the explanations. This is a self-assessment activity suitable for
       <strong>RCPSC Section 3</strong> credits.
     </div>
 
-    <form id="quizForm">{questions_html}
+    <form id="quizForm">%%QUESTIONS_HTML%%
     </form>
 
     <p class="warn" id="warn">Please answer all questions before submitting.</p>
@@ -202,143 +352,123 @@ _PAGE_TEMPLATE = """<!DOCTYPE html>
   </footer>
 
 <script>
-  var QUIZ = {quiz_json};
-  var QUIZ_DATE = "{pretty_date}";
-  var TOTAL = {total};
+%%CERT_JS%%
+
+  var QUIZ = %%QUIZ_JSON%%;
+  var QUIZ_DATE = "%%PRETTY_DATE%%";
+  var TOTAL = %%TOTAL%%;
   var graded = false;
   var lastScore = 0;
 
-  function escapeHtml(s) {{
+  function escapeHtml(s){
     return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }}
+  }
 
-  document.getElementById("submitBtn").addEventListener("click", function () {{
-    // Require every question answered.
+  document.getElementById("submitBtn").addEventListener("click", function(){
     var unanswered = 0;
-    for (var i = 0; i < TOTAL; i++) {{
+    for (var i = 0; i < TOTAL; i++){
       if (!document.querySelector('input[name="q' + i + '"]:checked')) unanswered++;
-    }}
-    if (unanswered > 0 && !graded) {{
+    }
+    if (unanswered > 0 && !graded){
       document.getElementById("warn").style.display = "block";
       return;
-    }}
+    }
     document.getElementById("warn").style.display = "none";
     grade();
-  }});
+  });
 
-  function grade() {{
+  function grade(){
     var correct = 0;
-    for (var i = 0; i < TOTAL; i++) {{
+    for (var i = 0; i < TOTAL; i++){
       var chosen = document.querySelector('input[name="q' + i + '"]:checked');
       var ans = QUIZ[i].correct;
       var picked = chosen ? chosen.value : null;
       if (picked === ans) correct++;
 
-      // Colour the options.
       var labels = document.querySelectorAll('#card' + i + ' .option');
-      labels.forEach(function (lab) {{
+      labels.forEach(function(lab){
         var val = lab.querySelector("input").value;
         lab.querySelector("input").disabled = true;
         if (val === ans) lab.classList.add("correct");
         else if (chosen && val === picked) lab.classList.add("incorrect");
-      }});
+      });
 
-      // Reveal the explanation.
       var res = document.getElementById("result" + i);
       var right = picked === ans;
       var srcHtml = "";
-      if (QUIZ[i].source_article) {{
-        var label = (QUIZ[i].source_journal ? QUIZ[i].source_journal + " — " : "") +
-                    QUIZ[i].source_article;
+      if (QUIZ[i].source_article){
+        var label = (QUIZ[i].source_journal ? QUIZ[i].source_journal + " — " : "") + QUIZ[i].source_article;
         var url = QUIZ[i].source_url || "#";
-        srcHtml = '<span class="src">Source: <a href="' + url +
-                  '" target="_blank" rel="noopener">' + escapeHtml(label) + '</a></span>';
-      }}
+        srcHtml = '<span class="src">Source: <a href="' + url + '" target="_blank" rel="noopener">' +
+                  escapeHtml(label) + '</a></span>';
+      }
       res.className = "result " + (right ? "right" : "wrong");
       res.innerHTML = '<span class="verdict">' +
         (right ? "&#10003; Correct" : "&#10007; Your answer: " + (picked || "—") +
                  " · Correct answer: " + ans) + '</span>' +
         escapeHtml(QUIZ[i].rationale) + srcHtml;
       res.hidden = false;
-    }}
+    }
 
     lastScore = correct;
     graded = true;
     var pct = Math.round((correct / TOTAL) * 100);
     document.getElementById("scorePct").textContent = pct + "%";
-    document.getElementById("scoreDetail").textContent =
-      correct + " of " + TOTAL + " correct";
+    document.getElementById("scoreDetail").textContent = correct + " of " + TOTAL + " correct";
     document.getElementById("scorebar").style.display = "block";
     document.getElementById("namebox").style.display = "block";
     document.getElementById("submitBtn").textContent = "Re-check Answers";
     document.getElementById("certBtn").style.display = "inline-block";
-    document.getElementById("scorebar").scrollIntoView({{ behavior: "smooth", block: "start" }});
-  }}
+    document.getElementById("scorebar").scrollIntoView({behavior:"smooth", block:"start"});
+  }
 
-  document.getElementById("certBtn").addEventListener("click", function () {{
+  document.getElementById("certBtn").addEventListener("click", function(){
     if (!graded) return;
     var name = (document.getElementById("participant").value || "").trim();
-    var jsPDFNS = window.jspdf || {{}};
-    var Ctor = jsPDFNS.jsPDF;
-    if (!Ctor) {{ alert("Certificate library failed to load. Check your connection and retry."); return; }}
-    var doc = new Ctor({{ orientation: "landscape", unit: "pt", format: "letter" }});
-    var W = doc.internal.pageSize.getWidth();
-    var pct = Math.round((lastScore / TOTAL) * 100);
-
-    // Border
-    doc.setDrawColor(26, 82, 118); doc.setLineWidth(3);
-    doc.rect(28, 28, W - 56, doc.internal.pageSize.getHeight() - 56);
-    doc.setLineWidth(1);
-    doc.rect(38, 38, W - 76, doc.internal.pageSize.getHeight() - 76);
-
-    function center(text, y, size, style, color) {{
-      doc.setFont("times", style || "normal");
-      doc.setFontSize(size);
-      doc.setTextColor.apply(doc, color || [44, 62, 80]);
-      doc.text(text, W / 2, y, {{ align: "center" }});
-    }}
-
-    center("CME Completion Certificate", 110, 30, "bold", [26, 82, 118]);
-    center("Anesthesia Journal Digest Weekly CME", 150, 16, "italic");
-    center("Date: " + QUIZ_DATE, 200, 13);
-    center("This certifies that", 240, 13);
-    center(name || "____________________________", 276, 20, "bold");
-    center("completed a " + TOTAL + "-question self-assessment", 312, 13);
-    center("Score achieved: " + lastScore + " / " + TOTAL + " (" + pct + "%)", 344, 15, "bold", [30, 132, 73]);
-    center("Self-assessment activity — suitable for RCPSC Section 3 credits.", 392, 11);
-    center("Retain for your records.", 408, 11);
-
-    var fileDate = "{iso_date}";
-    doc.save("CME_Certificate_" + fileDate + ".pdf");
-  }});
+    if (!name){
+      var inp = document.getElementById("participant");
+      inp.style.borderColor = "#ffd27f";
+      inp.focus();
+      alert("Please enter your full name and credentials before downloading the certificate.");
+      return;
+    }
+    var info = generateCertificate({name:name, score:lastScore, total:TOTAL, completedAt:new Date()});
+    if (info){
+      var box = document.getElementById("certinfo");
+      box.style.display = "block";
+      box.textContent = "Certificate ID " + info.certId + "  ·  Verification " + info.verCode;
+    }
+  });
 </script>
 </body>
 </html>"""
 
 
-_INDEX_TEMPLATE = """<!DOCTYPE html>
+_INDEX_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anesthesia Digest — Weekly CME Quizzes</title>
 <style>
-  body {{ margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-         background:#f4f6f9; color:#2c3e50; }}
-  header {{ background:linear-gradient(135deg,#1a5276,#2e86c1); color:#fff;
-           padding:28px 20px; text-align:center; }}
-  header h1 {{ margin:0; font-size:22px; font-family:Georgia,serif; }}
-  header p {{ margin:6px 0 0; font-size:13px; opacity:.9; }}
-  main {{ max-width:640px; margin:0 auto; padding:22px 18px 60px; }}
-  ul {{ list-style:none; padding:0; margin:0; }}
-  li {{ background:#fff; border:1px solid #e3e8ee; border-radius:10px; margin:10px 0;
-       box-shadow:0 1px 3px rgba(0,0,0,.04); }}
-  li a {{ display:block; padding:16px 18px; color:#1a5276; text-decoration:none;
-         font-weight:600; font-size:15px; }}
-  li a:hover {{ background:#f7fafd; }}
-  li.empty {{ padding:16px 18px; color:#9bb1c4; font-style:italic; }}
-  footer {{ text-align:center; font-size:11px; color:#9bb1c4; padding:24px 16px; }}
-  footer a {{ color:#9bb1c4; }}
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         background:#f4f6f9; color:#2c3e50; font-size:16px; }
+  header { background:linear-gradient(135deg,#1a5276,#2e86c1); color:#fff;
+           padding:30px 20px; text-align:center; }
+  header h1 { margin:0; font-size:25px; font-family:Georgia,serif; }
+  header p { margin:8px 0 0; font-size:15px; opacity:.92; }
+  main { max-width:660px; margin:0 auto; padding:24px 18px 60px; }
+  ul { list-style:none; padding:0; margin:0; }
+  li { background:#fff; border:1px solid #e3e8ee; border-radius:10px; margin:11px 0;
+       box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  li a { display:block; padding:18px 20px; color:#1a5276; text-decoration:none;
+         font-weight:600; font-size:17px; }
+  li a:hover { background:#f7fafd; }
+  li.empty { padding:18px 20px; color:#9bb1c4; font-style:italic; }
+  .preview-link { text-align:center; margin-top:18px; font-size:14px; }
+  .preview-link a { color:#2e86c1; }
+  footer { text-align:center; font-size:12.5px; color:#9bb1c4; padding:26px 16px; }
+  footer a { color:#9bb1c4; }
 </style>
 </head>
 <body>
@@ -348,10 +478,66 @@ _INDEX_TEMPLATE = """<!DOCTYPE html>
   </header>
   <main>
     <ul>
-{items}    </ul>
+%%ITEMS%%    </ul>
+    <p class="preview-link"><a href="cert-preview.html">Preview the certificate design &#8594;</a></p>
   </main>
   <footer>
     AI-generated self-assessment · Not affiliated with any journal · <a href="../">&#8592; Audio summaries</a>
   </footer>
+</body>
+</html>"""
+
+
+_CERT_PREVIEW_TEMPLATE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Certificate Preview</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         background:linear-gradient(160deg,#0e2a3b,#1a5276); color:#eaf2f8;
+         min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .card { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+          border-radius:18px; padding:38px; max-width:560px; text-align:center;
+          box-shadow:0 12px 40px rgba(0,0,0,.35); }
+  .seal { font-size:56px; margin-bottom:8px; }
+  h1 { font-size:24px; margin:0 0 10px; font-family:Georgia,serif; }
+  p { font-size:15px; color:#cfe3f2; line-height:1.6; }
+  button { font:inherit; font-size:16px; font-weight:700; border:none; border-radius:26px;
+           padding:15px 30px; margin-top:18px; cursor:pointer; background:#caa75a; color:#3a2c10; }
+  .meta { margin-top:16px; font-size:13px; font-family:monospace; color:#9ecbf0; min-height:18px; }
+  .note { margin-top:18px; font-size:12px; color:#8fb3cd; font-style:italic; }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="seal">&#127891;</div>
+    <h1>CME Certificate — Design Preview</h1>
+    <p>Click below to generate a sample certificate PDF (<strong>Dr. Sample, MD, FRCPC</strong>,
+       score <strong>8 / 10</strong>) with the current date and time, a sample certificate ID,
+       and an auditable verification code — so you can preview the classical design locally.</p>
+    <button type="button" id="previewBtn">Generate Sample Certificate</button>
+    <div class="meta" id="meta"></div>
+    <p class="note">This is a design preview only. Real certificates are issued from the
+       weekly quiz after you submit your answers.</p>
+  </main>
+<script>
+%%CERT_JS%%
+
+  document.getElementById("previewBtn").addEventListener("click", function(){
+    var info = generateCertificate({
+      name: "Dr. Sample, MD, FRCPC",
+      score: 8,
+      total: 10,
+      completedAt: new Date()
+    });
+    if (info){
+      document.getElementById("meta").textContent =
+        "Certificate ID " + info.certId + "  ·  Verification " + info.verCode;
+    }
+  });
+</script>
 </body>
 </html>"""

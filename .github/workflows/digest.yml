@@ -55,7 +55,9 @@ jobs:
       - name: Restore article cache
         uses: actions/cache@v4
         with:
-          path: articles_cache.json
+          path: |
+            articles_cache.json
+            featured_cache.json
           key: cache-${{ github.run_id }}
           restore-keys: cache-
 
@@ -91,7 +93,9 @@ jobs:
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: articles_cache.json
+          path: |
+            articles_cache.json
+            featured_cache.json
           key: cache-${{ github.run_id }}
 
       - name: Save MOC tracker

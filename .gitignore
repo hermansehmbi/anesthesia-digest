@@ -6,6 +6,7 @@ podcast_script.txt
 *.mp3
 *_script.txt
 articles_cache.json
+featured_cache.json
 moc_tracker.xlsx
 .env
 

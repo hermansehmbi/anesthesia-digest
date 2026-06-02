@@ -30,6 +30,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 CACHE_FILE = "articles_cache.json"
+FEATURED_FILE = "featured_cache.json"  # only the articles actually shown in a digest
 
 
 def run_digest(preview=False):
@@ -63,6 +64,11 @@ def run_digest(preview=False):
     # article per journal (chosen by Claude), capped at 10 total.
     selected = select_digest_articles(all_articles, per_journal=1, max_total=10)
     logger.info(f"Selected {len(selected)} articles for the digest email")
+
+    # Record exactly what was featured this week so Saturday's CME quiz can be
+    # built from the articles the reader actually saw (not the full fetch).
+    if not preview:
+        _cache_featured(selected)
 
     # API mode: generate the two-host audio podcast from the same selection so
     # the audio summary matches the articles shown in the email, then publish
@@ -101,14 +107,21 @@ def run_saturday(preview=False):
     logger.info("SATURDAY — CME and weekly review")
     logger.info("=" * 50)
 
-    # Load this week's articles from cache (or fetch fresh)
-    week = _load_cached(days=7)
+    # CME quiz is built from the articles actually FEATURED in this week's
+    # Monday/Thursday digests, so the quiz tests what was emailed. Fall back to
+    # the full weekly cache (or a fresh fetch) only if no featured set exists.
+    week = _load_featured(days=7)
+    source = "featured digest articles"
+    if not week:
+        week = _load_cached(days=7)
+        source = "weekly article cache (no featured set found)"
     if not week:
         logger.info("Cache empty — fetching last 7 days")
         for j in JOURNALS:
             week.extend(fetch_articles(j, since_days=7))
+        source = "fresh 7-day fetch"
 
-    logger.info(f"Week's articles: {len(week)}")
+    logger.info(f"Week's articles: {len(week)} (from {source})")
 
     # API mode: generate 10 CME questions and publish an interactive quiz page.
     cme = None
@@ -205,6 +218,52 @@ def _load_cached(days=7) -> list:
                 out.append(art)
         except (ValueError, TypeError):
             out.append(art)
+    return out
+
+
+def _cache_featured(selected: list):
+    """Append the articles featured in a digest, stamped with featured_at, so
+    Saturday can rebuild the week's set. De-duplicated by URL."""
+    p = Path(FEATURED_FILE)
+    existing = []
+    if p.exists():
+        try:
+            existing = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            existing = []
+    seen = {a.get("url") for a in existing}
+    stamp = datetime.now().isoformat()
+    for art in selected:
+        if art.get("url") in seen:
+            continue
+        copy = dict(art)
+        if isinstance(copy.get("date"), datetime):
+            copy["date"] = copy["date"].isoformat()
+        copy["featured_at"] = stamp
+        existing.append(copy)
+        seen.add(art.get("url"))
+    p.write_text(json.dumps(existing, default=str), encoding="utf-8")
+    logger.info(f"Recorded {len(selected)} featured articles → {FEATURED_FILE}")
+
+
+def _load_featured(days=7) -> list:
+    """Load featured articles whose featured_at is within the window."""
+    p = Path(FEATURED_FILE)
+    if not p.exists():
+        return []
+    try:
+        items = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+    cutoff = datetime.now() - timedelta(days=days)
+    out = []
+    for art in items:
+        fa = art.get("featured_at")
+        try:
+            if fa and datetime.fromisoformat(fa) >= cutoff:
+                out.append(art)
+        except (ValueError, TypeError):
+            continue
     return out
 
 

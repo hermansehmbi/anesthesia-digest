@@ -149,10 +149,10 @@ def build_saturday_email(articles_this_week: list,
         quiz_cta = f"""
     <tr><td style="padding:18px 20px 4px;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#1a5276,#2e86c1);border-radius:12px;">
-        <tr><td style="padding:20px 22px;text-align:center;">
-          <div style="font-size:16px;font-weight:bold;color:#ffffff;font-family:Georgia,serif;">&#127891; Take this week's CME quiz</div>
-          <div style="font-size:12px;color:#cfe3f2;margin:6px 0 14px;line-height:1.4;">10 single-best-answer questions · instant score &amp; explanations · downloadable certificate</div>
-          <a href="{quiz_url}" style="display:inline-block;background:#ffffff;color:#1a5276;text-decoration:none;font-size:14px;font-weight:bold;padding:12px 26px;border-radius:24px;">Take the CME Quiz &amp; Get Certificate &#8594;</a>
+        <tr><td style="padding:22px 22px;text-align:center;">
+          <div style="font-size:20px;font-weight:bold;color:#ffffff;font-family:Georgia,serif;">&#127891; Take this week's CME quiz</div>
+          <div style="font-size:15px;color:#cfe3f2;margin:8px 0 16px;line-height:1.5;">10 single-best-answer questions · instant score &amp; explanations · downloadable certificate</div>
+          <a href="{quiz_url}" style="display:inline-block;background:#ffffff;color:#1a5276;text-decoration:none;font-size:16px;font-weight:bold;padding:14px 28px;border-radius:24px;">Take the CME Quiz &amp; Get Certificate &#8594;</a>
         </td></tr>
       </table>
     </td></tr>"""
@@ -163,16 +163,16 @@ def build_saturday_email(articles_this_week: list,
         top = sorted(articles_this_week, key=lambda a: a["impact_factor"], reverse=True)[:10]
         highlights = """
     <tr><td style="padding:18px 20px 6px;">
-        <h2 style="margin:0;font-size:16px;color:#1a5276;font-family:Georgia,serif;">📋 This Week's Top Articles</h2>
-        <p style="font-size:12px;color:#999;margin:4px 0 0;">Great candidates for RCPSC Section 2 self-learning credits</p>
+        <h2 style="margin:0;font-size:20px;color:#1a5276;font-family:Georgia,serif;">📋 This Week's Top Articles</h2>
+        <p style="font-size:14px;color:#999;margin:5px 0 0;">Great candidates for RCPSC Section 2 self-learning credits</p>
     </td></tr>"""
         for i, art in enumerate(top, 1):
-            oa = ' <span style="background:#27ae60;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;">OA</span>' if art["is_open_access"] else ""
+            oa = ' <span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;">OA</span>' if art["is_open_access"] else ""
             highlights += f"""
-    <tr><td style="padding:3px 20px 6px 30px;font-size:13px;">
+    <tr><td style="padding:4px 20px 8px 30px;font-size:16px;line-height:1.5;">
         <strong style="color:#999;">{i}.</strong>
         <a href="{art['url']}" style="color:#2c3e50;text-decoration:none;font-weight:600;">{art['title']}</a>{oa}
-        <div style="font-size:11px;color:#999;">{art['journal_abbr']} · {art['date_str']}</div>
+        <div style="font-size:13px;color:#999;">{art['journal_abbr']} · {art['date_str']}</div>
     </td></tr>"""
 
     # CME Questions (API mode only)
@@ -181,8 +181,8 @@ def build_saturday_email(articles_this_week: list,
         cme_html = """
     <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
     <tr><td style="padding:18px 20px 6px;">
-        <h2 style="margin:0;font-size:16px;color:#1a5276;font-family:Georgia,serif;">🎓 Weekly CME Questions</h2>
-        <p style="font-size:12px;color:#999;margin:4px 0 0;">
+        <h2 style="margin:0;font-size:20px;color:#1a5276;font-family:Georgia,serif;">🎓 Weekly CME Questions</h2>
+        <p style="font-size:14px;color:#999;margin:5px 0 0;">
             RCPSC Section 2 (self-learning) & Section 3 (self-assessment) · Answers below
         </p>
     </td></tr>"""
@@ -191,37 +191,37 @@ def build_saturday_email(articles_this_week: list,
         for i, q in enumerate(cme_questions, 1):
             options_html = ""
             for letter, text in q["options"].items():
-                options_html += f'<div style="margin:3px 0;font-size:13px;"><strong>{letter}.</strong> {text}</div>'
+                options_html += f'<div style="margin:5px 0;font-size:16px;line-height:1.5;"><strong>{letter}.</strong> {text}</div>'
 
             cme_html += f"""
-    <tr><td style="padding:12px 20px 4px 30px;">
-        <div style="font-size:13px;font-weight:600;color:#2c3e50;line-height:1.4;">Q{i}. {q['question']}</div>
-        <div style="font-size:12px;color:#888;margin-top:2px;margin-bottom:4px;">Source: {q['source_journal']} — 
+    <tr><td style="padding:14px 20px 4px 30px;">
+        <div style="font-size:18px;font-weight:600;color:#2c3e50;line-height:1.5;">Q{i}. {q['question']}</div>
+        <div style="font-size:14px;color:#888;margin-top:4px;margin-bottom:6px;">Source: {q['source_journal']} —
             <a href="{q.get('source_url', '#')}" style="color:#2e86c1;">{q['source_article'][:60]}...</a>
         </div>
-        <div style="padding:6px 12px;background:#f8f9fa;border-radius:4px;">{options_html}</div>
+        <div style="padding:8px 14px;background:#f8f9fa;border-radius:4px;">{options_html}</div>
     </td></tr>"""
 
         # Answer key
         cme_html += """
     <tr><td style="padding:20px 20px 6px;">
-        <h3 style="margin:0;font-size:15px;color:#1a5276;border-top:2px solid #1a5276;padding-top:12px;">
+        <h3 style="margin:0;font-size:18px;color:#1a5276;border-top:2px solid #1a5276;padding-top:14px;">
             Answer Key
         </h3>
     </td></tr>"""
         for i, q in enumerate(cme_questions, 1):
             cme_html += f"""
-    <tr><td style="padding:4px 20px 10px 30px;">
-        <div style="font-size:13px;"><strong>Q{i}: {q['correct']}</strong></div>
-        <div style="font-size:12px;color:#555;line-height:1.4;margin-top:2px;">{q['rationale']}</div>
+    <tr><td style="padding:6px 20px 12px 30px;">
+        <div style="font-size:16px;"><strong>Q{i}: {q['correct']}</strong></div>
+        <div style="font-size:16px;color:#555;line-height:1.6;margin-top:4px;">{q['rationale']}</div>
     </td></tr>"""
 
     # MOC reminder
     moc_html = f"""
     <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
     <tr><td style="padding:16px 20px;background:#f8f9fa;">
-        <strong style="color:#1a5276;font-size:14px;">📊 MOC Tracking</strong>
-        <p style="font-size:12px;color:#555;margin:6px 0 0;line-height:1.5;">
+        <strong style="color:#1a5276;font-size:16px;">📊 MOC Tracking</strong>
+        <p style="font-size:15px;color:#555;margin:7px 0 0;line-height:1.6;">
             Log your self-learning for Royal College MOC. Your Excel tracker is updated monthly.<br>
             <strong>Section 2:</strong> 2 credits/hour for reading articles ·
             <strong>Section 3:</strong> 2 credits/hour for self-assessment with feedback
@@ -230,8 +230,8 @@ def build_saturday_email(articles_this_week: list,
 
     html = _wrap(f"""
     <tr><td style="background:linear-gradient(135deg,#1a5276,#148f77);padding:24px 20px;text-align:center;">
-        <h1 style="margin:0;color:#fff;font-size:21px;font-family:Georgia,serif;">Weekly CME & Review</h1>
-        <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;">{date_str} · Week of {week_start.strftime('%b %d')}</p>
+        <h1 style="margin:0;color:#fff;font-size:24px;font-family:Georgia,serif;">Weekly CME & Review</h1>
+        <p style="margin:7px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">{date_str} · Week of {week_start.strftime('%b %d')}</p>
     </td></tr>
     {quiz_cta}
     {highlights}
