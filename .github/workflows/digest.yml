@@ -59,8 +59,11 @@ jobs:
           git config user.name "Anesthesia Digest Bot"
           git config user.email "anesthesia-digest@users.noreply.github.com"
 
+      # Restore-only (no post-job auto-save) so the explicit Save steps below are
+      # the single writer per key — avoids the "Cache save failed / unable to
+      # reserve cache" collision from double-saving the same key.
       - name: Restore article cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             articles_cache.json
@@ -70,7 +73,7 @@ jobs:
           restore-keys: cache-
 
       - name: Restore MOC tracker
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: moc_tracker.xlsx
           key: moc-${{ github.run_id }}
