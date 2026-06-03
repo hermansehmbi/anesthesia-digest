@@ -103,13 +103,26 @@ def _ensure_cert_folder(drive, folder_id):
 
 
 def _ensure_spreadsheet(gc, drive, folder_id):
+    # A service account on a PERSONAL Google account has no Drive storage quota,
+    # so it cannot CREATE a file it would own (you'd get "storage quota
+    # exceeded"). Instead we open a sheet YOU created (the SA can edit a file you
+    # own without using quota). Prefer an explicit GOOGLE_SHEET_ID, else find the
+    # 'MOC Tracker' sheet by name inside the shared folder.
+    sheet_id = os.environ.get("GOOGLE_SHEET_ID", "").strip()
+    if sheet_id:
+        return gc.open_by_key(sheet_id)
+
     sid = _find_in_folder(drive, folder_id, SPREADSHEET_NAME,
                           "application/vnd.google-apps.spreadsheet")
     if sid:
         return gc.open_by_key(sid)
-    sh = gc.create(SPREADSHEET_NAME, folder_id=folder_id)
-    logger.info(f"Created spreadsheet '{SPREADSHEET_NAME}'")
-    return sh
+
+    raise RuntimeError(
+        f"'{SPREADSHEET_NAME}' spreadsheet not found and a service account can't "
+        f"create one on a personal Google account (no storage quota). Create an "
+        f"empty Google Sheet named '{SPREADSHEET_NAME}' inside the shared folder "
+        f"(or set the GOOGLE_SHEET_ID secret to a sheet you created), then re-run."
+    )
 
 
 def _ensure_ws(sh, title, headers, rows=200):
