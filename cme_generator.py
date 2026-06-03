@@ -6,11 +6,15 @@ For Section 2 (self-learning) and Section 3 (self-assessment) credits.
 """
 
 import os
+import re
 import json
+import random
 import logging
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
+_LETTERS = ["A", "B", "C", "D"]
 
 
 def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict] | None:
@@ -21,7 +25,7 @@ def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict
         {
             "question": str,
             "options": {"A": str, "B": str, "C": str, "D": str},
-            "correct": "B",
+            "correct": "A|B|C|D",   # the letter of the correct option (randomized)
             "rationale": str,
             "source_article": str,
             "source_journal": str,
@@ -110,37 +114,41 @@ Generate EXACTLY {num_questions} single-best-answer multiple-choice questions. F
    distractors. Avoid "all/none of the above".
 4. Write a full-paragraph explanation of ABOUT 10 LINES (8-12 sentences). It MUST:
    - quote ACTUAL effect sizes and statistics taken from that article's Source text above —
-     mean differences, relative risk, odds ratios, hazard ratios, NNT, confidence intervals,
-     p-values, percentages — e.g. "a mean pain-score reduction of 1.8 points (95% CI 1.2-2.4)
-     and an OR of 0.62 (p=0.01) for rescue analgesia";
-   - explain WHY the correct answer is right, then why EACH distractor is wrong;
+     the types of figures to look for are mean/median differences, relative risk, odds or
+     hazard ratios, NNT, confidence intervals, p-values, and percentages, reported with the
+     exact values found in that article's Source text;
+   - explain WHY the correct choice is right, then why EACH of the other choices is wrong,
+     REFERRING TO THE CHOICES BY THEIR CONTENT/WORDING, never by their letter (do not write
+     "Option A/B/C/D"), because the option order will be randomized after generation;
    - end with the practical bedside takeaway.
-   CRITICAL: Use ONLY numbers that actually appear in that article's Source text. If the
-   source is abstract-only or a specific number is not present, describe the direction and
-   magnitude qualitatively instead. NEVER fabricate or guess statistics, confidence
-   intervals, or p-values that are not in the provided text.
+   CRITICAL: Use ONLY numbers that actually appear in that article's Source text. Do NOT copy
+   any numbers from these instructions. If the source is abstract-only or a specific number is
+   not present, describe the direction and magnitude qualitatively instead. NEVER fabricate or
+   guess statistics, confidence intervals, or p-values that are not in the provided text.
 5. Reference the source article (use its exact title, journal, and URL from the list).
+6. VARY which option is correct across the set — do not make the same letter correct every
+   time. (The positions will also be shuffled afterwards as a safeguard.)
 
 RESPOND IN THIS EXACT JSON FORMAT (no markdown, no backticks, just raw JSON):
 [
   {{
     "question": "A 65-year-old ... <clinical vignette> ... Which ... ?",
     "options": {{
-      "A": "Option text",
-      "B": "Option text",
-      "C": "Option text",
-      "D": "Option text"
+      "A": "<distinct option text>",
+      "B": "<distinct option text>",
+      "C": "<distinct option text>",
+      "D": "<distinct option text>"
     }},
-    "correct": "B",
-    "rationale": "~10 lines citing the article's real numbers. The trial found <actual statistic from source text> ... The correct answer is B because ... Option A is wrong because ... Option C is wrong because ... Option D is wrong because ... The bedside takeaway is ...",
+    "correct": "<the letter of the correct option>",
+    "rationale": "<about 10 lines. State the article's real figures from its Source text. Explain why the correct choice is right and why each other choice is wrong, naming choices by their wording (not by letter). End with the bedside takeaway.>",
     "source_article": "Exact title of the source article",
-    "source_journal": "BJA",
+    "source_journal": "<journal abbreviation>",
     "source_url": "https://..."
   }}
 ]
 
 Generate exactly {num_questions} questions, each from a different article, at exam-level
-difficulty, with statistics grounded in the provided source text."""
+difficulty, with statistics grounded ONLY in the provided source text."""
 
     try:
         import httpx
@@ -177,11 +185,18 @@ difficulty, with statistics grounded in the provided source text."""
 
         questions = json.loads(text)
 
+        # Randomize the position of the correct option so there is no positional
+        # bias (the model tends to favor one letter). This also remaps any stray
+        # "Option X" references in the rationale to the new letters.
+        _shuffle_options(questions)
+
         # Add RCPSC section tag
         for q in questions:
             q["rcpsc_section"] = "Section 2 & 3"
 
-        logger.info(f"Generated {len(questions)} CME questions")
+        dist = {L: sum(1 for q in questions if q.get("correct") == L) for L in _LETTERS}
+        logger.info(f"Generated {len(questions)} CME questions; "
+                    f"correct-answer distribution {dist}")
         return questions
 
     except json.JSONDecodeError as e:
@@ -191,3 +206,62 @@ difficulty, with statistics grounded in the provided source text."""
     except Exception as e:
         logger.error(f"Claude API call failed for CME: {e}")
         return None
+
+
+# ── Answer-position randomization ────────────────────────────────────────────
+
+def _shuffle_options(questions: list, rng: random.Random | None = None) -> list:
+    """Shuffle each question's A-D options in place and update the correct letter.
+
+    Tracks the correct answer by its TEXT (not its letter), so after shuffling
+    the ``correct`` field points at whichever letter now holds the right answer.
+    Any explicit "Option X" letter references in the rationale are remapped to
+    the new letters as a safety net (the prompt asks the model to avoid them).
+    """
+    rng = rng or random
+    for q in questions:
+        opts = q.get("options") or {}
+        correct = q.get("correct")
+        items = [(L, opts.get(L)) for L in _LETTERS if opts.get(L)]
+        if len(items) < 2 or correct not in dict(items):
+            continue
+
+        correct_text = dict(items)[correct]
+        texts = [t for _, t in items]
+        rng.shuffle(texts)
+
+        new_opts = {}
+        new_correct = correct
+        for i, t in enumerate(texts):
+            L = _LETTERS[i]
+            new_opts[L] = t
+            if t == correct_text:
+                new_correct = L
+
+        # old letter -> new letter, matched by identical option text
+        text_to_new = {t: _LETTERS[i] for i, t in enumerate(texts)}
+        old_to_new = {oldL: text_to_new.get(t, oldL) for oldL, t in items}
+
+        q["options"] = new_opts
+        q["correct"] = new_correct
+        q["rationale"] = _remap_letters(q.get("rationale", ""), old_to_new)
+    return questions
+
+
+# Match clear option-letter references like "Option B", "choice C", "answer is A".
+_LETTER_REF_RE = re.compile(
+    r"(?P<pre>\b[Oo]ptions?\s+|\b[Cc]hoices?\s+|\banswer(?:\s+is|:)?\s+)(?P<L>[A-D])\b")
+
+
+def _remap_letters(text: str, mapping: dict) -> str:
+    """Remap option-letter references in a rationale using old->new mapping.
+
+    Uses a single pass so swaps never chain (e.g. A->C and C->A stay distinct).
+    """
+    if not text:
+        return text
+
+    def repl(m):
+        return m.group("pre") + mapping.get(m.group("L"), m.group("L"))
+
+    return _LETTER_REF_RE.sub(repl, text)
