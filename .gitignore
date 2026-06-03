@@ -7,6 +7,7 @@ podcast_script.txt
 *_script.txt
 articles_cache.json
 featured_cache.json
+fulltext_cache.json
 moc_tracker.xlsx
 .env
 

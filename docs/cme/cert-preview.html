@@ -155,18 +155,25 @@ function generateCertificate(opts){
   doc.setFont('times', 'normal'); doc.setFontSize(12); doc.setTextColor(ink[0], ink[1], ink[2]);
   doc.text('Completed: ' + stamp, W / 2, 340, {align:'center'});
 
-  drawSeal(doc, W / 2, 388, gold, wax);
+  drawSeal(doc, W / 2, 384, gold, wax);
 
-  // Certificate ID + verification (monospace, bottom-left)
-  doc.setFont('courier', 'normal'); doc.setFontSize(10); doc.setTextColor(ink[0], ink[1], ink[2]);
-  doc.text('Certificate ID:  ' + certId, 72, H - 74);
-  doc.text('Verification:    ' + ver,  72, H - 60);
-
-  // Disclaimer (bottom-center)
+  // Bottom block — everything sits clearly INSIDE the inner border (which is at
+  // H-34) with margin. Disclaimer is drawn line-by-line, then the ID row, so
+  // nothing overruns or hides behind the frame.
   doc.setFont('times', 'italic'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
   var disc = 'Anesthesia Digest is an automated, AI-generated educational service delivering weekly summaries of open-access anesthesia literature. This certificate reflects self-assessment completion and is suitable for RCPSC Section 3 self-learning records. Not affiliated with any journal or accrediting body.';
-  var lines = doc.splitTextToSize(disc, W - 180);
-  doc.text(lines, W / 2, H - 42, {align:'center'});
+  var lines = doc.splitTextToSize(disc, W - 160);
+  var lh = 11;                          // line spacing (pt)
+  var discLast = H - 74;                // baseline of the LAST disclaimer line
+  var discFirst = discLast - (lines.length - 1) * lh;
+  for (var li = 0; li < lines.length; li++){
+    doc.text(lines[li], W / 2, discFirst + li * lh, {align:'center'});
+  }
+
+  // Certificate ID (left) + verification code (right) on one row, above the frame.
+  doc.setFont('courier', 'normal'); doc.setFontSize(9.5); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Certificate ID:  ' + certId, 72, H - 50);
+  doc.text('Verification:  ' + ver, W - 72, H - 50, {align:'right'});
 
   doc.save('CME_Certificate_' + certId + '.pdf');
   return {certId: certId, verCode: ver};

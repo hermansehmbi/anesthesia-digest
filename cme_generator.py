@@ -44,51 +44,87 @@ def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict
 
     from config import CLAUDE_MODEL
 
-    # Pick articles with best abstracts (need substance for good questions)
+    # Pick the ~10 articles that will actually drive the quiz (need substance).
     candidates = [a for a in articles if len(a.get("abstract", "")) > 100]
     if not candidates:
         candidates = articles
-    candidates = sorted(candidates, key=lambda a: a["impact_factor"], reverse=True)[:15]
+    candidates = sorted(candidates, key=lambda a: a["impact_factor"],
+                        reverse=True)[:num_questions]
 
-    # Build article summaries for prompt
+    # Fetch (and cache) full text ONLY for these CME articles so explanations
+    # can quote real statistics. Open access → parsed Results/Discussion/etc.;
+    # paywalled → abstract only.
+    try:
+        from fulltext_fetcher import get_article_text
+    except Exception:
+        get_article_text = None
+
     briefs = []
     for i, art in enumerate(candidates, 1):
+        info = {"source": "abstract", "text": art.get("abstract", "")}
+        if get_article_text:
+            try:
+                info = get_article_text(art)
+            except Exception as e:
+                logger.warning(f"Full-text fetch failed for {art.get('url')}: {e}")
+
+        body = (info.get("text") or art.get("abstract", "")).strip()
+        if info.get("source") == "fulltext":
+            access = "OPEN-ACCESS FULL TEXT (quote real numbers from the sections below)"
+        elif body:
+            access = ("ABSTRACT ONLY — paywalled. Describe direction/magnitude of "
+                      "findings; do NOT invent any statistic not present below")
+        else:
+            access = "NO SOURCE TEXT AVAILABLE — keep the explanation qualitative"
+
         briefs.append(
-            f"{i}. [{art['journal_abbr']}] {art['title']}\n"
-            f"   URL: {art['url']}\n"
-            f"   Abstract: {art['abstract'][:400]}"
+            f"[{i}] Journal: {art['journal_abbr']} | Title: {art['title']}\n"
+            f"URL: {art['url']}\n"
+            f"Access: {access}\n"
+            f"Source text:\n{body[:2400]}"
         )
     articles_text = "\n\n".join(briefs)
 
-    prompt = f"""You are creating CME (Continuing Medical Education) questions for a practicing
-COMMUNITY anesthesiologist (general OR lists, obstetrics, regional, acute pain — not a
-subspecialty researcher), suitable for RCPSC (Royal College of Physicians and Surgeons of
-Canada) Maintenance of Certification.
+    prompt = f"""You are writing CME (Continuing Medical Education) self-assessment questions
+suitable for RCPSC (Royal College of Physicians and Surgeons of Canada) Maintenance of
+Certification (Section 2 self-learning and Section 3 self-assessment).
 
-These questions should be appropriate for:
-- Section 2 credits (self-learning): questions that prompt reflection on practice
-- Section 3 credits (self-assessment): knowledge-testing questions with feedback
+TOPIC GUIDANCE (internal only — for choosing what to test): favor topics that matter at the
+bedside for a generalist anesthesiologist (airway, analgesia, obstetric anesthesia, regional
+techniques, perioperative management, patient safety).
+HARD RULE: NEVER write the phrase "community anesthesiologist" (or "community anaesthetist",
+or "community anesthetist") anywhere in a question, option, or explanation. That phrase is
+internal guidance only and must not appear in the output.
 
-ARTICLES FROM THIS WEEK:
+ARTICLES FOR THIS WEEK (each has source text — full text if open access, otherwise abstract):
 {articles_text}
 
 Generate EXACTLY {num_questions} single-best-answer multiple-choice questions. For each:
-1. Base it on a specific article from the list above (use a DIFFERENT article when possible).
-2. Write a single-best-answer question — ideally a brief clinical scenario — that matters at
-   the bedside for a community anesthesiologist.
-3. Provide exactly 4 options (A-D) with ONE clearly correct answer and three plausible
+1. Base it on a DIFFERENT article from the list above.
+2. Write a REALISTIC CLINICAL VIGNETTE question with specific patient details (age, sex,
+   comorbidities, procedure, doses, monitoring, or context) — e.g. "A 72-year-old undergoes
+   elective hip arthroplasty under spinal anesthesia. Which intervention has the strongest
+   evidence for reducing postoperative delirium?" Some may be focused knowledge questions,
+   but most should be scenarios. Do NOT describe the target audience in the question.
+3. Provide exactly 4 options (A-D): ONE clearly correct answer and three plausible
    distractors. Avoid "all/none of the above".
-4. Write a full-paragraph explanation of ABOUT 10 LINES (roughly 8-12 sentences, ~120-160
-   words). Explain clearly WHY the correct answer is right with clinical reasoning, then
-   address EACH of the other three options individually and explain why each is wrong, and
-   finish with the practical bedside takeaway. This is the teaching point — make it thorough
-   and substantive, not a couple of sentences.
-5. Reference the source article.
+4. Write a full-paragraph explanation of ABOUT 10 LINES (8-12 sentences). It MUST:
+   - quote ACTUAL effect sizes and statistics taken from that article's Source text above —
+     mean differences, relative risk, odds ratios, hazard ratios, NNT, confidence intervals,
+     p-values, percentages — e.g. "a mean pain-score reduction of 1.8 points (95% CI 1.2-2.4)
+     and an OR of 0.62 (p=0.01) for rescue analgesia";
+   - explain WHY the correct answer is right, then why EACH distractor is wrong;
+   - end with the practical bedside takeaway.
+   CRITICAL: Use ONLY numbers that actually appear in that article's Source text. If the
+   source is abstract-only or a specific number is not present, describe the direction and
+   magnitude qualitatively instead. NEVER fabricate or guess statistics, confidence
+   intervals, or p-values that are not in the provided text.
+5. Reference the source article (use its exact title, journal, and URL from the list).
 
 RESPOND IN THIS EXACT JSON FORMAT (no markdown, no backticks, just raw JSON):
 [
   {{
-    "question": "A 65-year-old patient undergoing...",
+    "question": "A 65-year-old ... <clinical vignette> ... Which ... ?",
     "options": {{
       "A": "Option text",
       "B": "Option text",
@@ -96,15 +132,15 @@ RESPOND IN THIS EXACT JSON FORMAT (no markdown, no backticks, just raw JSON):
       "D": "Option text"
     }},
     "correct": "B",
-    "rationale": "A full paragraph of about 10 lines. The correct answer is B because <clinical reasoning>. Option A is incorrect because... Option C is wrong because... Option D does not apply because... <continue the reasoning>... The practical bedside takeaway is that...",
-    "source_article": "Title of the source article",
+    "rationale": "~10 lines citing the article's real numbers. The trial found <actual statistic from source text> ... The correct answer is B because ... Option A is wrong because ... Option C is wrong because ... Option D is wrong because ... The bedside takeaway is ...",
+    "source_article": "Exact title of the source article",
     "source_journal": "BJA",
     "source_url": "https://..."
   }}
 ]
 
-Generate exactly {num_questions} questions. Make them clinically relevant and exam-level
-difficulty, with each explanation 5-10 lines long."""
+Generate exactly {num_questions} questions, each from a different article, at exam-level
+difficulty, with statistics grounded in the provided source text."""
 
     try:
         import httpx

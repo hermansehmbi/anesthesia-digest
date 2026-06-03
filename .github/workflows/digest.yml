@@ -58,6 +58,7 @@ jobs:
           path: |
             articles_cache.json
             featured_cache.json
+            fulltext_cache.json
           key: cache-${{ github.run_id }}
           restore-keys: cache-
 
@@ -96,6 +97,7 @@ jobs:
           path: |
             articles_cache.json
             featured_cache.json
+            fulltext_cache.json
           key: cache-${{ github.run_id }}
 
       - name: Save MOC tracker
