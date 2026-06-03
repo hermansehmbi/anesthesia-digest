@@ -253,20 +253,37 @@ def _render_audio(turns: list[tuple[str, str]], output_path: str) -> str | None:
             pass
 
 
-async def _synth_all(turns, tmpdir, voice_a, voice_b, rate):
-    """Render every turn to its own MP3 file (sequentially, in order)."""
+async def _synth_all(turns, tmpdir, voice_a, voice_b, rate, concurrency=6):
+    """Render every turn to its own MP3 file concurrently, preserving order.
+
+    Sequentially this is the slow step (~90 turns × a few seconds each blew past
+    the CI timeout). Bounded concurrency cuts it several-fold; results[i] keeps
+    strict turn order regardless of completion order. One retry per turn rides
+    out transient Edge-TTS hiccups.
+    """
     import edge_tts
-    files = []
-    for i, (speaker, body) in enumerate(turns):
+    sem = asyncio.Semaphore(concurrency)
+    results: list = [None] * len(turns)
+
+    async def _one(i, speaker, body):
         voice = voice_a if speaker == "A" else voice_b
         out = tmpdir / f"seg_{i:03d}.mp3"
-        try:
-            await edge_tts.Communicate(body, voice, rate=rate).save(str(out))
-            files.append(out)
-        except Exception as e:
-            logger.warning(f"TTS failed for turn {i} ({speaker}): {e}")
-            files.append(None)
-    return files
+        async with sem:
+            for attempt in (1, 2):
+                try:
+                    await edge_tts.Communicate(body, voice, rate=rate).save(str(out))
+                    results[i] = out
+                    return
+                except Exception as e:
+                    if attempt == 2:
+                        logger.warning(f"TTS failed for turn {i} ({speaker}): {e}")
+                    else:
+                        await asyncio.sleep(1.5)
+
+    await asyncio.gather(*(_one(i, s, b) for i, (s, b) in enumerate(turns)))
+    done = sum(1 for r in results if r)
+    logger.info(f"TTS rendered {done}/{len(turns)} turns")
+    return results
 
 
 def _mix_music(narration, AudioSegment):
