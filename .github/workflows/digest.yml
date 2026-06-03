@@ -2,11 +2,11 @@ name: Anesthesia Digest
 
 on:
   schedule:
-    # Monday & Thursday 11:00 UTC (7:00 AM ET summer)
-    - cron: '0 11 * * 1,4'
-    # Saturday 12:00 UTC (8:00 AM ET)
+    # Monday 11:00 UTC (7:00 AM ET summer) — weekly digest
+    - cron: '0 11 * * 1'
+    # Saturday 12:00 UTC (8:00 AM ET) — weekly CME
     - cron: '0 12 * * 6'
-    # 1st of each month 13:00 UTC (9:00 AM ET)
+    # 1st of each month 13:00 UTC (9:00 AM ET) — monthly MOC
     - cron: '0 13 1 * *'
 
   workflow_dispatch:

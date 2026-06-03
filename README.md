@@ -6,7 +6,7 @@ Automated email service covering 10 leading anesthesia journals. Runs free on Gi
 
 | Day | Email |
 |-----|-------|
-| **Monday & Thursday** | New **open-access** articles (most clinically relevant one per journal, chosen by Claude in a single batched call), journal podcast cards, and a ~15 min AI **two-host** audio summary played inline via GitHub Pages |
+| **Monday** | New **open-access** articles (most clinically relevant one per journal, chosen by Claude in a single batched call), journal podcast cards, and a ~15 min AI **two-host** audio summary played inline via GitHub Pages |
 | **Saturday** | Week's top articles + 10 AI-generated CME questions, plus a button to an interactive online quiz with instant grading, explanations, and a downloadable PDF certificate (RCPSC Section 2 & 3) |
 | **1st of month** | Top 5 monthly articles + MOC Excel tracker attached |
 
@@ -156,7 +156,7 @@ Change in `config.py` → `MODE`.
 
 ## Troubleshooting
 
-**Empty emails?** Normal for the first run if between journal issues. The `INITIAL_LOOKBACK_DAYS = 30` setting pulls the last month to start. Reduce to `4` after 2-3 weeks.
+**Empty emails?** Normal for the first run if between journal issues. The `INITIAL_LOOKBACK_DAYS = 30` setting pulls the last month to start. Reduce to `7` after 2-3 weeks (the digest now runs weekly on Monday, so a 7-day window covers everything since the last one).
 
 **No audio / player empty?** Check that `ANTHROPIC_API_KEY` is set in GitHub Secrets, that GitHub Pages is enabled (Settings → Pages → `/docs` on `main`), and that the workflow has `permissions: contents: write` (already set) so it can push the episode.
 

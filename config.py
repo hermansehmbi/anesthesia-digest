@@ -64,8 +64,9 @@ AUDIO_SUBDIR = "audio"
 
 # ── Initial Run Settings ─────────────────────────────────────────────────────
 # For the first few weeks, pull from older issues so emails aren't empty.
-# Set to 30 to get the last month of articles; reduce to 4 once running.
-INITIAL_LOOKBACK_DAYS = 30  # Change to 4 after the first 2-3 weeks
+# Set to 30 to get the last month of articles; reduce to 7 once running
+# (the digest runs weekly on Monday, so 7 days covers a full week).
+INITIAL_LOOKBACK_DAYS = 30  # Change to 7 after the first 2-3 weeks
 
 # ── Journal Registry ─────────────────────────────────────────────────────────
 JOURNALS = [
@@ -207,6 +208,6 @@ BONUS_PODCASTS = [
 ]
 
 # ── Schedule Reference ───────────────────────────────────────────────────────
-# Monday & Thursday  → biweekly digest (articles + podcasts + audio if API)
-# Saturday           → weekly CME questions (API) + week's highlights
-# 1st of month       → monthly top-5 + MOC tracker attachment
+# Monday        → weekly digest (articles + podcasts + audio if API)
+# Saturday      → weekly CME questions (API) + week's highlights
+# 1st of month  → monthly top-5 + MOC tracker attachment

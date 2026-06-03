@@ -2,7 +2,7 @@
 Anesthesia Journal Digest — Main
 ==================================
 Usage:
-    python main.py digest          # Monday/Thursday article digest
+    python main.py digest          # Monday weekly article digest
     python main.py saturday        # Saturday CME + week highlights
     python main.py monthly         # Monthly top-5 + MOC tracker
     python main.py preview         # Preview digest locally (no email)
@@ -34,17 +34,16 @@ FEATURED_FILE = "featured_cache.json"  # only the articles actually shown in a d
 
 
 def run_digest(preview=False):
-    """Monday/Thursday: articles + podcasts + audio (if API mode)."""
+    """Monday (weekly): articles + podcasts + audio (if API mode)."""
     logger.info("=" * 50)
     logger.info("DIGEST — fetching articles and podcasts")
     logger.info("=" * 50)
 
     since = INITIAL_LOOKBACK_DAYS
-    # After initial period, use shorter windows
-    # Monday=0 covers Thu-Sun (4 days), Thursday=3 covers Mon-Wed (3 days)
-    dow = datetime.now().weekday()
+    # The digest runs once a week (Monday), so once past the initial backfill
+    # period look back a full week to cover everything since the last digest.
     if since <= 7:
-        since = 4 if dow == 0 else 3
+        since = 7
 
     all_articles = []
     for j in JOURNALS:
@@ -108,7 +107,7 @@ def run_saturday(preview=False):
     logger.info("=" * 50)
 
     # CME quiz is built from the articles actually FEATURED in this week's
-    # Monday/Thursday digests, so the quiz tests what was emailed. Fall back to
+    # Monday digests, so the quiz tests what was emailed. Fall back to
     # the full weekly cache (or a fresh fetch) only if no featured set exists.
     week = _load_featured(days=7)
     source = "featured digest articles"
