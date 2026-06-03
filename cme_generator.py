@@ -151,29 +151,12 @@ Generate exactly {num_questions} questions, each from a different article, at ex
 difficulty, with statistics grounded ONLY in the provided source text."""
 
     try:
-        import httpx
-
-        response = httpx.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json",
-            },
-            json={
-                "model": CLAUDE_MODEL,
-                "max_tokens": 8192,
-                "messages": [{"role": "user", "content": prompt}],
-            },
-            timeout=120,
-        )
-        response.raise_for_status()
-        data = response.json()
-
-        text = ""
-        for block in data.get("content", []):
-            if block.get("type") == "text":
-                text += block["text"]
+        # Stream the response so a long generation never trips a single read
+        # timeout (the previous non-streaming call timed out at 120s).
+        text = _stream_message(api_key, CLAUDE_MODEL, prompt, max_tokens=8192)
+        if not text.strip():
+            logger.error("CME stream returned no text")
+            return None
 
         # Parse JSON (strip any accidental markdown fences)
         text = text.strip()
@@ -206,6 +189,65 @@ difficulty, with statistics grounded ONLY in the provided source text."""
     except Exception as e:
         logger.error(f"Claude API call failed for CME: {e}")
         return None
+
+
+# ── Streaming API call ───────────────────────────────────────────────────────
+
+def _stream_message(api_key: str, model: str, prompt: str, max_tokens: int) -> str:
+    """Call the Anthropic Messages API in streaming mode and return the full text.
+
+    Streaming avoids a single long read timeout: the per-read timeout only has to
+    cover the gap between SSE chunks (which arrive continuously), not the whole
+    multi-minute generation. Same model and output as a non-streaming call.
+    """
+    import httpx
+
+    # connect/read/write/pool — read is the max gap BETWEEN streamed chunks.
+    timeout = httpx.Timeout(connect=30.0, read=120.0, write=30.0, pool=30.0)
+    parts: list[str] = []
+    with httpx.stream(
+        "POST",
+        "https://api.anthropic.com/v1/messages",
+        headers={
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        },
+        json={
+            "model": model,
+            "max_tokens": max_tokens,
+            "stream": True,
+            "messages": [{"role": "user", "content": prompt}],
+        },
+        timeout=timeout,
+    ) as response:
+        if response.status_code != 200:
+            body = response.read().decode("utf-8", "replace")
+            raise RuntimeError(f"Anthropic API HTTP {response.status_code}: {body[:300]}")
+
+        for line in response.iter_lines():
+            if not line or not line.startswith("data:"):
+                continue
+            payload = line[5:].strip()
+            if payload == "[DONE]":
+                break
+            try:
+                evt = json.loads(payload)
+            except json.JSONDecodeError:
+                continue
+            etype = evt.get("type")
+            if etype == "content_block_delta":
+                delta = evt.get("delta", {})
+                if delta.get("type") == "text_delta":
+                    parts.append(delta.get("text", ""))
+            elif etype == "error":
+                raise RuntimeError(f"Anthropic stream error: {evt.get('error')}")
+            elif etype == "message_stop":
+                break
+
+    text = "".join(parts)
+    logger.info(f"CME stream assembled {len(text)} chars ({len(text.split())} words)")
+    return text
 
 
 # ── Answer-position randomization ────────────────────────────────────────────

@@ -64,7 +64,7 @@ jobs:
         with:
           path: |
             articles_cache.json
-            featured_cache.json
+            monday_featured.json
             fulltext_cache.json
           key: cache-${{ github.run_id }}
           restore-keys: cache-
@@ -103,7 +103,7 @@ jobs:
         with:
           path: |
             articles_cache.json
-            featured_cache.json
+            monday_featured.json
             fulltext_cache.json
           key: cache-${{ github.run_id }}
 

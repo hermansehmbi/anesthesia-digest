@@ -30,7 +30,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 CACHE_FILE = "articles_cache.json"
-FEATURED_FILE = "featured_cache.json"  # only the articles actually shown in a digest
+# The EXACT final list of articles emailed in the most recent Monday digest.
+# Saturday CME reads ONLY from this file — no re-fetching, no new articles.
+MONDAY_FEATURED_FILE = "monday_featured.json"
 
 
 def run_digest(preview=False):
@@ -64,10 +66,9 @@ def run_digest(preview=False):
     selected = select_digest_articles(all_articles, per_journal=1, max_total=10)
     logger.info(f"Selected {len(selected)} articles for the digest email")
 
-    # Record exactly what was featured this week so Saturday's CME quiz can be
-    # built from the articles the reader actually saw (not the full fetch).
-    if not preview:
-        _cache_featured(selected)
+    # Save the EXACT final list emailed in this Monday digest (overwrite). The
+    # Saturday CME reads only from this so it tests precisely these articles.
+    _write_monday_featured(selected)
 
     # API mode: generate the two-host audio podcast from the same selection so
     # the audio summary matches the articles shown in the email, then publish
@@ -101,49 +102,59 @@ def run_digest(preview=False):
 
 
 def run_saturday(preview=False):
-    """Saturday: week's highlights + CME questions (if API mode)."""
+    """Saturday: CME questions built from EXACTLY this week's Monday digest."""
     logger.info("=" * 50)
     logger.info("SATURDAY — CME and weekly review")
     logger.info("=" * 50)
 
-    # CME quiz is built from the articles actually FEATURED in this week's
-    # Monday digests, so the quiz tests what was emailed. Fall back to
-    # the full weekly cache (or a fresh fetch) only if no featured set exists.
-    week = _load_featured(days=7)
-    source = "featured digest articles"
-    if not week:
-        week = _load_cached(days=7)
-        source = "weekly article cache (no featured set found)"
-    if not week:
-        logger.info("Cache empty — fetching last 7 days")
-        for j in JOURNALS:
-            week.extend(fetch_articles(j, since_days=7))
-        source = "fresh 7-day fetch"
+    # Locked to Monday's digest: read ONLY the exact articles that were emailed
+    # Monday. No re-fetching, no newly-appeared articles.
+    week = _load_monday_featured()
+    logger.info(f"Monday digest articles: {len(week)} "
+                f"(locked to {MONDAY_FEATURED_FILE})")
 
-    logger.info(f"Week's articles: {len(week)} (from {source})")
+    # Free mode has no CME — just a weekly highlights review of Monday's set.
+    if MODE != "api":
+        subject, html = build_saturday_email(week, cme_questions=None, quiz_url=None)
+        if preview:
+            _save(subject, html, "saturday")
+        else:
+            send_email(RECIPIENT_EMAIL, subject, html, SENDER_EMAIL)
+        return
 
-    # API mode: generate 10 CME questions and publish an interactive quiz page.
+    # API mode: CME is required. Never send a question-less email — if anything
+    # fails, flag it (non-zero exit) so the failure is visible instead of silent.
+    if not week:
+        logger.error(f"No Monday digest articles in {MONDAY_FEATURED_FILE} — "
+                     "run the Monday digest first. NOT sending a CME email.")
+        if not preview:
+            sys.exit(1)
+        return
+
     cme = None
+    try:
+        from cme_generator import generate_cme_questions
+        cme = generate_cme_questions(week, num_questions=10)
+    except Exception as e:
+        logger.error(f"CME generation raised: {e}")
+
+    if not cme:
+        logger.error("CME generation failed (no questions produced) — "
+                     "NOT sending a question-less email.")
+        if not preview:
+            sys.exit(1)
+        return
+
+    log_cme(cme)
+
     quiz_url = None
-    if MODE == "api" and week:
-        try:
-            from cme_generator import generate_cme_questions
-            cme = generate_cme_questions(week, num_questions=10)
-            if cme:
-                # Log CME to MOC tracker
-                log_cme(cme)
-                # Publish the interactive quiz to GitHub Pages.
-                try:
-                    from publisher import publish_cme_quiz
-                    quiz_url = publish_cme_quiz(cme, datetime.now(),
-                                                push=not preview)
-                except Exception as e:
-                    logger.error(f"CME quiz publishing failed: {e}")
-        except Exception as e:
-            logger.error(f"CME generation failed: {e}")
+    try:
+        from publisher import publish_cme_quiz
+        quiz_url = publish_cme_quiz(cme, datetime.now(), push=not preview)
+    except Exception as e:
+        logger.error(f"CME quiz publishing failed: {e}")
 
     subject, html = build_saturday_email(week, cme_questions=cme, quiz_url=quiz_url)
-
     if preview:
         _save(subject, html, "saturday")
     else:
@@ -220,50 +231,28 @@ def _load_cached(days=7) -> list:
     return out
 
 
-def _cache_featured(selected: list):
-    """Append the articles featured in a digest, stamped with featured_at, so
-    Saturday can rebuild the week's set. De-duplicated by URL."""
-    p = Path(FEATURED_FILE)
-    existing = []
-    if p.exists():
-        try:
-            existing = json.loads(p.read_text(encoding="utf-8"))
-        except Exception:
-            existing = []
-    seen = {a.get("url") for a in existing}
-    stamp = datetime.now().isoformat()
+def _write_monday_featured(selected: list):
+    """Overwrite monday_featured.json with the EXACT list emailed this Monday."""
+    out = []
     for art in selected:
-        if art.get("url") in seen:
-            continue
         copy = dict(art)
         if isinstance(copy.get("date"), datetime):
             copy["date"] = copy["date"].isoformat()
-        copy["featured_at"] = stamp
-        existing.append(copy)
-        seen.add(art.get("url"))
-    p.write_text(json.dumps(existing, default=str), encoding="utf-8")
-    logger.info(f"Recorded {len(selected)} featured articles → {FEATURED_FILE}")
+        out.append(copy)
+    Path(MONDAY_FEATURED_FILE).write_text(json.dumps(out, default=str),
+                                          encoding="utf-8")
+    logger.info(f"Saved {len(out)} Monday featured articles → {MONDAY_FEATURED_FILE}")
 
 
-def _load_featured(days=7) -> list:
-    """Load featured articles whose featured_at is within the window."""
-    p = Path(FEATURED_FILE)
+def _load_monday_featured() -> list:
+    """Load the exact Monday digest article list (or [] if none yet)."""
+    p = Path(MONDAY_FEATURED_FILE)
     if not p.exists():
         return []
     try:
-        items = json.loads(p.read_text(encoding="utf-8"))
+        return json.loads(p.read_text(encoding="utf-8"))
     except Exception:
         return []
-    cutoff = datetime.now() - timedelta(days=days)
-    out = []
-    for art in items:
-        fa = art.get("featured_at")
-        try:
-            if fa and datetime.fromisoformat(fa) >= cutoff:
-                out.append(art)
-        except (ValueError, TypeError):
-            continue
-    return out
 
 
 def _save(subject, html, label):
