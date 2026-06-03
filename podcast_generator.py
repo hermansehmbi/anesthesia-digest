@@ -7,12 +7,14 @@ Anesthesia Journal Digest — AI Two-Host Podcast Generator
 3. pydub stitches the segments in order and mixes in intro / outro music.
 
 Cost: ~$0.01-0.04 per episode (Claude API only; Edge TTS is free).
-Requires ffmpeg on the system PATH (GitHub Actions has it; `brew install
-ffmpeg` on a Mac).
+Requires the ffmpeg/ffprobe binaries on PATH for the two-host stitch+music mix
+(the CI workflow installs them via apt; `brew install ffmpeg` on a Mac). If they
+are missing it degrades to a single-voice file instead of producing nothing.
 """
 
 import os
 import re
+import shutil
 import asyncio
 import logging
 import tempfile
@@ -197,7 +199,16 @@ def _render_audio(turns: list[tuple[str, str]], output_path: str) -> str | None:
     try:
         from pydub import AudioSegment
     except ImportError:
-        logger.warning("pydub/ffmpeg not available — falling back to single file")
+        logger.warning("pydub not installed — falling back to single-voice file")
+        return _render_single_voice(turns, output_path)
+
+    # pydub needs the ffmpeg/ffprobe binaries to read & mix MP3s. If they aren't
+    # on PATH, multi-voice stitching cannot work — degrade to a single-voice
+    # file (edge-tts writes MP3 directly, no ffmpeg needed) rather than produce
+    # nothing.
+    if not (shutil.which("ffmpeg") and shutil.which("ffprobe")):
+        logger.warning("ffmpeg/ffprobe not found on PATH — falling back to "
+                       "single-voice file (install ffmpeg for the two-host mix)")
         return _render_single_voice(turns, output_path)
 
     from config import HOST_A_VOICE, HOST_B_VOICE, TTS_RATE
