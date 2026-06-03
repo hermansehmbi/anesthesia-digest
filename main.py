@@ -134,7 +134,9 @@ def run_saturday(preview=False):
     cme = None
     try:
         from cme_generator import generate_cme_questions
-        cme = generate_cme_questions(week, num_questions=10)
+        # One question per Monday article (no repeats). Usually 10; fewer if a
+        # journal had no open-access article that week.
+        cme = generate_cme_questions(week, num_questions=len(week))
     except Exception as e:
         logger.error(f"CME generation raised: {e}")
 

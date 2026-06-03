@@ -163,8 +163,8 @@ def build_saturday_email(articles_this_week: list,
         top = sorted(articles_this_week, key=lambda a: a["impact_factor"], reverse=True)[:10]
         highlights = """
     <tr><td style="padding:18px 20px 6px;">
-        <h2 style="margin:0;font-size:20px;color:#1a5276;font-family:Georgia,serif;">📋 This Week's Top Articles</h2>
-        <p style="font-size:14px;color:#999;margin:5px 0 0;">Great candidates for RCPSC Section 2 self-learning credits</p>
+        <h2 style="margin:0;font-size:20px;color:#1a5276;font-family:Georgia,serif;">📋 This Week's Articles</h2>
+        <p style="font-size:14px;color:#999;margin:5px 0 0;">This week's CME quiz is based on these articles</p>
     </td></tr>"""
         for i, art in enumerate(top, 1):
             oa = ' <span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;">OA</span>' if art["is_open_access"] else ""
@@ -175,46 +175,8 @@ def build_saturday_email(articles_this_week: list,
         <div style="font-size:13px;color:#999;">{art['journal_abbr']} · {art['date_str']}</div>
     </td></tr>"""
 
-    # CME Questions (API mode only)
-    cme_html = ""
-    if cme_questions:
-        cme_html = """
-    <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
-    <tr><td style="padding:18px 20px 6px;">
-        <h2 style="margin:0;font-size:20px;color:#1a5276;font-family:Georgia,serif;">🎓 Weekly CME Questions</h2>
-        <p style="font-size:14px;color:#999;margin:5px 0 0;">
-            RCPSC Section 2 (self-learning) & Section 3 (self-assessment) · Answers below
-        </p>
-    </td></tr>"""
-
-        # Questions first
-        for i, q in enumerate(cme_questions, 1):
-            options_html = ""
-            for letter, text in q["options"].items():
-                options_html += f'<div style="margin:5px 0;font-size:16px;line-height:1.5;"><strong>{letter}.</strong> {text}</div>'
-
-            cme_html += f"""
-    <tr><td style="padding:14px 20px 4px 30px;">
-        <div style="font-size:18px;font-weight:600;color:#2c3e50;line-height:1.5;">Q{i}. {q['question']}</div>
-        <div style="font-size:14px;color:#888;margin-top:4px;margin-bottom:6px;">Source: {q['source_journal']} —
-            <a href="{q.get('source_url', '#')}" style="color:#2e86c1;">{q['source_article'][:60]}...</a>
-        </div>
-        <div style="padding:8px 14px;background:#f8f9fa;border-radius:4px;">{options_html}</div>
-    </td></tr>"""
-
-        # Answer key
-        cme_html += """
-    <tr><td style="padding:20px 20px 6px;">
-        <h3 style="margin:0;font-size:18px;color:#1a5276;border-top:2px solid #1a5276;padding-top:14px;">
-            Answer Key
-        </h3>
-    </td></tr>"""
-        for i, q in enumerate(cme_questions, 1):
-            cme_html += f"""
-    <tr><td style="padding:6px 20px 12px 30px;">
-        <div style="font-size:16px;"><strong>Q{i}: {q['correct']}</strong></div>
-        <div style="font-size:16px;color:#555;line-height:1.6;margin-top:4px;">{q['rationale']}</div>
-    </td></tr>"""
+    # Questions are NOT shown in the email — they live only on the quiz page.
+    # The email shows the source articles and the "Take the CME Quiz" button.
 
     # MOC reminder
     moc_html = f"""
@@ -233,9 +195,8 @@ def build_saturday_email(articles_this_week: list,
         <h1 style="margin:0;color:#fff;font-size:24px;font-family:Georgia,serif;">Weekly CME & Review</h1>
         <p style="margin:7px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">{date_str} · Week of {week_start.strftime('%b %d')}</p>
     </td></tr>
-    {quiz_cta}
     {highlights}
-    {cme_html}
+    {quiz_cta}
     {moc_html}""")
 
     return subject, html

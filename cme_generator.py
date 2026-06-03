@@ -46,14 +46,19 @@ def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict
         logger.warning("No articles for CME generation")
         return None
 
-    from config import CLAUDE_MODEL, CME_SOURCE_CHARS
+    # Haiku (cheap model) for CME generation — streaming keeps it from timing out.
+    from config import CLAUDE_MODEL_FAST, CME_SOURCE_CHARS
 
-    # Pick the ~10 articles that will actually drive the quiz (need substance).
-    candidates = [a for a in articles if len(a.get("abstract", "")) > 100]
-    if not candidates:
-        candidates = articles
-    candidates = sorted(candidates, key=lambda a: a["impact_factor"],
+    # One question per article. Keep every provided article (they're Monday's
+    # featured set); just order by impact and cap at num_questions.
+    candidates = sorted(articles, key=lambda a: a["impact_factor"],
                         reverse=True)[:num_questions]
+    # Match the question count to the actual number of articles so the prompt's
+    # "one question per article" instruction is exactly satisfiable.
+    num_questions = len(candidates)
+    if num_questions == 0:
+        logger.warning("No articles to build CME questions from")
+        return None
 
     # Fetch (and cache) full text ONLY for these CME articles so explanations
     # can quote real statistics. Open access → parsed Results/Discussion/etc.;
@@ -103,36 +108,36 @@ internal guidance only and must not appear in the output.
 ARTICLES FOR THIS WEEK (each has source text — full text if open access, otherwise abstract):
 {articles_text}
 
-Generate EXACTLY {num_questions} single-best-answer multiple-choice questions. For each:
-1. Base it on a DIFFERENT article from the list above.
-2. Write a REALISTIC CLINICAL VIGNETTE question with specific patient details (age, sex,
+Generate EXACTLY {num_questions} single-best-answer multiple-choice questions — ONE question
+per article, using EACH article in the list exactly once (there are {num_questions} articles).
+No two questions may come from the same article, and no two may test the same teaching point.
+
+For each question:
+1. Make it a REALISTIC CLINICAL question with specific patient details (age, sex,
    comorbidities, procedure, doses, monitoring, or context) — e.g. "A 72-year-old undergoes
-   elective hip arthroplasty under spinal anesthesia. Which intervention has the strongest
-   evidence for reducing postoperative delirium?" Some may be focused knowledge questions,
-   but most should be scenarios. Do NOT describe the target audience in the question.
+   elective hip arthroplasty under spinal anesthesia. Which intervention best reduces
+   postoperative delirium?" Do NOT describe the target audience in the question.
+2. Focus on CLINICAL DECISION-MAKING, not statistics. Test things like: best management step,
+   drug or dose choice, technique selection, recognizing/managing a complication, monitoring,
+   or applying the article's finding to the patient. AT MOST 1-2 of the {num_questions}
+   questions may be about interpreting statistical results (effect sizes, CIs, etc.) — the
+   rest must be clinical-application questions, NOT statistics questions.
 3. Provide exactly 4 options (A-D): ONE clearly correct answer and three plausible
    distractors. Avoid "all/none of the above".
-4. Write a full-paragraph explanation of ABOUT 10 LINES (8-12 sentences). It MUST:
-   - quote ACTUAL effect sizes and statistics taken from that article's Source text above —
-     the types of figures to look for are mean/median differences, relative risk, odds or
-     hazard ratios, NNT, confidence intervals, p-values, and percentages, reported with the
-     exact values found in that article's Source text;
-   - explain WHY the correct choice is right, then why EACH of the other choices is wrong,
-     REFERRING TO THE CHOICES BY THEIR CONTENT/WORDING, never by their letter (do not write
-     "Option A/B/C/D"), because the option order will be randomized after generation;
-   - end with the practical bedside takeaway.
-   CRITICAL: Use ONLY numbers that actually appear in that article's Source text. Do NOT copy
-   any numbers from these instructions. If the source is abstract-only or a specific number is
-   not present, describe the direction and magnitude qualitatively instead. NEVER fabricate or
-   guess statistics, confidence intervals, or p-values that are not in the provided text.
+4. Write a CONCISE explanation of 5 to 10 LINES MAXIMUM (do NOT exceed 10 lines). State why
+   the correct choice is right with clinical reasoning, then briefly why the main distractors
+   are wrong. You MAY mention one real effect size/number from the article's Source text if it
+   adds value, but keep it brief — do not pad with statistics. Refer to choices BY THEIR
+   CONTENT/WORDING, never by letter (the option order is randomized afterwards).
+   Use ONLY numbers that actually appear in the Source text; if abstract-only or a number
+   isn't present, stay qualitative. NEVER fabricate statistics, CIs, or p-values.
 5. Reference the source article (use its exact title, journal, and URL from the list).
-6. VARY which option is correct across the set — do not make the same letter correct every
-   time. (The positions will also be shuffled afterwards as a safeguard.)
+6. VARY which option is correct across the set (positions are also shuffled afterwards).
 
 RESPOND IN THIS EXACT JSON FORMAT (no markdown, no backticks, just raw JSON):
 [
   {{
-    "question": "A 65-year-old ... <clinical vignette> ... Which ... ?",
+    "question": "A 65-year-old ... <clinical scenario> ... What is the best ... ?",
     "options": {{
       "A": "<distinct option text>",
       "B": "<distinct option text>",
@@ -140,20 +145,20 @@ RESPOND IN THIS EXACT JSON FORMAT (no markdown, no backticks, just raw JSON):
       "D": "<distinct option text>"
     }},
     "correct": "<the letter of the correct option>",
-    "rationale": "<about 10 lines. State the article's real figures from its Source text. Explain why the correct choice is right and why each other choice is wrong, naming choices by their wording (not by letter). End with the bedside takeaway.>",
+    "rationale": "<5-10 lines max. Clinical reasoning for the correct choice, brief note on why the main distractors are wrong, optionally ONE real figure from the Source text. Name choices by wording, not letter.>",
     "source_article": "Exact title of the source article",
     "source_journal": "<journal abbreviation>",
     "source_url": "https://..."
   }}
 ]
 
-Generate exactly {num_questions} questions, each from a different article, at exam-level
-difficulty, with statistics grounded ONLY in the provided source text."""
+Generate exactly {num_questions} clinically-focused questions — one per article, each testing
+a different point, explanations 5-10 lines."""
 
     try:
         # Stream the response so a long generation never trips a single read
         # timeout (the previous non-streaming call timed out at 120s).
-        text = _stream_message(api_key, CLAUDE_MODEL, prompt, max_tokens=8192)
+        text = _stream_message(api_key, CLAUDE_MODEL_FAST, prompt, max_tokens=8192)
         if not text.strip():
             logger.error("CME stream returned no text")
             return None
