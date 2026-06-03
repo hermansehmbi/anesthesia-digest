@@ -46,7 +46,7 @@ def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict
         logger.warning("No articles for CME generation")
         return None
 
-    from config import CLAUDE_MODEL
+    from config import CLAUDE_MODEL, CME_SOURCE_CHARS
 
     # Pick the ~10 articles that will actually drive the quiz (need substance).
     candidates = [a for a in articles if len(a.get("abstract", "")) > 100]
@@ -85,7 +85,7 @@ def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict
             f"[{i}] Journal: {art['journal_abbr']} | Title: {art['title']}\n"
             f"URL: {art['url']}\n"
             f"Access: {access}\n"
-            f"Source text:\n{body[:2400]}"
+            f"Source text:\n{body[:CME_SOURCE_CHARS]}"
         )
     articles_text = "\n\n".join(briefs)
 

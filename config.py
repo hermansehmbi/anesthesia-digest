@@ -24,7 +24,16 @@ MODE = "api"
 # ALWAYS read from the ANTHROPIC_API_KEY environment variable / GitHub Secret.
 # Never paste a key here — this repo is public. Kept only as an empty fallback.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+# Strong model — used only where reasoning quality matters most (CME questions).
 CLAUDE_MODEL = "claude-sonnet-4-6"
+# Cheaper/faster model — used for the simpler tasks (article selection,
+# podcast script writing) to cut cost while keeping quality.
+CLAUDE_MODEL_FAST = "claude-haiku-4-5"
+
+# Cap how much article source text is sent to the API per CME article (chars).
+# The fetcher already extracts only Results/Discussion/Conclusions sections;
+# this truncates them further to keep token cost down.
+CME_SOURCE_CHARS = 1600
 
 # ── Audio Settings (only if MODE = "api") ────────────────────────────────────
 # Two-host NotebookLM-style conversation. Host A = male, Host B = female.
@@ -32,10 +41,10 @@ HOST_A_VOICE = "en-US-AndrewMultilingualNeural"  # Host A — male, warm
 HOST_B_VOICE = "en-US-AvaMultilingualNeural"     # Host B — female, bright
 TTS_VOICE = HOST_A_VOICE        # Back-compat single-voice fallback
 TTS_VOICE_ALT = HOST_B_VOICE
-TTS_RATE = "+25%"               # Faster playback → ~15 min listening time
-# ~2600 words at +25% speed ≈ 15 minutes of actual listening time.
+TTS_RATE = "+10%"               # Gentle speed-up — natural pace, not rushed
+# ~2400 words at +10% speed ≈ 15 minutes of actual listening time.
 PODCAST_MINUTES_TARGET = 15
-PODCAST_WORD_TARGET = 2600
+PODCAST_WORD_TARGET = 2400
 
 # ── Music / Mixing (assets/intro_music.mp3, assets/outro_music.mp3) ──────────
 INTRO_MUSIC = "assets/intro_music.mp3"

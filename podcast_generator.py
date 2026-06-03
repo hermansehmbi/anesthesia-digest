@@ -70,7 +70,7 @@ def _generate_script(articles: list) -> list[tuple[str, str]] | None:
         logger.error("No ANTHROPIC_API_KEY found. Set it as an environment variable.")
         return None
 
-    from config import CLAUDE_MODEL, PODCAST_WORD_TARGET
+    from config import CLAUDE_MODEL_FAST, PODCAST_WORD_TARGET
 
     # Use up to 10 articles — the script must cover ALL of them.
     articles = articles[:10]
@@ -96,8 +96,9 @@ There are TWO hosts:
 - Host A (warm, leads the discussion, sets up each topic)
 - Host B (curious, asks sharp follow-up questions, adds clinical color)
 
-TARGET LENGTH: about {PODCAST_WORD_TARGET} words total. This is important — it \
-needs to fill roughly 15 minutes of listening. Do not stop short.
+TARGET LENGTH: approximately {PODCAST_WORD_TARGET} words total (this fills about \
+15 minutes of listening). Aim for this length — do not stop far short, and do \
+not significantly exceed it.
 
 ARTICLES TO COVER (there are {n} — you MUST cover ALL {n}):
 {articles_text}
@@ -134,7 +135,7 @@ Write the full script now."""
                 "content-type": "application/json",
             },
             json={
-                "model": CLAUDE_MODEL,
+                "model": CLAUDE_MODEL_FAST,
                 "max_tokens": 8192,
                 "messages": [{"role": "user", "content": prompt}],
             },

@@ -1,8 +1,12 @@
 """
 Anesthesia Journal Digest — Smart Article Selection
 ====================================================
-For each journal with multiple new articles, ask the Claude API to pick the
-ONE most clinically relevant article for a practicing COMMUNITY anesthesiologist.
+Pick the ONE most clinically relevant article per journal for a practicing
+generalist anesthesiologist.
+
+- OPEN ACCESS ONLY: paywalled articles are never featured.
+- A SINGLE batched Claude API call (cheap model) chooses the best article for
+  every journal at once (instead of one call per journal).
 
 Selection priorities (high → low):
   HIGH  randomized controlled trials, systematic reviews, meta-analyses,
@@ -12,7 +16,6 @@ Selection priorities (high → low):
   LOW   basic-science / animal studies (e.g. mouse models), bibliometric or
         methodology papers, editorials, and letters
 
-Open access is used ONLY as a tiebreaker between two equally clinical articles.
 Falls back to a sensible heuristic if the API is unavailable.
 """
 
@@ -23,84 +26,91 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+_MAX_CANDIDATES_PER_JOURNAL = 8   # cap sent to the API to bound token cost
+_ABSTRACT_CHARS = 280             # truncate abstracts in the selection prompt
+
 
 def select_digest_articles(articles: list, per_journal: int = 1,
                            max_total: int = 10) -> list:
-    """Pick the best article(s) per journal, capped at ``max_total`` total.
+    """Pick the best OPEN-ACCESS article per journal, capped at ``max_total``.
 
-    Uses Claude to choose the single most clinically relevant article from each
-    journal that has more than one candidate. Journals are then ordered by
-    impact factor to fill the limited slots.
+    Paywalled articles are excluded entirely. For journals with more than one
+    open-access candidate, a single batched Claude call chooses the most
+    clinically relevant one across all journals at once.
     """
+    # OPEN ACCESS ONLY — never feature paywalled articles.
+    oa = [a for a in articles if a.get("is_open_access")]
+    dropped = len(articles) - len(oa)
+    if dropped:
+        logger.info(f"Open-access filter: kept {len(oa)}, dropped {dropped} paywalled")
+
     by_journal = {}
-    for a in articles:
+    for a in oa:
         by_journal.setdefault(a["journal_abbr"], []).append(a)
 
-    api_key = _api_key()
-
     selected = []
+    # Journals with a single candidate need no API call.
+    multi = {abbr: arts for abbr, arts in by_journal.items() if len(arts) > per_journal}
     for abbr, arts in by_journal.items():
-        if len(arts) <= per_journal:
-            selected.extend(arts)
-            continue
+        if abbr not in multi:
+            selected.extend(arts[:per_journal])
 
-        chosen = None
-        if api_key and per_journal == 1:
-            chosen = _claude_pick(arts, api_key)
-        if chosen is not None:
-            selected.append(chosen)
-        else:
-            # Heuristic fallback: clinical keywords first, then open access,
-            # then most recent.
-            ranked = sorted(arts, key=_heuristic_key, reverse=True)
-            selected.extend(ranked[:per_journal])
+    api_key = _api_key()
+    picks = {}
+    if api_key and per_journal == 1 and multi:
+        picks = _claude_pick_batch(multi, api_key)
+
+    for abbr, arts in multi.items():
+        chosen = picks.get(abbr)
+        if chosen is None:
+            chosen = sorted(arts, key=_heuristic_key, reverse=True)[0]
+        selected.append(chosen)
 
     # Highest-impact journals fill the limited slots first.
     selected.sort(key=lambda a: a["impact_factor"], reverse=True)
     return selected[:max_total]
 
 
-# ── Claude-driven pick ───────────────────────────────────────────────────────
+# ── Claude-driven pick (single batched call across all journals) ─────────────
 
-def _claude_pick(articles: list, api_key: str) -> dict | None:
-    """Ask Claude to choose the single most clinically relevant article."""
-    from config import CLAUDE_MODEL
+def _claude_pick_batch(by_journal: dict, api_key: str) -> dict:
+    """One API call: choose the best article for EVERY journal at once.
 
-    briefs = []
-    for i, art in enumerate(articles, 1):
-        brief = f"[{i}] {art['title']}"
-        if art.get("abstract"):
-            brief += f"\n    Abstract: {art['abstract'][:600]}"
-        if art.get("is_open_access"):
-            brief += "\n    (open access)"
-        briefs.append(brief)
-    candidates = "\n\n".join(briefs)
+    Returns {journal_abbr: chosen_article}. Missing/failed journals are left
+    out so the caller can fall back to the heuristic.
+    """
+    from config import CLAUDE_MODEL_FAST
 
-    prompt = f"""You are the editor of a digest for a practicing COMMUNITY \
-anesthesiologist (general OR list, obstetrics, regional, acute pain — not a \
-researcher). From the candidate articles below, all from the same journal, \
-pick the ONE single most clinically relevant article for that reader.
+    # Build a compact listing; cap candidates per journal and abstract length.
+    blocks = []
+    capped = {}
+    for abbr, arts in by_journal.items():
+        cand = arts[:_MAX_CANDIDATES_PER_JOURNAL]
+        capped[abbr] = cand
+        lines = [f"JOURNAL {abbr}:"]
+        for i, art in enumerate(cand, 1):
+            ab = (art.get("abstract") or "")[:_ABSTRACT_CHARS]
+            lines.append(f"  [{i}] {art['title']}\n      {ab}")
+        blocks.append("\n".join(lines))
+    listing = "\n\n".join(blocks)
 
-PRIORITIZE (most valuable first):
-- Randomized controlled trials
-- Systematic reviews and meta-analyses
-- Clinical practice guidelines and consensus statements
-- Topics with direct bedside impact: analgesia, airway, obstetric anesthesia,
-  perioperative management, regional techniques, patient safety
+    prompt = f"""You are the editor of a digest for a practicing generalist \
+anesthesiologist (general OR lists, obstetrics, regional, acute pain). For EACH \
+journal below, pick the ONE single most clinically relevant article for that \
+reader by its number.
 
-DEPRIORITIZE (rarely pick these):
-- Basic science or animal studies (e.g. mouse models)
-- Bibliometric, scientometric, or methodology papers
-- Editorials, commentaries, and letters
+PRIORITIZE: randomized controlled trials; systematic reviews and meta-analyses;
+clinical practice guidelines and consensus statements; topics with direct
+bedside impact (analgesia, airway, obstetric anesthesia, perioperative
+management, regional techniques, patient safety).
+DEPRIORITIZE: basic-science/animal studies (e.g. mouse models); bibliometric,
+scientometric, or methodology papers; editorials, commentaries, and letters.
 
-Open access should ONLY break a tie between two articles that are otherwise
-equally clinically relevant. Do not let open access outweigh clinical value.
+CANDIDATES (grouped by journal):
+{listing}
 
-CANDIDATE ARTICLES:
-{candidates}
-
-Respond with ONLY raw JSON, no markdown:
-{{"choice": <number>, "reason": "<one short sentence>"}}"""
+Respond with ONLY raw JSON, no markdown — one entry per journal:
+{{"picks": [{{"journal": "<abbr>", "choice": <number>}}, ...]}}"""
 
     try:
         import httpx
@@ -112,8 +122,8 @@ Respond with ONLY raw JSON, no markdown:
                 "content-type": "application/json",
             },
             json={
-                "model": CLAUDE_MODEL,
-                "max_tokens": 256,
+                "model": CLAUDE_MODEL_FAST,
+                "max_tokens": 600,
                 "messages": [{"role": "user", "content": prompt}],
             },
             timeout=60,
@@ -125,14 +135,22 @@ Respond with ONLY raw JSON, no markdown:
         if text.startswith("```"):
             text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
         result = json.loads(text)
-        idx = int(result.get("choice", 0)) - 1
-        if 0 <= idx < len(articles):
-            abbr = articles[idx]["journal_abbr"]
-            logger.info(f"  {abbr}: picked #{idx+1} — {result.get('reason', '')}")
-            return articles[idx]
+
+        chosen = {}
+        for pick in result.get("picks", []):
+            abbr = pick.get("journal")
+            cand = capped.get(abbr)
+            if not cand:
+                continue
+            idx = int(pick.get("choice", 0)) - 1
+            if 0 <= idx < len(cand):
+                chosen[abbr] = cand[idx]
+        logger.info(f"Batched selection: chose for {len(chosen)}/{len(by_journal)} "
+                    f"journals in 1 API call ({CLAUDE_MODEL_FAST})")
+        return chosen
     except Exception as e:
-        logger.warning(f"  Claude article pick failed ({e}); using heuristic")
-    return None
+        logger.warning(f"Batched article pick failed ({e}); using heuristic")
+        return {}
 
 
 # ── Heuristic fallback ───────────────────────────────────────────────────────

@@ -6,7 +6,7 @@ Automated email service covering 10 leading anesthesia journals. Runs free on Gi
 
 | Day | Email |
 |-----|-------|
-| **Monday & Thursday** | New articles (most clinically relevant one per journal, chosen by Claude), journal podcast cards, and a ~15 min AI **two-host** audio summary played inline via GitHub Pages |
+| **Monday & Thursday** | New **open-access** articles (most clinically relevant one per journal, chosen by Claude in a single batched call), journal podcast cards, and a ~15 min AI **two-host** audio summary played inline via GitHub Pages |
 | **Saturday** | Week's top articles + 10 AI-generated CME questions, plus a button to an interactive online quiz with instant grading, explanations, and a downloadable PDF certificate (RCPSC Section 2 & 3) |
 | **1st of month** | Top 5 monthly articles + MOC Excel tracker attached |
 
