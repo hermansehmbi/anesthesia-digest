@@ -25,6 +25,7 @@ from article_selector import select_digest_articles
 from email_builder import build_digest_email, build_saturday_email, build_monthly_email
 from email_sender import send_email
 from moc_tracker import log_articles, log_cme, update_summary, MOC_FILE
+import gsheets
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -69,6 +70,10 @@ def run_digest(preview=False):
     # Save the EXACT final list emailed in this Monday digest (overwrite). The
     # Saturday CME reads only from this so it tests precisely these articles.
     _write_monday_featured(selected)
+
+    # Rolling MOC log: append these articles (Google Sheets, or xlsx fallback).
+    if not preview:
+        _track_digest(selected)
 
     # API mode: generate the two-host audio podcast from the same selection so
     # the audio summary matches the articles shown in the email, then publish
@@ -147,7 +152,8 @@ def run_saturday(preview=False):
             sys.exit(1)
         return
 
-    log_cme(cme)
+    if not preview:
+        _track_cme(cme)
 
     quiz_url = None
     try:
@@ -183,17 +189,78 @@ def run_monthly(preview=False):
     ranked = oa + rest
     top5 = ranked[:5]
 
-    # Update MOC tracker
-    log_articles(ranked[:20])
-    update_summary()
+    # MOC: live Google Sheet (Monthly Top 5 + summary) or local xlsx fallback.
+    used_google = _track_monthly(ranked[:20])
 
     subject, html = build_monthly_email(all_articles, top5)
 
+    # Attach the local xlsx only in fallback mode (Google sheet is the live copy).
+    attachments = [] if used_google else [MOC_FILE]
     if preview:
         _save(subject, html, "monthly")
     else:
         send_email(RECIPIENT_EMAIL, subject, html, SENDER_EMAIL,
-                   attachments=[MOC_FILE])
+                   attachments=attachments)
+
+
+# ── MOC tracking (Google Sheets, with local xlsx fallback) ───────────────────
+
+def _track_digest(selected: list):
+    """Append featured articles to the live MOC sheet, or the xlsx fallback."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    if gsheets.is_configured():
+        try:
+            url = gsheets.log_digest(selected, today)
+            logger.info(f"MOC mode: Google Sheets (live) → {url}")
+            return
+        except Exception as e:
+            logger.error(f"Google Sheets MOC failed ({e}); falling back to local xlsx")
+    else:
+        logger.info("MOC mode: local xlsx (Google not configured)")
+    try:
+        log_articles(selected)
+    except Exception as e:
+        logger.error(f"Local xlsx MOC fallback failed: {e}")
+
+
+def _track_cme(cme: list):
+    """Append a CME Log row to the live MOC sheet, or the xlsx fallback."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    if gsheets.is_configured():
+        try:
+            url = gsheets.log_cme(today, len(cme))
+            logger.info(f"MOC mode: Google Sheets (live) → {url}")
+            return
+        except Exception as e:
+            logger.error(f"Google Sheets CME log failed ({e}); falling back to local xlsx")
+    else:
+        logger.info("MOC mode: local xlsx (Google not configured)")
+    try:
+        log_cme(cme)
+    except Exception as e:
+        logger.error(f"Local xlsx CME fallback failed: {e}")
+
+
+def _track_monthly(fallback_articles: list) -> bool:
+    """Update Monthly Top 5 + live Summary in Google Sheets. Returns True if the
+    Google path was used; False means the xlsx fallback ran (attach it)."""
+    month = datetime.now().strftime("%Y-%m")
+    if gsheets.is_configured():
+        try:
+            gsheets.update_monthly_top5(month)
+            url = gsheets.refresh_summary()
+            logger.info(f"MOC mode: Google Sheets (live) → {url}")
+            return True
+        except Exception as e:
+            logger.error(f"Google Sheets monthly update failed ({e}); falling back to xlsx")
+    else:
+        logger.info("MOC mode: local xlsx (Google not configured)")
+    try:
+        log_articles(fallback_articles)
+        update_summary()
+    except Exception as e:
+        logger.error(f"Local xlsx monthly fallback failed: {e}")
+    return False
 
 
 # ── Cache ────────────────────────────────────────────────────────────────────

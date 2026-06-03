@@ -34,6 +34,9 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
       SENDER_EMAIL: ${{ secrets.GMAIL_ADDRESS }}
+      # Tier 1 live MOC tracking (optional — falls back to local xlsx if unset).
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
       # Pages URL is derived from the repo context — no username hardcoded.
       GITHUB_PAGES_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
 

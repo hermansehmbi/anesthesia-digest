@@ -6,3 +6,8 @@ pydub>=0.25.1
 # pydub needs the ffmpeg/ffprobe binaries on PATH to read/write/mix MP3s.
 #   GitHub Actions: installed by the "Install ffmpeg" step in digest.yml.
 #   Local Mac: install it with `brew install ffmpeg`.
+
+# Tier 1: live MOC tracking in Google Sheets (service-account auth).
+gspread>=6.0.0
+google-auth>=2.23.0
+google-api-python-client>=2.100.0

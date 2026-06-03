@@ -11,6 +11,12 @@ fulltext_cache.json
 moc_tracker.xlsx
 .env
 
+# Google service-account keys — NEVER commit (use the GitHub Secret instead).
+service_account*.json
+*service-account*.json
+gcp-*.json
+credentials.json
+
 # Published podcast episodes ARE tracked so GitHub Pages can serve them.
 !docs/audio/*.mp3
 
