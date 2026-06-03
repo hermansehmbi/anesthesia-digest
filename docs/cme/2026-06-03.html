@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Weekly CME (June 03, 2026)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root { --navy:#1a5276; --blue:#2e86c1; --green:#1e8449; --red:#c0392b;
+          --bg:#f4f6f9; --card:#ffffff; --line:#e3e8ee; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         background:var(--bg); color:#2c3e50; font-size:16px; line-height:1.6; }
+  header { background:linear-gradient(135deg,var(--navy),var(--blue)); color:#fff;
+           padding:28px 20px; text-align:center; }
+  header h1 { margin:0; font-size:25px; font-family:Georgia,serif; }
+  header p { margin:8px 0 0; font-size:15px; opacity:.92; }
+  main { max-width:780px; margin:0 auto; padding:18px 16px 70px; }
+  .intro { background:#eef5fb; border:1px solid #d6e6f5; border-radius:10px;
+           padding:16px 18px; font-size:15px; color:#34516b; margin-bottom:20px; }
+  .question { background:var(--card); border:1px solid var(--line); border-radius:12px;
+             padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .qnum { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+          color:var(--blue); }
+  .qnum .of { color:#9bb1c4; font-weight:600; }
+  .qtext { font-size:18px; font-weight:600; margin:8px 0 16px; line-height:1.5; }
+  .option { display:flex; align-items:flex-start; gap:12px; padding:13px 14px;
+            border:1px solid var(--line); border-radius:9px; margin:9px 0; cursor:pointer;
+            transition:background .12s,border-color .12s; }
+  .option:hover { background:#f7fafd; }
+  .option input { margin-top:4px; flex:none; width:18px; height:18px; }
+  .opt-letter { font-weight:700; color:var(--navy); flex:none; font-size:16px; }
+  .opt-text { font-size:16px; }
+  .option.correct { border-color:var(--green); background:#eafaf1; }
+  .option.incorrect { border-color:var(--red); background:#fdedec; }
+  .result { margin-top:14px; padding:14px 16px; border-radius:9px; font-size:15.5px;
+            line-height:1.65; }
+  .result.right { background:#eafaf1; border:1px solid #abe2c1; }
+  .result.wrong { background:#fdedec; border:1px solid #f3b7b1; }
+  .result .verdict { font-weight:700; display:block; margin-bottom:6px; font-size:16px; }
+  .result .src { display:block; margin-top:10px; font-size:13.5px; color:#5b6b7a; }
+  .result .src a { color:var(--blue); }
+  .actions { position:sticky; bottom:0; background:linear-gradient(180deg,rgba(244,246,249,0),var(--bg) 32%);
+             padding:18px 0 10px; text-align:center; }
+  button { font:inherit; border:none; border-radius:26px; padding:15px 30px; font-weight:700;
+           font-size:16px; cursor:pointer; }
+  .btn-submit { background:var(--blue); color:#fff; }
+  .btn-submit:disabled { background:#9bb9d1; cursor:default; }
+  .btn-cert { background:var(--green); color:#fff; margin-left:8px; }
+  .scorebar { display:none; background:var(--navy); color:#fff; border-radius:12px;
+              padding:18px 20px; text-align:center; margin-bottom:20px; }
+  .scorebar .pct { font-size:34px; font-weight:800; }
+  .scorebar .detail { font-size:15px; opacity:.92; margin-top:2px; }
+  .namebox { display:none; margin-top:16px; }
+  .namebox label { display:block; font-size:14px; opacity:.92; margin-bottom:7px; }
+  .namebox input { font:inherit; font-size:16px; padding:12px 14px; border-radius:8px;
+                   border:1px solid var(--line); width:340px; max-width:86%; color:#2c3e50; }
+  .certinfo { display:none; margin-top:12px; font-size:13px; opacity:.92; font-family:monospace; }
+  .warn { color:var(--red); font-size:15px; margin-top:12px; display:none; }
+  footer { text-align:center; font-size:12.5px; color:#9bb1c4; padding:26px 16px 44px; }
+  footer a { color:#9bb1c4; }
+  @media (max-width:520px) {
+    .qtext { font-size:17px; }
+    .btn-cert { margin:10px 0 0; }
+    .actions button { width:100%; }
+    .namebox input { width:100%; max-width:100%; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>&#127891; Anesthesia Digest — Weekly CME</h1>
+    <p>June 03, 2026 · 10 single-best-answer questions</p>
+  </header>
+  <main>
+    <div class="scorebar" id="scorebar">
+      <div class="pct" id="scorePct">0%</div>
+      <div class="detail" id="scoreDetail"></div>
+      <div class="namebox" id="namebox">
+        <label for="participant">Enter your full name &amp; credentials for the certificate</label>
+        <input type="text" id="participant" placeholder="e.g. Dr. Jane Smith, MD, FRCPC" autocomplete="name">
+      </div>
+      <div class="certinfo" id="certinfo"></div>
+    </div>
+
+    <div class="intro">
+      Answer all 10 questions, then press <strong>Submit Test</strong> to see your score
+      and the explanations. This is a self-assessment activity suitable for
+      <strong>RCPSC Section 3</strong> credits.
+    </div>
+
+    <form id="quizForm">
+    <section class="question" id="card0" data-index="0">
+      <div class="qnum">Question 1 <span class="of">of 10</span></div>
+      <div class="qtext">A 68-year-old man with hypertension and moderate aortic stenosis is scheduled for elective aortic valve replacement with cardiopulmonary bypass. The anesthesia team is considering an opioid-free anesthesia (OFA) protocol using intravenous ketamine, dexamethasone, lidocaine, and magnesium sulfate instead of sufentanil-based anesthesia. Based on the best available randomized trial evidence, which of the following best describes the effect of OFA on the composite 30-day complication rate in this setting?</div>
+      <div class="options">
+        <label class="option" for="q0A">
+          <input type="radio" id="q0A" name="q0" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">OFA reduces the composite complication rate by approximately 9 percentage points, with a fragility index of 1, suggesting the result is statistically robust</span>
+        </label>
+        <label class="option" for="q0B">
+          <input type="radio" id="q0B" name="q0" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">OFA reduces the composite complication rate by approximately 9 percentage points, but the fragility index of 1 indicates the finding is statistically fragile</span>
+        </label>
+        <label class="option" for="q0C">
+          <input type="radio" id="q0C" name="q0" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">OFA increases the risk of cardiovascular complications compared with sufentanil-based anesthesia due to sympatholytic effects of the adjuncts</span>
+        </label>
+        <label class="option" for="q0D">
+          <input type="radio" id="q0D" name="q0" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">OFA shows no significant difference in the composite complication rate but significantly reduces intraoperative opioid consumption</span>
+        </label>
+      </div>
+      <div class="result" id="result0" hidden></div>
+    </section>
+    <section class="question" id="card1" data-index="1">
+      <div class="qnum">Question 2 <span class="of">of 10</span></div>
+      <div class="qtext">A 54-year-old woman undergoes elective laparoscopic right hemicolectomy as part of an enhanced recovery after surgery (ERAS) protocol. The surgeon requests a transversus abdominis plane (TAP) block for multimodal analgesia. The operating room has both an ultrasound machine and laparoscopic equipment available. Based on a recent multicenter randomized controlled trial, which statement best reflects the comparative analgesic efficacy of laparoscopic-assisted TAP (L-TAP) versus ultrasound-guided TAP (US-TAP) blocks in this setting?</div>
+      <div class="options">
+        <label class="option" for="q1A">
+          <input type="radio" id="q1A" name="q1" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">US-TAP is superior to placebo and non-inferior to L-TAP, making it the preferred technique in minimally invasive colon surgery</span>
+        </label>
+        <label class="option" for="q1B">
+          <input type="radio" id="q1B" name="q1" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">L-TAP is superior to placebo and non-inferior to US-TAP, although neither block met the predetermined minimal clinically important difference threshold</span>
+        </label>
+        <label class="option" for="q1C">
+          <input type="radio" id="q1C" name="q1" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Both US-TAP and L-TAP are superior to placebo and provide a clinically important reduction in 24-hour opioid consumption</span>
+        </label>
+        <label class="option" for="q1D">
+          <input type="radio" id="q1D" name="q1" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">L-TAP is inferior to US-TAP for 24-hour opioid consumption but superior to placebo for patient-reported quality of recovery</span>
+        </label>
+      </div>
+      <div class="result" id="result1" hidden></div>
+    </section>
+    <section class="question" id="card2" data-index="2">
+      <div class="qnum">Question 3 <span class="of">of 10</span></div>
+      <div class="qtext">A 45-year-old woman with no significant comorbidities is scheduled for elective laparoscopic cholecystectomy under general anesthesia. The anesthesiologist is considering preemptive intravenous dexmedetomidine to improve intraoperative nociception monitoring compliance and reduce postoperative pain. Based on a recent randomized controlled trial using the nociception index (NOX) as an objective measure, what is the most accurate description of dexmedetomidine&#x27;s effect on intraoperative NOX compliance?</div>
+      <div class="options">
+        <label class="option" for="q2A">
+          <input type="radio" id="q2A" name="q2" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Dexmedetomidine improved NOX compliance modestly, with approximately 55% of the dexmedetomidine group meeting the compliance threshold versus 12.5% of placebo</span>
+        </label>
+        <label class="option" for="q2B">
+          <input type="radio" id="q2B" name="q2" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Dexmedetomidine achieved NOX compliance in 90.7% of patients compared with 12.5% in the placebo group</span>
+        </label>
+        <label class="option" for="q2C">
+          <input type="radio" id="q2C" name="q2" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Dexmedetomidine and placebo achieved similar NOX compliance rates, but dexmedetomidine significantly reduced postoperative pain at 24 hours</span>
+        </label>
+        <label class="option" for="q2D">
+          <input type="radio" id="q2D" name="q2" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Dexmedetomidine reduced postoperative pain at 24 hours but had no measurable effect on intraoperative nociception monitoring</span>
+        </label>
+      </div>
+      <div class="result" id="result2" hidden></div>
+    </section>
+    <section class="question" id="card3" data-index="3">
+      <div class="qnum">Question 4 <span class="of">of 10</span></div>
+      <div class="qtext">A 71-year-old man with ischemic cardiomyopathy (ejection fraction 35%) and chronic kidney disease stage 3 undergoes elective coronary artery bypass grafting with cardiopulmonary bypass. The team debates whether opioid-free anesthesia using ketamine, dexamethasone, lidocaine, and magnesium might reduce postoperative myocardial damage compared with a standard sufentanil-based technique. According to the OFACAR trial, which of the following outcomes was specifically reported as significantly reduced with OFA?</div>
+      <div class="options">
+        <label class="option" for="q3A">
+          <input type="radio" id="q3A" name="q3" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Postoperative digestive complications, with an incidence of 2.5% versus 11.2% in the control group</span>
+        </label>
+        <label class="option" for="q3B">
+          <input type="radio" id="q3B" name="q3" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Postoperative respiratory failure requiring prolonged mechanical ventilation beyond 48 hours</span>
+        </label>
+        <label class="option" for="q3C">
+          <input type="radio" id="q3C" name="q3" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Postoperative neurological complications including stroke</span>
+        </label>
+        <label class="option" for="q3D">
+          <input type="radio" id="q3D" name="q3" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Postoperative acute kidney injury requiring renal replacement therapy</span>
+        </label>
+      </div>
+      <div class="result" id="result3" hidden></div>
+    </section>
+    <section class="question" id="card4" data-index="4">
+      <div class="qnum">Question 5 <span class="of">of 10</span></div>
+      <div class="qtext">A 60-year-old man is scheduled for elective laparoscopic sigmoid colectomy for recurrent diverticulitis. He has no significant cardiorespiratory comorbidities. The attending anesthesiologist proposes adding an ultrasound-guided TAP block as part of the ERAS protocol to reduce opioid consumption. A colleague argues that the laparoscopic-assisted TAP technique should be used instead because the surgeon can place it under direct vision. Based on the best available randomized evidence from a multicenter three-arm trial, which statement is most accurate?</div>
+      <div class="options">
+        <label class="option" for="q4A">
+          <input type="radio" id="q4A" name="q4" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Laparoscopic-assisted TAP is non-inferior to ultrasound-guided TAP and superior to placebo, though the reduction did not reach the minimal clinically important difference of 10 mg morphine</span>
+        </label>
+        <label class="option" for="q4B">
+          <input type="radio" id="q4B" name="q4" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Both ultrasound-guided and laparoscopic-assisted TAP blocks are superior to placebo and exceed the minimal clinically important difference of 10 mg morphine reduction</span>
+        </label>
+        <label class="option" for="q4C">
+          <input type="radio" id="q4C" name="q4" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Ultrasound-guided TAP is superior to placebo and should be preferred over laparoscopic-assisted TAP because it achieves a greater reduction in 24-hour morphine consumption</span>
+        </label>
+        <label class="option" for="q4D">
+          <input type="radio" id="q4D" name="q4" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Neither ultrasound-guided nor laparoscopic-assisted TAP was superior to placebo for 24-hour opioid consumption in this trial</span>
+        </label>
+      </div>
+      <div class="result" id="result4" hidden></div>
+    </section>
+    <section class="question" id="card5" data-index="5">
+      <div class="qnum">Question 6 <span class="of">of 10</span></div>
+      <div class="qtext">A 38-year-old woman with no known allergies undergoes elective open myomectomy under general anesthesia. Her anesthesiologist administers intravenous dexmedetomidine 1.5 µg·kg⁻¹·h⁻¹ starting 15 minutes before induction and continuing until 15 minutes post-induction as preemptive analgesia. Postoperatively in the recovery room, which outcome would the trial evidence most strongly support for this patient compared with a patient who received placebo?</div>
+      <div class="options">
+        <label class="option" for="q5A">
+          <input type="radio" id="q5A" name="q5" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Reduced need for postoperative antiemetics due to improved surgical field conditions</span>
+        </label>
+        <label class="option" for="q5B">
+          <input type="radio" id="q5B" name="q5" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Reduced incidence of intraoperative awareness due to improved depth of anesthesia monitoring</span>
+        </label>
+        <label class="option" for="q5C">
+          <input type="radio" id="q5C" name="q5" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Significantly shorter time to extubation compared with opioid-based analgesia</span>
+        </label>
+        <label class="option" for="q5D">
+          <input type="radio" id="q5D" name="q5" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Significantly lower incidence of moderate-to-severe postoperative pain at zero hours after surgery</span>
+        </label>
+      </div>
+      <div class="result" id="result5" hidden></div>
+    </section>
+    <section class="question" id="card6" data-index="6">
+      <div class="qnum">Question 7 <span class="of">of 10</span></div>
+      <div class="qtext">During a morbidity and mortality conference, the results of the OFACAR trial are being reviewed. A colleague raises concerns about the statistical strength of the primary finding. The trial reported that the composite 30-day complication rate was 75.4% in the OFA group versus 84.5% in the opioid group (RR 0.90; 95% CI 0.80–0.99; p=0.049), with a fragility index of 1. Which of the following interpretations of the fragility index in this context is most accurate?</div>
+      <div class="options">
+        <label class="option" for="q6A">
+          <input type="radio" id="q6A" name="q6" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">A fragility index of 1 indicates that only one center contributed the events driving significance, introducing center bias</span>
+        </label>
+        <label class="option" for="q6B">
+          <input type="radio" id="q6B" name="q6" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">A fragility index of 1 is acceptable for a superiority trial and does not affect interpretation of the confidence interval</span>
+        </label>
+        <label class="option" for="q6C">
+          <input type="radio" id="q6C" name="q6" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">A fragility index of 1 means that the trial was adequately powered and the result is likely to be replicated in future studies</span>
+        </label>
+        <label class="option" for="q6D">
+          <input type="radio" id="q6D" name="q6" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">A fragility index of 1 means that changing the outcome of just one participant would render the primary result non-significant, indicating the finding is statistically fragile</span>
+        </label>
+      </div>
+      <div class="result" id="result6" hidden></div>
+    </section>
+    <section class="question" id="card7" data-index="7">
+      <div class="qnum">Question 8 <span class="of">of 10</span></div>
+      <div class="qtext">A 50-year-old man undergoes elective laparoscopic right hemicolectomy for colon cancer under a standard ERAS protocol that includes scheduled acetaminophen, ketorolac, and oral gabapentin. On postoperative day one, his nursing staff reports he required minimal rescue opioids. His anesthesiologist had placed an ultrasound-guided TAP block at the end of the case. Based on the multicenter three-arm TAP block trial, how should the anesthesiologist interpret the analgesic contribution of the US-TAP block in this patient?</div>
+      <div class="options">
+        <label class="option" for="q7A">
+          <input type="radio" id="q7A" name="q7" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">The US-TAP block and laparoscopic-assisted TAP block are equally ineffective, and the low opioid use is attributable entirely to the ERAS protocol medications</span>
+        </label>
+        <label class="option" for="q7B">
+          <input type="radio" id="q7B" name="q7" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">The US-TAP block reduced opioid consumption by 5.9 mg morphine equivalents compared with placebo, confirming its superior efficacy to the laparoscopic approach</span>
+        </label>
+        <label class="option" for="q7C">
+          <input type="radio" id="q7C" name="q7" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">The US-TAP block likely contributed substantially to analgesia, as it has been shown to reduce 24-hour opioid consumption by more than 10 mg morphine equivalents versus placebo</span>
+        </label>
+        <label class="option" for="q7D">
+          <input type="radio" id="q7D" name="q7" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">The US-TAP block likely had limited independent analgesic contribution, as it was not significantly different from placebo in 24-hour opioid consumption in the trial</span>
+        </label>
+      </div>
+      <div class="result" id="result7" hidden></div>
+    </section>
+    <section class="question" id="card8" data-index="8">
+      <div class="qnum">Question 9 <span class="of">of 10</span></div>
+      <div class="qtext">A 62-year-old woman with well-controlled type 2 diabetes is scheduled for elective total knee arthroplasty. Her anesthesiologist reads about preemptive dexmedetomidine for pain control and notes that in one trial, dexmedetomidine was given at 1.5 µg·kg⁻¹·h⁻¹ for 30 minutes spanning the induction period. Considering the trial data, which statement most accurately describes the duration of postoperative pain benefit seen with this preemptive dexmedetomidine regimen?</div>
+      <div class="options">
+        <label class="option" for="q8A">
+          <input type="radio" id="q8A" name="q8" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">The analgesic benefit was limited to the immediate recovery period (0 hours) and was not statistically significant beyond 24 hours</span>
+        </label>
+        <label class="option" for="q8B">
+          <input type="radio" id="q8B" name="q8" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">The analgesic benefit was significant at 24 hours only, with no difference at 0, 48 hours, or 7 days</span>
+        </label>
+        <label class="option" for="q8C">
+          <input type="radio" id="q8C" name="q8" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">The analgesic benefit was statistically significant at 0, 24, and 48 hours but not at 7 days</span>
+        </label>
+        <label class="option" for="q8D">
+          <input type="radio" id="q8D" name="q8" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">The analgesic benefit persisted and was statistically significant at all measured postoperative time points including 7 days</span>
+        </label>
+      </div>
+      <div class="result" id="result8" hidden></div>
+    </section>
+    <section class="question" id="card9" data-index="9">
+      <div class="qnum">Question 10 <span class="of">of 10</span></div>
+      <div class="qtext">A 74-year-old man with a history of previous myocardial infarction and peripheral vascular disease undergoes elective mitral valve repair with cardiopulmonary bypass. Postoperatively in the cardiac ICU, he develops ileus on day two. The team retrospectively reviews whether his anesthetic choice may have influenced this outcome. He received a standard sufentanil-based anesthetic. Based on the OFACAR trial, what does the evidence suggest about the relationship between opioid-based anesthesia and digestive complications in cardiac surgery?</div>
+      <div class="options">
+        <label class="option" for="q9A">
+          <input type="radio" id="q9A" name="q9" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">The OFACAR trial did not assess gastrointestinal outcomes and no conclusions can be drawn about digestive complications from this study</span>
+        </label>
+        <label class="option" for="q9B">
+          <input type="radio" id="q9B" name="q9" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Sufentanil-based anesthesia was associated with a higher rate of digestive complications compared with OFA, with an incidence of 11.2% versus 2.5% (RR 0.22 for OFA; p=0.007)</span>
+        </label>
+        <label class="option" for="q9C">
+          <input type="radio" id="q9C" name="q9" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Sufentanil-based anesthesia reduced digestive complications compared with OFA because opioids decrease gastrointestinal motility and reduce surgical stress response</span>
+        </label>
+        <label class="option" for="q9D">
+          <input type="radio" id="q9D" name="q9" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Sufentanil-based anesthesia was associated with a similar rate of digestive complications as OFA, suggesting the ileus is attributable to other perioperative factors</span>
+        </label>
+      </div>
+      <div class="result" id="result9" hidden></div>
+    </section>
+    </form>
+
+    <p class="warn" id="warn">Please answer all questions before submitting.</p>
+
+    <div class="actions">
+      <button type="button" class="btn-submit" id="submitBtn">Submit Test</button>
+      <button type="button" class="btn-cert" id="certBtn" style="display:none;">Download Certificate</button>
+    </div>
+  </main>
+  <footer>
+    Anesthesia Journal Digest · AI-generated self-assessment · Not affiliated with any journal.<br>
+    <a href="index.html">&#8592; All weekly quizzes</a>
+  </footer>
+
+<script>
+
+function ad2(n){ return ('0' + n).slice(-2); }
+
+// FNV-1a 32-bit hash -> short uppercase base36 code (deterministic & auditable).
+function adHash(str){
+  var h = 0x811c9dc5 >>> 0;
+  for (var i = 0; i < str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return ('0000000' + h.toString(36).toUpperCase()).slice(-7);
+}
+
+function makeCertId(d){
+  var rnd = Math.floor(Math.random() * 0x10000).toString(16).toUpperCase();
+  rnd = ('000' + rnd).slice(-4);
+  return 'AD-' + d.getFullYear() + ad2(d.getMonth() + 1) + ad2(d.getDate()) + '-' + rnd;
+}
+
+function adVerCode(name, ymd, score, total, certId){
+  return adHash(name + '|' + ymd + '|' + score + '/' + total + '|' + certId);
+}
+
+function drawCorners(doc, x1, y1, x2, y2, color){
+  doc.setDrawColor(color[0], color[1], color[2]);
+  doc.setLineWidth(1);
+  var s = 26, o = 44;
+  var pts = [[x1+o,y1+o,1,1],[x2-o,y1+o,-1,1],[x1+o,y2-o,1,-1],[x2-o,y2-o,-1,-1]];
+  for (var i = 0; i < pts.length; i++){
+    var px = pts[i][0], py = pts[i][1], dx = pts[i][2], dy = pts[i][3];
+    doc.line(px, py, px + dx * s, py);
+    doc.line(px, py, px, py + dy * s);
+    doc.circle(px, py, 2.2, 'F');
+    doc.circle(px + dx * s, py, 1.4, 'F');
+    doc.circle(px, py + dy * s, 1.4, 'F');
+  }
+}
+
+function drawSeal(doc, cx, cy, gold, wax){
+  // Rosette of petals, then a stamped disc with initials.
+  doc.setFillColor(wax[0], wax[1], wax[2]);
+  var R = 30;
+  for (var a = 0; a < 360; a += 24){
+    var r = a * Math.PI / 180;
+    var x1 = cx + Math.cos(r) * R,            y1 = cy + Math.sin(r) * R;
+    var x2 = cx + Math.cos(r + 0.27) * (R*0.66), y2 = cy + Math.sin(r + 0.27) * (R*0.66);
+    var x3 = cx + Math.cos(r - 0.27) * (R*0.66), y3 = cy + Math.sin(r - 0.27) * (R*0.66);
+    doc.triangle(x1, y1, x2, y2, x3, y3, 'F');
+  }
+  doc.setFillColor(wax[0], wax[1], wax[2]);
+  doc.circle(cx, cy, R * 0.72, 'F');
+  doc.setDrawColor(gold[0], gold[1], gold[2]);
+  doc.setLineWidth(1.3); doc.circle(cx, cy, R * 0.72, 'S');
+  doc.setLineWidth(0.7); doc.circle(cx, cy, R * 0.55, 'S');
+  doc.setFont('times', 'bold'); doc.setFontSize(12); doc.setTextColor(255, 246, 236);
+  doc.text('AD', cx, cy - 1, {align:'center'});
+  doc.setFontSize(6); doc.text('SECTION 3', cx, cy + 9, {align:'center'});
+}
+
+// opts: {name, score, total, completedAt(Date), certId?, verCode?}
+// Returns {certId, verCode}. Builds and downloads the PDF.
+function generateCertificate(opts){
+  var ns = window.jspdf || {};
+  var JsPDF = ns.jsPDF;
+  if (!JsPDF){ alert('Certificate library failed to load. Check your internet connection and try again.'); return null; }
+
+  var name  = (opts.name || '').trim();
+  var score = opts.score, total = opts.total;
+  var now   = opts.completedAt || new Date();
+  var certId = opts.certId || makeCertId(now);
+  var ymd = now.getFullYear() + '-' + ad2(now.getMonth() + 1) + '-' + ad2(now.getDate());
+  var pct = Math.round(score / total * 100);
+  var ver = opts.verCode || adVerCode(name, ymd, score, total, certId);
+  var dateStr = now.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
+  var timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+  var stamp = dateStr + ' at ' + timeStr;
+
+  var doc = new JsPDF({orientation:'landscape', unit:'pt', format:'letter'});
+  var W = doc.internal.pageSize.getWidth();
+  var H = doc.internal.pageSize.getHeight();
+  var navy = [26,82,118], gold = [176,141,87], ink = [44,62,80], wax = [140,32,32];
+
+  // Parchment background
+  doc.setFillColor(252, 250, 244); doc.rect(0, 0, W, H, 'F');
+
+  // Decorative double border
+  doc.setDrawColor(navy[0], navy[1], navy[2]); doc.setLineWidth(4);
+  doc.rect(24, 24, W - 48, H - 48);
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1.4);
+  doc.rect(34, 34, W - 68, H - 68);
+  drawCorners(doc, 24, 24, W - 24, H - 24, gold);
+
+  // Title + flourish
+  doc.setFont('times', 'bold'); doc.setFontSize(34); doc.setTextColor(navy[0], navy[1], navy[2]);
+  doc.text('CME Completion Certificate', W / 2, 108, {align:'center'});
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1);
+  doc.line(W / 2 - 160, 122, W / 2 + 160, 122);
+  doc.circle(W / 2 - 168, 122, 2, 'F'); doc.circle(W / 2 + 168, 122, 2, 'F');
+
+  doc.setFont('times', 'italic'); doc.setFontSize(16); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Anesthesia Journal Digest — Weekly CME', W / 2, 148, {align:'center'});
+
+  doc.setFont('times', 'normal'); doc.setFontSize(13);
+  doc.text('This is to certify that', W / 2, 192, {align:'center'});
+
+  doc.setFont('times', 'bold'); doc.setFontSize(26); doc.setTextColor(navy[0], navy[1], navy[2]);
+  doc.text(name || '—', W / 2, 226, {align:'center'});
+  var nameW = Math.min(460, Math.max(220, doc.getTextWidth(name || '—') + 70));
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(0.8);
+  doc.line(W / 2 - nameW / 2, 236, W / 2 + nameW / 2, 236);
+
+  doc.setFont('times', 'normal'); doc.setFontSize(13); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text("has completed a " + total + "-question self-assessment based on this week's", W / 2, 266, {align:'center'});
+  doc.text('featured open-access anesthesia literature, achieving a score of', W / 2, 284, {align:'center'});
+
+  doc.setFont('times', 'bold'); doc.setFontSize(20); doc.setTextColor(30, 110, 70);
+  doc.text(score + ' / ' + total + '    (' + pct + '%)', W / 2, 314, {align:'center'});
+
+  doc.setFont('times', 'normal'); doc.setFontSize(12); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Completed: ' + stamp, W / 2, 340, {align:'center'});
+
+  drawSeal(doc, W / 2, 384, gold, wax);
+
+  // Bottom block — everything sits clearly INSIDE the inner border (which is at
+  // H-34) with margin. Disclaimer is drawn line-by-line, then the ID row, so
+  // nothing overruns or hides behind the frame.
+  doc.setFont('times', 'italic'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
+  var disc = 'Anesthesia Digest is an automated, AI-generated educational service delivering weekly summaries of open-access anesthesia literature. This certificate reflects self-assessment completion and is suitable for RCPSC Section 3 self-learning records. Not affiliated with any journal or accrediting body.';
+  var lines = doc.splitTextToSize(disc, W - 160);
+  var lh = 11;                          // line spacing (pt)
+  var discLast = H - 74;                // baseline of the LAST disclaimer line
+  var discFirst = discLast - (lines.length - 1) * lh;
+  for (var li = 0; li < lines.length; li++){
+    doc.text(lines[li], W / 2, discFirst + li * lh, {align:'center'});
+  }
+
+  // Certificate ID (left) + verification code (right) on one row, above the frame.
+  doc.setFont('courier', 'normal'); doc.setFontSize(9.5); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Certificate ID:  ' + certId, 72, H - 50);
+  doc.text('Verification:  ' + ver, W - 72, H - 50, {align:'right'});
+
+  doc.save('CME_Certificate_' + certId + '.pdf');
+  return {certId: certId, verCode: ver};
+}
+
+
+  var QUIZ = [{"correct": "B", "rationale": "The OFACAR trial enrolled 320 adult patients undergoing elective cardiac surgery with cardiopulmonary bypass and found that the composite 30-day outcome (neurological, respiratory, cardiovascular, renal complications, and/or death) occurred in 75.4% of the OFA group versus 84.5% of the control group, yielding a Risk Ratio of 0.90 (95% CI 0.80\u20130.99; p=0.049). Although statistically significant, the fragility index for this primary outcome was reported as 1, meaning that a change in the outcome of just one participant would render the result non-significant \u2014 this is a hallmark of a statistically fragile result. Therefore, the option stating that OFA reduces the composite rate by approximately 9 percentage points while noting the fragility index of 1 indicates statistical fragility is the most accurate and clinically nuanced answer. The option claiming the result is statistically robust incorrectly interprets the fragility index of 1; a fragility index of 1 is among the lowest possible values and signals that the finding must be interpreted with caution despite the p-value below 0.05. The option stating no significant difference in composite complications contradicts the published data, which showed a statistically significant reduction at p=0.049. The option suggesting OFA increases cardiovascular complications is directly refuted by the trial, which showed OFA was associated with significantly fewer cardiovascular complications (64.2% vs. 75.2%; RR 0.86; 95% CI 0.74\u20130.99; p=0.031) and fewer deaths (0 vs. 6; p=0.014). The bedside takeaway is that while OFA in cardiac surgery shows a promising signal, clinicians should remain cautious given the fragility index of 1 \u2014 this result could easily be overturned by a single event, and replication in larger trials is warranted before widespread adoption.", "source_article": "Opioid Free anesthesia in cardiac surgery: The OFACAR randomized clinical trial", "source_journal": "Anesthesiology", "source_url": "https://doi.org/10.1097/aln.0000000000006164"}, {"correct": "B", "rationale": "In this multicenter three-arm randomized trial of 340 patients undergoing elective minimally invasive colon surgery, the L-TAP block was found to be superior to placebo with a reduction of 5.9 mg morphine equivalents (97.5% CI \u221211.3 to \u22120.5 mg; p=0.01) in 24-hour postoperative opioid consumption. The L-TAP block was also non-inferior to the US-TAP block, with a difference of \u22124.5 mg morphine (98.75% CI \u221210.0 to 1.1 mg). Crucially, neither block met the investigators' predetermined estimate of the minimal clinically important difference (MCID) of 10 mg morphine, meaning the observed reductions, while statistically detectable for L-TAP, are of uncertain clinical significance. The option stating US-TAP is superior to placebo is incorrect because the trial showed US-TAP was no different from placebo, with a difference of only \u22121.4 mg morphine (97.5% CI \u22126.8 to 4.0 mg; p=0.55). The option claiming both blocks are superior to placebo and provide a clinically important reduction is incorrect on both counts \u2014 US-TAP was not superior to placebo, and neither block reached the MCID of 10 mg morphine. The option suggesting L-TAP is inferior to US-TAP contradicts the non-inferiority finding. The bedside takeaway is that when a TAP block is planned for minimally invasive colon surgery, the laparoscopic-assisted technique is a reasonable choice since it is non-inferior to ultrasound guidance and superior to placebo; however, the modest absolute opioid reduction below the MCID should temper expectations and reinforce the importance of comprehensive multimodal analgesia.", "source_article": "Transversus abdominis plane block in minimally invasive colon surgery: a multicenter three-arm randomized controlled superiority and non-inferiority clinical trial", "source_journal": "RAPM", "source_url": "http://rapm.bmj.com/cgi/content/short/51/5/558?rss=1"}, {"correct": "B", "rationale": "In this single-center, double-blind, randomized controlled trial of 220 patients receiving either intravenous dexmedetomidine at 1.5 \u00b5g\u00b7kg\u207b\u00b9\u00b7h\u207b\u00b9 or placebo from 15 minutes before induction until 15 minutes post-induction, the NOX compliance rate (defined as mean NOX \u226460 during nociceptive stimulation) was 90.7% (98/108) in the dexmedetomidine group compared with only 12.5% (14/112) in the placebo group, a highly statistically significant difference (p<0.000). This represents an extremely large separation between groups and confirms robust intraoperative nociceptive attenuation. The option citing approximately 55% compliance in the dexmedetomidine group is factually incorrect; the actual rate was 90.7%, not approximately 55%. The option stating that both groups achieved similar NOX compliance is directly contradicted by the data showing a dramatic difference between groups. The option claiming dexmedetomidine had no effect on intraoperative nociception is also incorrect, as the NOX compliance rate was the co-primary outcome and showed a profound difference. Beyond intraoperative effects, the trial also showed that moderate-to-severe postoperative pain (pNRS >3) was significantly lower in the dexmedetomidine group at all postoperative time points: 2.8% vs. 25.9% at 0 hours, 5.6% vs. 29.5% at 24 hours, 0.9% vs. 17% at 48 hours, and 0% vs. 5.4% at 7 days. The bedside takeaway is that preemptive dexmedetomidine at this dose provides both excellent intraoperative nociception control and sustained postoperative pain reduction, making it a compelling non-opioid component of multimodal analgesia for noncardiac surgery.", "source_article": "Dexmedetomidine Preemptive Analgesia on Intra- and Postoperative Pain in Noncardiac Surgery: A Randomized, Double-Blind, Controlled Study", "source_journal": "A&A", "source_url": "https://doi.org/10.1213/ane.0000000000008078"}, {"correct": "A", "rationale": "The OFACAR trial specifically reported that digestive complications were significantly reduced in the OFA group compared with the sufentanil control group: 2.5% versus 11.2%, yielding a Risk Ratio of 0.22 (95% CI 0.08\u20130.65; p=0.007). This represents a large relative risk reduction of approximately 78% and is one of the most statistically compelling secondary findings in the trial. Additionally, cardiovascular complications as a category were significantly reduced (64.2% vs. 75.2%; RR 0.86; 95% CI 0.74\u20130.99; p=0.031), particularly driven by postoperative myocardial damage (61.6% vs. 72.1%), though exact confidence intervals and p-values for myocardial damage alone were not separately reported in the abstract. Regarding postoperative acute kidney injury requiring renal replacement therapy, while renal complications were included in the composite endpoint, a specific significant reduction in renal outcomes as a standalone finding was not reported in the available abstract data. Neurological complications as an isolated outcome were not reported as a separately significant finding in the abstract, and the composite included neurological events without a specific p-value for that subcategory alone. Respiratory failure requiring prolonged mechanical ventilation was not identified as a separately significant finding in the abstract. The bedside takeaway is that OFA in cardiac surgery may offer meaningful protection against digestive and cardiovascular complications, but given the fragility index of 1 for the primary composite outcome, these results should inform rather than dictate practice pending confirmation.", "source_article": "Opioid Free anesthesia in cardiac surgery: The OFACAR randomized clinical trial", "source_journal": "Anesthesiology", "source_url": "https://doi.org/10.1097/aln.0000000000006164"}, {"correct": "A", "rationale": "In the multicenter three-arm RCT of 340 patients undergoing minimally invasive colon surgery, the L-TAP block demonstrated superiority over placebo with a morphine-equivalent reduction of 5.9 mg (97.5% CI \u221211.3 to \u22120.5 mg; p=0.01) and non-inferiority to the US-TAP block with a difference of \u22124.5 mg (98.75% CI \u221210.0 to 1.1 mg). However, neither block reached the investigators' predetermined MCID of 10 mg morphine, making the clinical significance of the L-TAP superiority finding uncertain. The option claiming US-TAP is superior to placebo is incorrect; the US-TAP block showed no significant difference from placebo (\u22121.4 mg morphine; 97.5% CI \u22126.8 to 4.0 mg; p=0.55). The option stating both blocks exceed the MCID of 10 mg is doubly incorrect \u2014 neither block met this threshold, and US-TAP was not superior to placebo at all. The option claiming neither block was superior to placebo is also incorrect because the L-TAP block did achieve statistical superiority over placebo (p=0.01), even if the effect size fell short of clinical importance. The bedside takeaway is that if a TAP block is to be used for minimally invasive colon resection, the laparoscopic-assisted approach is evidence-based and non-inferior to the ultrasound approach; however, neither technique should be relied upon as the sole analgesic strategy given the modest absolute opioid-sparing effect.", "source_article": "Transversus abdominis plane block in minimally invasive colon surgery: a multicenter three-arm randomized controlled superiority and non-inferiority clinical trial", "source_journal": "RAPM", "source_url": "http://rapm.bmj.com/cgi/content/short/51/5/558?rss=1"}, {"correct": "D", "rationale": "The randomized controlled trial of preemptive dexmedetomidine in noncardiac surgery reported that the incidence of moderate-to-severe postoperative pain (pNRS >3) at zero hours after surgery was dramatically lower in the dexmedetomidine group compared with placebo: 2.8% (3/108) versus 25.9% (29/112). This was one of the co-primary outcomes and was statistically significant (p=0.000). The trial thus provides strong evidence that this patient would experience a substantially lower rate of significant pain immediately in the recovery room. Reduced intraoperative awareness was not a reported outcome of this trial; the intraoperative monitoring assessment used the nociception index (NOX) to measure adequacy of analgesia, not awareness specifically. While dexmedetomidine did reduce postoperative nausea and vomiting (mPONV; z=\u22124.901, p=0.001) as a secondary outcome, the question asks specifically about what occurs in the recovery room relative to analgesia, and improved surgical field conditions are not a mechanism by which PONV is reduced by this drug. Time to extubation was not reported as a significant outcome in the abstract, and comparing to opioid-based analgesia specifically is not within the scope of this placebo-controlled trial. The bedside takeaway is that preemptive dexmedetomidine at this dose is highly effective at reducing early postoperative pain immediately upon emergence from anesthesia, with an absolute risk reduction in moderate-to-severe pain at zero hours of over 23 percentage points compared with placebo.", "source_article": "Dexmedetomidine Preemptive Analgesia on Intra- and Postoperative Pain in Noncardiac Surgery: A Randomized, Double-Blind, Controlled Study", "source_journal": "A&A", "source_url": "https://doi.org/10.1213/ane.0000000000008078"}, {"correct": "D", "rationale": "The fragility index quantifies how many individual participant outcomes would need to change to flip a statistically significant result to non-significant. A fragility index of 1 \u2014 as explicitly reported in the OFACAR trial \u2014 means that a change in the outcome of only one participant would cause the p-value to exceed 0.05, rendering the primary composite result no longer statistically significant. This is one of the lowest possible fragility index values and is widely understood to indicate that the positive finding should be interpreted with considerable caution despite the technically significant p-value of 0.049. The option claiming a fragility index of 1 indicates adequate power and likely replicability is incorrect; in fact it suggests the opposite \u2014 that the power to detect the observed effect was marginal and that the result may not replicate. The option suggesting it refers to only one center contributing events is a misunderstanding of what the fragility index measures; it is a property of statistical robustness, not of center effect. The option claiming a fragility index of 1 is acceptable for superiority trials and does not affect interpretation of the confidence interval incorrectly minimizes its importance; even with a confidence interval that excludes 1.0 (0.80\u20130.99), the proximity of the upper bound to 1.0 and a fragility index of 1 together counsel caution. The bedside takeaway is that when evaluating any clinical trial, the fragility index should be examined alongside the p-value and confidence interval \u2014 a fragility index of 1 warrants restraint in practice change until the finding is replicated in larger, more definitive trials.", "source_article": "Opioid Free anesthesia in cardiac surgery: The OFACAR randomized clinical trial", "source_journal": "Anesthesiology", "source_url": "https://doi.org/10.1097/aln.0000000000006164"}, {"correct": "D", "rationale": "The multicenter three-arm RCT specifically examined ultrasound-guided TAP, laparoscopic-assisted TAP, and placebo groups in minimally invasive colon surgery. The US-TAP block was not significantly different from placebo for the primary outcome of 24-hour morphine equivalent consumption: the reduction was only \u22121.4 mg morphine (97.5% CI \u22126.8 to 4.0 mg; p=0.55). This null result means that, based on this trial, the US-TAP block cannot be credited with providing meaningful independent analgesic benefit beyond what a well-structured multimodal ERAS regimen already achieves. The option claiming US-TAP reduces opioid use by more than 10 mg morphine equivalents is incorrect; that threshold is the MCID, which neither block achieved, and US-TAP's absolute reduction was only 1.4 mg. The option asserting both TAP blocks are equally ineffective is partially incorrect \u2014 the L-TAP block was statistically superior to placebo at \u22125.9 mg (p=0.01), even if it did not meet the MCID of 10 mg; the US-TAP block was the one that failed to beat placebo. The option attributing the 5.9 mg opioid reduction to US-TAP and calling it superior to the laparoscopic approach reverses the findings \u2014 it was the L-TAP that achieved this reduction, not US-TAP, and L-TAP was non-inferior (not inferior) to US-TAP. The bedside takeaway is that within a robust ERAS protocol for minimally invasive colon surgery, the added value of US-TAP alone is not supported by this trial, whereas the laparoscopic-assisted approach may offer a modest, if clinically uncertain, benefit.", "source_article": "Transversus abdominis plane block in minimally invasive colon surgery: a multicenter three-arm randomized controlled superiority and non-inferiority clinical trial", "source_journal": "RAPM", "source_url": "http://rapm.bmj.com/cgi/content/short/51/5/558?rss=1"}, {"correct": "D", "rationale": "The preemptive dexmedetomidine trial measured the incidence of moderate-to-severe postoperative pain (pNRS >3) as a co-primary outcome at four time points: 0, 24, 48 hours, and 7 days. The dexmedetomidine group showed significantly lower rates of moderate-to-severe pain at every time point: 2.8% versus 25.9% at 0 hours; 5.6% versus 29.5% at 24 hours; 0.9% versus 17% at 48 hours; and 0% versus 5.4% at 7 days, with p=0.000 reported across all comparisons. The benefit was therefore not limited to the immediate recovery period, as the option claiming significance only at 0 hours states. The option asserting significance at 0, 24, and 48 hours but not 7 days is incorrect because the 7-day difference (0% vs. 5.4%) was also statistically significant per the reported data. The option claiming benefit only at 24 hours with no difference at other time points is directly contradicted by the data at all four time points. The prolonged duration of benefit is notably longer than the drug infusion itself (which ran only from 15 minutes before induction to 15 minutes post-induction), supporting the hypothesis that preemptive administration prevents central and peripheral sensitization rather than merely providing ongoing sedation or analgesia during infusion. The trial also demonstrated reduced rescue opioid consumption (z=\u22122.428; p=0.004) and reduced PONV (z=\u22124.901; p=0.001). The bedside takeaway is that a brief preemptive dexmedetomidine infusion can produce sustained analgesic benefits lasting at least one week, likely through attenuation of perioperative pain sensitization.", "source_article": "Dexmedetomidine Preemptive Analgesia on Intra- and Postoperative Pain in Noncardiac Surgery: A Randomized, Double-Blind, Controlled Study", "source_journal": "A&A", "source_url": "https://doi.org/10.1213/ane.0000000000008078"}, {"correct": "B", "rationale": "The OFACAR trial specifically reported digestive complications as a secondary outcome and found a striking difference between groups: 2.5% in the OFA group versus 11.2% in the sufentanil control group, with a Risk Ratio of 0.22 (95% CI 0.08\u20130.65; p=0.007). This represents one of the most statistically compelling secondary findings in the trial, with OFA associated with a relative risk reduction of approximately 78% in digestive complications. The option claiming similar rates across groups contradicts this direct finding from the trial. The option suggesting sufentanil reduced digestive complications relative to OFA is biologically implausible and directly wrong \u2014 it was the OFA group (not the opioid group) that had fewer digestive complications \u2014 and the well-established mechanism of opioid-induced bowel dysfunction further refutes this. The option claiming the trial did not assess gastrointestinal outcomes is factually incorrect; digestive complications were explicitly reported with specific incidences and statistical analysis. It should be noted that these digestive complication data come from a trial with a fragility index of 1 for the primary composite outcome; however, the secondary digestive complication finding itself had a more robust p-value of 0.007 and a wide confidence interval firmly below 1.0 (0.08\u20130.65), lending it somewhat greater statistical credibility. The bedside takeaway is that opioid avoidance during cardiac anesthesia may provide a specific protective benefit against postoperative gastrointestinal complications, which is mechanistically consistent with the known pro-dysmotility effects of opioids.", "source_article": "Opioid Free anesthesia in cardiac surgery: The OFACAR randomized clinical trial", "source_journal": "Anesthesiology", "source_url": "https://doi.org/10.1097/aln.0000000000006164"}];
+  var QUIZ_DATE = "June 03, 2026";
+  var TOTAL = 10;
+  var graded = false;
+  var lastScore = 0;
+
+  function escapeHtml(s){
+    return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  document.getElementById("submitBtn").addEventListener("click", function(){
+    var unanswered = 0;
+    for (var i = 0; i < TOTAL; i++){
+      if (!document.querySelector('input[name="q' + i + '"]:checked')) unanswered++;
+    }
+    if (unanswered > 0 && !graded){
+      document.getElementById("warn").style.display = "block";
+      return;
+    }
+    document.getElementById("warn").style.display = "none";
+    grade();
+  });
+
+  function grade(){
+    var correct = 0;
+    for (var i = 0; i < TOTAL; i++){
+      var chosen = document.querySelector('input[name="q' + i + '"]:checked');
+      var ans = QUIZ[i].correct;
+      var picked = chosen ? chosen.value : null;
+      if (picked === ans) correct++;
+
+      var labels = document.querySelectorAll('#card' + i + ' .option');
+      labels.forEach(function(lab){
+        var val = lab.querySelector("input").value;
+        lab.querySelector("input").disabled = true;
+        if (val === ans) lab.classList.add("correct");
+        else if (chosen && val === picked) lab.classList.add("incorrect");
+      });
+
+      var res = document.getElementById("result" + i);
+      var right = picked === ans;
+      var srcHtml = "";
+      if (QUIZ[i].source_article){
+        var label = (QUIZ[i].source_journal ? QUIZ[i].source_journal + " — " : "") + QUIZ[i].source_article;
+        var url = QUIZ[i].source_url || "#";
+        srcHtml = '<span class="src">Source: <a href="' + url + '" target="_blank" rel="noopener">' +
+                  escapeHtml(label) + '</a></span>';
+      }
+      res.className = "result " + (right ? "right" : "wrong");
+      res.innerHTML = '<span class="verdict">' +
+        (right ? "&#10003; Correct" : "&#10007; Your answer: " + (picked || "—") +
+                 " · Correct answer: " + ans) + '</span>' +
+        escapeHtml(QUIZ[i].rationale) + srcHtml;
+      res.hidden = false;
+    }
+
+    lastScore = correct;
+    graded = true;
+    var pct = Math.round((correct / TOTAL) * 100);
+    document.getElementById("scorePct").textContent = pct + "%";
+    document.getElementById("scoreDetail").textContent = correct + " of " + TOTAL + " correct";
+    document.getElementById("scorebar").style.display = "block";
+    document.getElementById("namebox").style.display = "block";
+    document.getElementById("submitBtn").textContent = "Re-check Answers";
+    document.getElementById("certBtn").style.display = "inline-block";
+    document.getElementById("scorebar").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  document.getElementById("certBtn").addEventListener("click", function(){
+    if (!graded) return;
+    var name = (document.getElementById("participant").value || "").trim();
+    if (!name){
+      var inp = document.getElementById("participant");
+      inp.style.borderColor = "#ffd27f";
+      inp.focus();
+      alert("Please enter your full name and credentials before downloading the certificate.");
+      return;
+    }
+    var info = generateCertificate({name:name, score:lastScore, total:TOTAL, completedAt:new Date()});
+    if (info){
+      var box = document.getElementById("certinfo");
+      box.style.display = "block";
+      box.textContent = "Certificate ID " + info.certId + "  ·  Verification " + info.verCode;
+    }
+  });
+</script>
+</body>
+</html>
