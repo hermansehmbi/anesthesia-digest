@@ -21,6 +21,9 @@ import tempfile
 from pathlib import Path
 from datetime import datetime
 
+# Repo root = directory of this module, so music paths resolve no matter the cwd.
+_REPO_ROOT = Path(__file__).resolve().parent
+
 logger = logging.getLogger(__name__)
 
 
@@ -287,46 +290,66 @@ async def _synth_all(turns, tmpdir, voice_a, voice_b, rate, concurrency=6):
     return results
 
 
+def _resolve_music(path_str: str) -> Path:
+    """Resolve a music path relative to the repo root (where this file lives),
+    so it works no matter what the process's current directory is."""
+    p = Path(path_str)
+    if not p.is_absolute():
+        p = _REPO_ROOT / p
+    return p
+
+
 def _mix_music(narration, AudioSegment):
     """Play intro music solo for 5-7s, crossfade into the hosts, then after the
     hosts finish crossfade into the outro and let it play solo for 5-7s.
 
     Music sits -12 dB under the voices; all transitions are smooth fades.
+    Logs clearly at each stage so a missing/undecodable file is never silent.
     """
     from config import (INTRO_MUSIC, OUTRO_MUSIC, MUSIC_DUCK_DB,
                         INTRO_SOLO_MS, OUTRO_SOLO_MS, MUSIC_CROSSFADE_MS)
 
     final = narration
 
-    intro_path = Path(INTRO_MUSIC)
-    if intro_path.exists():
+    # ── Intro ────────────────────────────────────────────────────────────────
+    intro_path = _resolve_music(INTRO_MUSIC)
+    if not intro_path.exists():
+        logger.warning(f"Intro music NOT FOUND at {intro_path} — skipping intro")
+    else:
         try:
+            logger.info(f"Loading intro music… {intro_path}")
+            intro = AudioSegment.from_file(intro_path)
+            logger.info(f"  loaded intro: {len(intro)/1000:.1f}s; ducking {MUSIC_DUCK_DB} dB")
+            intro = intro + MUSIC_DUCK_DB
             xf = min(MUSIC_CROSSFADE_MS, len(final))
-            intro = AudioSegment.from_file(intro_path) + MUSIC_DUCK_DB
             # Clip = solo portion + the overlap that crossfades into the voices,
             # so the listener hears INTRO_SOLO_MS of music before anyone speaks.
             intro_clip = intro[:INTRO_SOLO_MS + xf].fade_in(1200)
             final = intro_clip.append(final, crossfade=xf)
-            logger.info(f"Mixed in intro music (~{INTRO_SOLO_MS/1000:.0f}s solo)")
+            logger.info(f"  Prepended intro: ~{INTRO_SOLO_MS/1000:.0f}s solo "
+                        f"+ {xf/1000:.1f}s crossfade into narration")
         except Exception as e:
-            logger.warning(f"Intro music skipped: {e}")
-    else:
-        logger.info(f"No intro music at {INTRO_MUSIC} (optional)")
+            logger.warning(f"Intro music skipped (decode/mix error): {e}")
 
-    outro_path = Path(OUTRO_MUSIC)
-    if outro_path.exists():
+    # ── Outro ────────────────────────────────────────────────────────────────
+    outro_path = _resolve_music(OUTRO_MUSIC)
+    if not outro_path.exists():
+        logger.warning(f"Outro music NOT FOUND at {outro_path} — skipping outro")
+    else:
         try:
+            logger.info(f"Loading outro music… {outro_path}")
+            outro = AudioSegment.from_file(outro_path)
+            logger.info(f"  loaded outro: {len(outro)/1000:.1f}s; ducking {MUSIC_DUCK_DB} dB")
+            outro = outro + MUSIC_DUCK_DB
             xf = min(MUSIC_CROSSFADE_MS, len(final))
-            outro = AudioSegment.from_file(outro_path) + MUSIC_DUCK_DB
             # Overlap crossfades from the last words into the music, then the
             # music plays solo for OUTRO_SOLO_MS before fading out.
             outro_clip = outro[:OUTRO_SOLO_MS + xf].fade_out(2000)
             final = final.append(outro_clip, crossfade=xf)
-            logger.info(f"Mixed in outro music (~{OUTRO_SOLO_MS/1000:.0f}s solo)")
+            logger.info(f"  Appended outro: {xf/1000:.1f}s crossfade "
+                        f"+ ~{OUTRO_SOLO_MS/1000:.0f}s solo at the end")
         except Exception as e:
-            logger.warning(f"Outro music skipped: {e}")
-    else:
-        logger.info(f"No outro music at {OUTRO_MUSIC} (optional)")
+            logger.warning(f"Outro music skipped (decode/mix error): {e}")
 
     return final
 
