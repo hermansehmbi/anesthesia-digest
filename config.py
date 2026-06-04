@@ -49,10 +49,21 @@ PODCAST_WORD_TARGET = 2400
 # ── Music / Mixing (assets/intro_music.mp3, assets/outro_music.mp3) ──────────
 INTRO_MUSIC = "assets/intro_music.mp3"
 OUTRO_MUSIC = "assets/outro_music.mp3"
-MUSIC_DUCK_DB = -12             # Lower music this many dB so it sits under voices
+# Music level is set RELATIVE TO THE VOICES (not the music's own source level):
+# the music RMS is placed this many dB BELOW the voice RMS so it sits comfortably
+# under speech during the crossfades and is still present when playing solo.
+MUSIC_DUCK_DB = -9              # Music sits ~9 dB under the voices (was -12, too quiet)
 INTRO_SOLO_MS = 6000            # Intro plays SOLO this long before the hosts start
 OUTRO_SOLO_MS = 6000            # Outro plays SOLO this long after the hosts finish
 MUSIC_CROSSFADE_MS = 1200       # Smooth crossfade between music and voices
+
+# ── Final loudness normalization ─────────────────────────────────────────────
+# After stitching voices + music, the whole episode is normalized to a standard
+# podcast loudness so it's consistently audible. We target an RMS level that
+# approximates -16 LUFS, then guarantee true peaks stay just under 0 dBFS so it
+# is loud without clipping.
+PODCAST_TARGET_DBFS = -16.0     # Target program RMS (≈ -16 LUFS for speech)
+PODCAST_PEAK_CEILING_DBFS = -1.0  # Hard ceiling on the loudest peak (no clipping)
 
 # ── GitHub Pages (inline podcast playback) ───────────────────────────────────
 # Project Pages served from the /docs folder on the main branch. The full URL

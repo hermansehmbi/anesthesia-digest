@@ -12,6 +12,8 @@ Requires the ffmpeg/ffprobe binaries on PATH for the two-host stitch+music mix
 are missing it degrades to a single-voice file instead of producing nothing.
 """
 
+from __future__ import annotations
+
 import os
 import re
 import shutil
@@ -235,7 +237,25 @@ def _render_audio(turns: list[tuple[str, str]], output_path: str) -> str | None:
             if i < len(segment_files) - 1:
                 narration += gap
 
+        # Bring the voices to the target program loudness FIRST, so the music can
+        # be placed a fixed number of dB underneath them (see _mix_music) and the
+        # final episode lands at a consistent, audible level regardless of how hot
+        # or quiet the raw Edge-TTS output happened to be.
+        from config import PODCAST_TARGET_DBFS, PODCAST_PEAK_CEILING_DBFS
+        logger.info(f"Voice level before normalize: RMS {narration.dBFS:.1f} dBFS, "
+                    f"peak {narration.max_dBFS:.1f} dBFS")
+        narration = _match_loudness(narration, PODCAST_TARGET_DBFS,
+                                    PODCAST_PEAK_CEILING_DBFS)
+        logger.info(f"Voice level after normalize:  RMS {narration.dBFS:.1f} dBFS, "
+                    f"peak {narration.max_dBFS:.1f} dBFS")
+
         final = _mix_music(narration, AudioSegment)
+
+        # Final safety pass: re-target the whole mix to program loudness and
+        # guarantee no peak exceeds the ceiling (no clipping).
+        final = _match_loudness(final, PODCAST_TARGET_DBFS, PODCAST_PEAK_CEILING_DBFS)
+        logger.info(f"Final mix loudness: RMS {final.dBFS:.1f} dBFS, "
+                    f"peak {final.max_dBFS:.1f} dBFS")
         final.export(output_path, format="mp3")
         size_mb = Path(output_path).stat().st_size / (1024 * 1024)
         dur_min = len(final) / 60000
@@ -299,17 +319,41 @@ def _resolve_music(path_str: str) -> Path:
     return p
 
 
+def _match_loudness(audio, target_dbfs, peak_ceiling_dbfs):
+    """Bring `audio` to a target RMS loudness, then guarantee its loudest peak
+    stays at or below the ceiling (so it's loud but never clips).
+
+    `audio.dBFS` is the RMS level; `audio.max_dBFS` is the peak (both relative to
+    full scale, so negative). We first apply a flat gain to hit the RMS target,
+    then — if that pushed any peak above the ceiling — pull the whole thing back
+    down so the peak just touches the ceiling. Net effect: consistent perceived
+    loudness (≈ -16 LUFS for speech) with no clipping.
+    """
+    if audio.dBFS == float("-inf"):  # pure silence — nothing to normalize
+        return audio
+    audio = audio.apply_gain(target_dbfs - audio.dBFS)
+    if audio.max_dBFS > peak_ceiling_dbfs:
+        audio = audio.apply_gain(peak_ceiling_dbfs - audio.max_dBFS)
+    return audio
+
+
 def _mix_music(narration, AudioSegment):
     """Play intro music solo for 5-7s, crossfade into the hosts, then after the
     hosts finish crossfade into the outro and let it play solo for 5-7s.
 
-    Music sits -12 dB under the voices; all transitions are smooth fades.
-    Logs clearly at each stage so a missing/undecodable file is never silent.
+    Music is placed MUSIC_DUCK_DB below the VOICE level (not its own source
+    level), so it sits comfortably under speech in the crossfades while staying
+    present when solo. All transitions are smooth fades. Logs clearly at each
+    stage so a missing/undecodable file is never silent.
     """
     from config import (INTRO_MUSIC, OUTRO_MUSIC, MUSIC_DUCK_DB,
                         INTRO_SOLO_MS, OUTRO_SOLO_MS, MUSIC_CROSSFADE_MS)
 
     final = narration
+    # Reference: the voices have already been normalized to the program target,
+    # so we duck the music relative to THIS level for a predictable balance.
+    voice_dbfs = narration.dBFS
+    music_target_dbfs = voice_dbfs + MUSIC_DUCK_DB  # MUSIC_DUCK_DB is negative
 
     # ── Intro ────────────────────────────────────────────────────────────────
     intro_path = _resolve_music(INTRO_MUSIC)
@@ -319,8 +363,9 @@ def _mix_music(narration, AudioSegment):
         try:
             logger.info(f"Loading intro music… {intro_path}")
             intro = AudioSegment.from_file(intro_path)
-            logger.info(f"  loaded intro: {len(intro)/1000:.1f}s; ducking {MUSIC_DUCK_DB} dB")
-            intro = intro + MUSIC_DUCK_DB
+            logger.info(f"  loaded intro: {len(intro)/1000:.1f}s; setting to "
+                        f"{music_target_dbfs:.1f} dBFS ({MUSIC_DUCK_DB} dB under voices)")
+            intro = intro.apply_gain(music_target_dbfs - intro.dBFS)
             xf = min(MUSIC_CROSSFADE_MS, len(final))
             # Clip = solo portion + the overlap that crossfades into the voices,
             # so the listener hears INTRO_SOLO_MS of music before anyone speaks.
@@ -339,8 +384,9 @@ def _mix_music(narration, AudioSegment):
         try:
             logger.info(f"Loading outro music… {outro_path}")
             outro = AudioSegment.from_file(outro_path)
-            logger.info(f"  loaded outro: {len(outro)/1000:.1f}s; ducking {MUSIC_DUCK_DB} dB")
-            outro = outro + MUSIC_DUCK_DB
+            logger.info(f"  loaded outro: {len(outro)/1000:.1f}s; setting to "
+                        f"{music_target_dbfs:.1f} dBFS ({MUSIC_DUCK_DB} dB under voices)")
+            outro = outro.apply_gain(music_target_dbfs - outro.dBFS)
             xf = min(MUSIC_CROSSFADE_MS, len(final))
             # Overlap crossfades from the last words into the music, then the
             # music plays solo for OUTRO_SOLO_MS before fading out.
