@@ -31,9 +31,14 @@ LH = "1.45"     # Readable line-height for body copy (mobile-friendly)
 
 def build_digest_email(articles: list, podcasts: list, bonus_podcasts: list,
                        has_audio: bool = False,
-                       podcast_url: str | None = None) -> tuple[str, str]:
+                       podcast_url: str | None = None,
+                       deepdive_url: str | None = None,
+                       summaries: list | None = None) -> tuple[str, str]:
     """Build Monday/Thursday digest email. Returns (subject, html)."""
     today = datetime.now()
+    # Map article URL -> its Deep Dive summary, so each article can carry a
+    # one-line "bottom line" teaser + a "Read more" anchor to the summaries page.
+    summary_by_url = {s.get("url"): s for s in (summaries or []) if s.get("url")}
     day_name = today.strftime("%A")
     date_str = today.strftime("%B %d, %Y")
 
@@ -78,6 +83,30 @@ def build_digest_email(articles: list, podcasts: list, bonus_podcasts: list,
       </a>
     </td></tr>"""
 
+    # Deep Dive button — sits directly below the podcast card and links to the
+    # GitHub Pages summaries page (green, to distinguish it from the audio card).
+    deepdive_banner = ""
+    if deepdive_url:
+        deepdive_banner = f"""
+    <tr><td style="padding:8px 20px 6px;">
+      <a href="{deepdive_url}" style="text-decoration:none;display:block;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#13321f,#1e8449);border-radius:12px;overflow:hidden;">
+        <tr>
+          <td width="108" valign="middle" align="center" style="padding:18px 0 18px 18px;">
+            <div style="width:84px;height:84px;border-radius:14px;background:linear-gradient(135deg,#1e8449,#27ae60);text-align:center;line-height:84px;font-size:38px;color:#ffffff;box-shadow:0 4px 14px rgba(0,0,0,0.35);">&#128214;</div>
+          </td>
+          <td style="padding:18px 20px;">
+            <div style="font-family:{FONT};font-size:{FS_HEAD}px;font-weight:bold;color:#ffffff;line-height:1.3;">&#128214; Read the Deep Dive</div>
+            <div style="font-family:{FONT};font-size:{FS_BODY}px;color:#d6f0e0;margin-top:6px;line-height:{LH};">Structured summaries of every featured article — what they did, design, findings, meaning, why it matters, limitations</div>
+            <div style="margin-top:12px;">
+              <span style="display:inline-block;background:#27ae60;color:#ffffff;font-family:{FONT};font-size:{FS_BODY}px;font-weight:bold;padding:8px 18px;border-radius:22px;">Open summaries &#8594;</span>
+            </div>
+          </td>
+        </tr>
+      </table>
+      </a>
+    </td></tr>"""
+
     # Articles
     articles_html = ""
     for j in sorted_j:
@@ -98,12 +127,30 @@ def build_digest_email(articles: list, podcasts: list, bonus_podcasts: list,
                 abstract = abstract[:247] + "..."
             abs_html = f'<div style="font-family:{FONT};font-size:{FS_BODY}px;color:#555;margin-top:4px;line-height:{LH};">{abstract}</div>' if abstract else ""
 
+            # Deep Dive "bottom line" teaser + Read more anchor (if we have a
+            # summary for this article and a page to link to).
+            bl_html = ""
+            s = summary_by_url.get(art["url"])
+            if s and s.get("bottom_line"):
+                more = ""
+                if deepdive_url:
+                    anchor = s.get("anchor", "")
+                    more = (f' <a href="{deepdive_url}#{anchor}" style="font-family:{FONT};'
+                            f'color:#2e86c1;text-decoration:none;font-weight:bold;white-space:nowrap;">'
+                            f'Read more &#8594;</a>')
+                bl_html = (f'<div style="font-family:{FONT};font-size:{FS_BODY}px;color:#33444f;'
+                           f'margin-top:8px;line-height:{LH};padding:10px 12px;background:#eef6fb;'
+                           f'border-left:3px solid #2e86c1;border-radius:0 6px 6px 0;">'
+                           f'<strong style="color:#1a5276;">Bottom line:</strong> '
+                           f'{s["bottom_line"]}{more}</div>')
+
             articles_html += f"""
     <tr><td style="padding:4px 20px 12px 30px;">
         <a href="{art['url']}" style="font-family:{FONT};color:#2c3e50;text-decoration:none;font-size:{FS_LINK}px;line-height:{LH};font-weight:600;">{art['title']}</a>{oa}
         {auth}
         <div style="font-family:{FONT};font-size:{FS_META}px;color:#999;margin-top:2px;">{art['date_str']}</div>
         {abs_html}
+        {bl_html}
     </td></tr>"""
 
     if not articles:
@@ -148,6 +195,7 @@ def build_digest_email(articles: list, podcasts: list, bonus_podcasts: list,
         <p style="margin:6px 0 0;font-family:{FONT};color:rgba(255,255,255,0.8);font-size:{FS_META}px;">{date_str} · {total} articles · {oa_count} open access</p>
     </td></tr>
     {audio_banner}
+    {deepdive_banner}
     {articles_html}
     <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
     {pods_html}""")
@@ -157,7 +205,8 @@ def build_digest_email(articles: list, podcasts: list, bonus_podcasts: list,
 
 def build_saturday_email(articles_this_week: list,
                          cme_questions: list | None = None,
-                         quiz_url: str | None = None) -> tuple[str, str]:
+                         quiz_url: str | None = None,
+                         deepdive_url: str | None = None) -> tuple[str, str]:
     """Build Saturday CME email. Returns (subject, html)."""
     today = datetime.now()
     week_start = today - timedelta(days=today.weekday())
@@ -200,6 +249,30 @@ def build_saturday_email(articles_this_week: list,
     # Questions are NOT shown in the email — they live only on the quiz page.
     # The email shows the source articles and the "Take the CME Quiz" button.
 
+    # Deep Dive reminder — a PROMINENT banner ABOVE the quiz, linking to the SAME
+    # summaries page published Monday. Nudges the reader to study first.
+    deepdive_ref = ""
+    if deepdive_url:
+        deepdive_ref = f"""
+    <tr><td style="padding:18px 20px 4px;">
+      <a href="{deepdive_url}" style="text-decoration:none;display:block;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#13321f,#1e8449);border-radius:12px;overflow:hidden;">
+        <tr>
+          <td width="96" valign="middle" align="center" style="padding:20px 0 20px 18px;">
+            <div style="width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,#1e8449,#27ae60);text-align:center;line-height:72px;font-size:34px;color:#ffffff;box-shadow:0 4px 14px rgba(0,0,0,0.35);">&#128214;</div>
+          </td>
+          <td style="padding:18px 20px;">
+            <div style="font-family:{FONT};font-size:{FS_HEAD}px;font-weight:bold;color:#ffffff;line-height:1.3;">&#128214; Read the Deep Dive first</div>
+            <div style="font-family:{FONT};font-size:{FS_BODY}px;color:#d6f0e0;margin-top:6px;line-height:{LH};">This quiz is based on the structured summaries of this week's articles. If you haven't read them yet, do so now — then the questions will be straightforward.</div>
+            <div style="margin-top:12px;">
+              <span style="display:inline-block;background:#27ae60;color:#ffffff;font-family:{FONT};font-size:{FS_BODY}px;font-weight:bold;padding:9px 20px;border-radius:22px;">Open the summaries &#8594;</span>
+            </div>
+          </td>
+        </tr>
+      </table>
+      </a>
+    </td></tr>"""
+
     # MOC reminder
     moc_html = f"""
     <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
@@ -218,6 +291,7 @@ def build_saturday_email(articles_this_week: list,
         <p style="margin:7px 0 0;font-family:{FONT};color:rgba(255,255,255,0.85);font-size:{FS_META}px;">{date_str} · Week of {week_start.strftime('%b %d')}</p>
     </td></tr>
     {highlights}
+    {deepdive_ref}
     {quiz_cta}
     {moc_html}""")
 

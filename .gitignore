@@ -8,6 +8,8 @@ podcast_script.txt
 articles_cache.json
 monday_featured.json
 fulltext_cache.json
+weekly_summaries.json
+summaries_cache.json
 moc_tracker.xlsx
 .env
 

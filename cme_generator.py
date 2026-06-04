@@ -5,6 +5,8 @@ Uses Claude API to generate RCPSC-style CME questions from the week's articles.
 For Section 2 (self-learning) and Section 3 (self-assessment) credits.
 """
 
+from __future__ import annotations
+
 import os
 import re
 import json
@@ -17,9 +19,15 @@ logger = logging.getLogger(__name__)
 _LETTERS = ["A", "B", "C", "D"]
 
 
-def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict] | None:
+def generate_cme_questions(articles: list, num_questions: int = 10,
+                           summaries: list | None = None) -> list[dict] | None:
     """
     Generate CME-style MCQs from the week's articles.
+
+    If ``summaries`` (the Monday Deep Dive summaries) are provided, each question
+    is grounded in the SAME structured summary the reader saw — keeping the quiz
+    and the Deep Dive consistent and skipping a redundant full-text re-fetch.
+    Articles without a matching summary fall back to the cached full text.
 
     Returns list of question dicts:
         {
@@ -68,8 +76,30 @@ def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict
     except Exception:
         get_article_text = None
 
+    # Map article URL -> Monday's Deep Dive summary (Option B: reuse, don't refetch).
+    summary_by_url = {s.get("url"): s for s in (summaries or []) if s.get("url")}
+
     briefs = []
     for i, art in enumerate(candidates, 1):
+        s = summary_by_url.get(art.get("url"))
+        if s:
+            # Ground the question in the same structured summary the reader saw.
+            body = _compose_summary_text(s)
+            if s.get("source") == "fulltext":
+                access = ("GROUNDED SUMMARY of the open-access full text (you may "
+                          "quote a real number only if it appears below)")
+            else:
+                access = ("ABSTRACT-BASED SUMMARY — describe direction/magnitude of "
+                          "findings; do NOT invent any statistic not present below")
+            briefs.append(
+                f"[{i}] Journal: {art['journal_abbr']} | Title: {art['title']}\n"
+                f"URL: {art['url']}\n"
+                f"Access: {access}\n"
+                f"Source text:\n{body[:2400]}"
+            )
+            continue
+
+        # Fallback: no summary for this article — fetch (cached) full text.
         info = {"source": "abstract", "text": art.get("abstract", "")}
         if get_article_text:
             try:
@@ -93,6 +123,10 @@ def generate_cme_questions(articles: list, num_questions: int = 10) -> list[dict
             f"Source text:\n{body[:CME_SOURCE_CHARS]}"
         )
     articles_text = "\n\n".join(briefs)
+    if summary_by_url:
+        used = sum(1 for art in candidates if art.get("url") in summary_by_url)
+        logger.info(f"CME grounding: {used}/{len(candidates)} from Monday's "
+                    f"Deep Dive summaries, rest from full text")
 
     prompt = f"""You are writing CME (Continuing Medical Education) self-assessment questions
 suitable for RCPSC (Royal College of Physicians and Surgeons of Canada) Maintenance of
@@ -194,6 +228,20 @@ a different point, explanations 5-10 lines."""
     except Exception as e:
         logger.error(f"Claude API call failed for CME: {e}")
         return None
+
+
+def _compose_summary_text(s: dict) -> str:
+    """Flatten a Deep Dive summary dict into labelled source text for grounding."""
+    order = [
+        ("Bottom line", "bottom_line"),
+        ("What they did", "what_they_did"),
+        ("Design", "design"),
+        ("Findings", "what_they_found"),
+        ("Interpretation", "what_it_means"),
+        ("Why it matters", "why_it_matters"),
+        ("Limitations", "limitations"),
+    ]
+    return "\n".join(f"{label}: {s[key]}" for label, key in order if s.get(key))
 
 
 # ── Streaming API call ───────────────────────────────────────────────────────

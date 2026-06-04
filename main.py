@@ -34,6 +34,9 @@ CACHE_FILE = "articles_cache.json"
 # The EXACT final list of articles emailed in the most recent Monday digest.
 # Saturday CME reads ONLY from this file — no re-fetching, no new articles.
 MONDAY_FEATURED_FILE = "monday_featured.json"
+# Monday's Deep Dive summaries + the published page URL. Saturday reuses these to
+# ground the CME questions (Option B) and to link the same page in the CME email.
+WEEKLY_SUMMARIES_FILE = "weekly_summaries.json"
 
 
 def run_digest(preview=False):
@@ -94,11 +97,34 @@ def run_digest(preview=False):
         except Exception as e:
             logger.error(f"Podcast generation/publishing failed: {e}")
 
+    # API mode: generate the structured "Deep Dive" summaries for each featured
+    # article, publish them as one dated GitHub Pages page, and persist them so
+    # Saturday's CME can reuse them. Bottom-line teasers go inline in the email.
+    summaries = None
+    deepdive_url = None
+    if MODE == "api" and selected:
+        try:
+            from summary_generator import generate_summaries
+            summaries = generate_summaries(selected)
+        except Exception as e:
+            logger.error(f"Deep Dive summary generation failed: {e}")
+        if summaries:
+            try:
+                from publisher import publish_deepdive
+                deepdive_url = publish_deepdive(summaries, datetime.now(),
+                                                push=not preview)
+            except Exception as e:
+                logger.error(f"Deep Dive publishing failed: {e}")
+    if not preview:
+        _write_weekly_summaries(summaries, deepdive_url)
+
     # Build and send. The podcast is played inline via GitHub Pages, so the MP3
     # is no longer attached to the email.
     subject, html = build_digest_email(selected, all_pods, bonus,
                                        has_audio=has_audio,
-                                       podcast_url=podcast_url)
+                                       podcast_url=podcast_url,
+                                       deepdive_url=deepdive_url,
+                                       summaries=summaries)
 
     if preview:
         _save(subject, html, "digest")
@@ -118,9 +144,15 @@ def run_saturday(preview=False):
     logger.info(f"Monday digest articles: {len(week)} "
                 f"(locked to {MONDAY_FEATURED_FILE})")
 
+    # Monday's Deep Dive summaries + page URL (for CME grounding and the email link).
+    wk = _load_weekly_summaries()
+    summaries = wk.get("summaries") or None
+    deepdive_url = wk.get("deepdive_url") or None
+
     # Free mode has no CME — just a weekly highlights review of Monday's set.
     if MODE != "api":
-        subject, html = build_saturday_email(week, cme_questions=None, quiz_url=None)
+        subject, html = build_saturday_email(week, cme_questions=None, quiz_url=None,
+                                             deepdive_url=deepdive_url)
         if preview:
             _save(subject, html, "saturday")
         else:
@@ -140,8 +172,10 @@ def run_saturday(preview=False):
     try:
         from cme_generator import generate_cme_questions
         # One question per Monday article (no repeats). Usually 10; fewer if a
-        # journal had no open-access article that week.
-        cme = generate_cme_questions(week, num_questions=len(week))
+        # journal had no open-access article that week. Grounded in Monday's
+        # Deep Dive summaries when available (Option B), else cached full text.
+        cme = generate_cme_questions(week, num_questions=len(week),
+                                     summaries=summaries)
     except Exception as e:
         logger.error(f"CME generation raised: {e}")
 
@@ -162,7 +196,8 @@ def run_saturday(preview=False):
     except Exception as e:
         logger.error(f"CME quiz publishing failed: {e}")
 
-    subject, html = build_saturday_email(week, cme_questions=cme, quiz_url=quiz_url)
+    subject, html = build_saturday_email(week, cme_questions=cme, quiz_url=quiz_url,
+                                         deepdive_url=deepdive_url)
     if preview:
         _save(subject, html, "saturday")
     else:
@@ -322,6 +357,30 @@ def _load_monday_featured() -> list:
         return json.loads(p.read_text(encoding="utf-8"))
     except Exception:
         return []
+
+
+def _write_weekly_summaries(summaries: list | None, deepdive_url: str | None):
+    """Persist Monday's Deep Dive summaries + page URL for Saturday to reuse."""
+    payload = {
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "deepdive_url": deepdive_url,
+        "summaries": summaries or [],
+    }
+    Path(WEEKLY_SUMMARIES_FILE).write_text(json.dumps(payload, default=str),
+                                           encoding="utf-8")
+    logger.info(f"Saved {len(summaries or [])} Deep Dive summaries → "
+                f"{WEEKLY_SUMMARIES_FILE}")
+
+
+def _load_weekly_summaries() -> dict:
+    """Load Monday's Deep Dive summaries payload (or {} if none yet)."""
+    p = Path(WEEKLY_SUMMARIES_FILE)
+    if not p.exists():
+        return {}
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
 
 
 def _save(subject, html, label):

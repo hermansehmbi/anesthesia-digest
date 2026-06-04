@@ -11,6 +11,8 @@ The exact URL is read from the GITHUB_PAGES_URL environment variable, which the
 GitHub Actions workflow derives automatically from the repo context.
 """
 
+from __future__ import annotations
+
 import re
 import shutil
 import logging
@@ -114,7 +116,58 @@ def publish_cme_quiz(questions: list[dict], date_obj: datetime | None = None,
     return quiz_url
 
 
+def publish_deepdive(summaries: list, date_obj: datetime | None = None,
+                     push: bool = True) -> str | None:
+    """Write the week's Deep Dive summaries to docs/deep-dive/<date>.html, refresh
+    the docs/deep-dive/index.html listing, commit + push, and return the page's
+    public GitHub Pages URL.
+    """
+    from config import GITHUB_PAGES_URL, DOCS_DIR
+    from deepdive_builder import build_deepdive_page, build_deepdive_index
+
+    if not summaries:
+        logger.warning("No Deep Dive summaries — skipping page publishing")
+        return None
+
+    date_obj = date_obj or datetime.now()
+    date_str = date_obj.strftime("%Y-%m-%d")
+
+    docs = Path(DOCS_DIR)
+    dd_dir = docs / "deep-dive"
+    dd_dir.mkdir(parents=True, exist_ok=True)
+    (docs / ".nojekyll").write_text("", encoding="utf-8")
+
+    page_name = f"{date_str}.html"
+    (dd_dir / page_name).write_text(
+        build_deepdive_page(summaries, date_obj), encoding="utf-8")
+    logger.info(f"Wrote Deep Dive page docs/deep-dive/{page_name}")
+
+    pages = _list_deepdive(dd_dir)
+    (dd_dir / "index.html").write_text(
+        build_deepdive_index(pages), encoding="utf-8")
+    logger.info("Rebuilt docs/deep-dive/index.html")
+
+    base = GITHUB_PAGES_URL.rstrip("/")
+    page_url = f"{base}/deep-dive/{page_name}"
+
+    if push:
+        _git_publish(f"Publish Deep Dive summaries {date_str}")
+
+    logger.info(f"Deep Dive URL: {page_url}")
+    return page_url
+
+
 _DATED_QUIZ_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.html$")
+
+
+def _list_deepdive(dd_dir: Path) -> list[tuple[str, str]]:
+    """Return [(YYYY-MM-DD, filename)] for dated Deep Dive pages, newest first."""
+    out = []
+    for page in dd_dir.glob("*.html"):
+        if _DATED_QUIZ_RE.match(page.name):
+            out.append((page.stem, page.name))
+    out.sort(reverse=True)
+    return out
 
 
 def _list_quizzes(cme_dir: Path) -> list[tuple[str, str]]:

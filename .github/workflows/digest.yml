@@ -72,6 +72,8 @@ jobs:
             articles_cache.json
             monday_featured.json
             fulltext_cache.json
+            weekly_summaries.json
+            summaries_cache.json
           key: cache-${{ github.run_id }}
           restore-keys: cache-
 
@@ -111,6 +113,8 @@ jobs:
             articles_cache.json
             monday_featured.json
             fulltext_cache.json
+            weekly_summaries.json
+            summaries_cache.json
           key: cache-${{ github.run_id }}
 
       - name: Save MOC tracker
