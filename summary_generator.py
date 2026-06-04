@@ -136,12 +136,13 @@ Access: {access}
 Source text:
 {text[:6000]}
 
-Write for a practicing generalist anesthesiologist. LEAD WITH WHAT THE FINDING \
-MEANS AT THE BEDSIDE and what to actually do. Keep statistics light — include only \
-one or two key numbers per article, stated in plain clinical terms (e.g. "about one \
-in five versus one in four" rather than a parade of confidence intervals and \
-p-values). Add a dash of clinical context: which patients, when in the case, and \
-how it fits everyday practice.
+Write for a practicing generalist anesthesiologist, BALANCING the study's actual \
+results with their bedside meaning. ALWAYS REPORT THE KEY NUMBERS — the primary \
+outcome figures (event rates, effect size, risk/odds ratio, or absolute/relative \
+change) and the main statistic if reported — and then translate them into plain \
+clinical interpretation and what to do. Do NOT omit the results, but do NOT bury \
+them under every confidence interval and p-value either: give the headline figures \
+that matter, in plain terms, alongside the clinical takeaway.
 
 Stay GROUNDED ONLY in the source text above. Never fabricate numbers, study \
 designs, or findings; if the source is an abstract only, or a detail is not stated, \
@@ -151,19 +152,19 @@ HARD RULE: never write the phrase "community anesthesiologist" (or "community \
 anaesthetist" / "community anesthetist") anywhere in the output — it is internal \
 audience guidance only and must not appear.
 
-LENGTH: aim for roughly 300-400 words total — clear and practical, not exhaustive.
+LENGTH: aim for roughly 320-420 words total — substantive but practical.
 
 Respond with RAW JSON only — no markdown, no backticks — with EXACTLY these keys:
 {{
-  "bottom_line": "1-2 sentence practical takeaway in plain terms (<=40 words).",
+  "bottom_line": "1-2 sentence takeaway that includes the single most important result (with its key number if reported) AND what it means (<=45 words).",
   "what_they_did": "The clinical question, the intervention or exposure, and the patients studied (2-3 sentences).",
   "design": "Study type, setting, size, comparator, and the main outcome — briefly (2-3 sentences; say 'not reported' where unclear).",
-  "what_they_found": "The main result in plain clinical language, with AT MOST one or two key real numbers from the source, plus any important safety point (3-4 sentences).",
-  "what_it_means": "What to actually do at the bedside — for which patients, and how it does or does not change management (3-4 sentences).",
+  "what_they_found": "Report the ACTUAL results with the real key numbers from the source — primary outcome figures and the main statistic, plus important secondary or safety findings. State numbers in plain terms but DO include them. If the source is an abstract with no numbers, say so and give the direction of effect (3-5 sentences).",
+  "what_it_means": "Translate the result into what to actually do at the bedside — for which patients, and how it does or does not change management (3-4 sentences).",
   "why_it_matters": "Why this matters in everyday practice (1-2 sentences).",
   "limitations": "The main caution and who the results may not apply to (1-2 sentences)."
 }}
-Aim for about 300-400 words total. Plain text only in each field (no markdown)."""
+Aim for about 320-420 words total. Plain text only in each field (no markdown)."""
 
     try:
         resp = httpx.post(
