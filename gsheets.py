@@ -369,8 +369,7 @@ def refresh_report(sh=None) -> str:
     from datetime import datetime
     if sh is None:
         sh = connect()
-    al = ensure_activity(sh)
-    ndata = max(0, len([r for r in al.get_all_values()[1:] if any(c.strip() for c in r)]))
+    ensure_activity(sh)
 
     ws = _get_or_add_ws(sh, REPORT_SHEET, rows=400, cols=6)
     ws.clear()
@@ -378,30 +377,35 @@ def refresh_report(sh=None) -> str:
 
     A = f"'{ACTIVITY_SHEET}'"
     stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
-    rows = []
-    rows.append(["PRINT THIS PAGE FOR YOUR MOC SUBMISSION  →  File ▸ Print", "", "", "", ""])  # 1
-    rows.append(["", "", "", "", ""])                                                           # 2
-    rows.append(["Self-Assessment Tracker — Summary & Report", "", "", "", ""])                 # 3
-    rows.append([f"Last updated: {stamp}", "", "", "", ""])                                     # 4
-    rows.append(["", "", "", "", ""])                                                           # 5
-    rows.append(["Total entries logged", f"=COUNTA({A}!A2:A{_LOG_MAXROW})", "", "", ""])        # 6
-    rows.append(["Total hours", f"=SUM({A}!B2:B{_LOG_MAXROW})", "", "", ""])                    # 7
-    rows.append(["Total credits (self-reported)", f"=SUM({A}!C2:C{_LOG_MAXROW})", "", "", ""])  # 8
-    rows.append(["", "", "", "", ""])                                                           # 9
-    rows.append(["Itemized activities (backup for the totals above)", "", "", "", ""])          # 10
-    rows.append(["Date", "Title", "Journal", "Hours", "Credits"])                               # 11
     DETAIL_START = 12
-    for k in range(ndata):
-        i = 2 + k  # Activity Log row
-        rows.append([
-            f'=IF({A}!A{i}="","",{A}!A{i})',
-            f'=IF({A}!A{i}="","",{A}!D{i})',
-            f'=IF({A}!A{i}="","",{A}!E{i})',
-            f'=IF({A}!A{i}="","",{A}!B{i})',
-            f'=IF({A}!A{i}="","",{A}!C{i})',
-        ])
-    last = DETAIL_START + ndata - 1 if ndata else 11
+
+    # Totals AND the itemized list count ONLY rows where Hours > 0. An article with
+    # Hours of 0 (or blank) is excluded from the totals and hidden from the printed
+    # list. Open-ended ranges + live formulas → updates the moment Hours changes.
+    hrng = f"{A}!B2:B"      # Hours
+    crng = f"{A}!C2:C"      # Credits
+    rows = [
+        ["PRINT THIS PAGE FOR YOUR MOC SUBMISSION  →  File ▸ Print", "", "", "", ""],   # 1
+        ["", "", "", "", ""],                                                           # 2
+        ["Self-Assessment Tracker — Summary & Report", "", "", "", ""],                 # 3
+        [f"Last updated: {stamp}", "", "", "", ""],                                     # 4
+        ["", "", "", "", ""],                                                           # 5
+        ["Total entries logged", f'=COUNTIF({hrng},">0")', "", "", ""],                 # 6
+        ["Total hours", f'=SUMIF({hrng},">0")', "", "", ""],                            # 7
+        ["Total credits (self-reported)", f'=SUMIF({hrng},">0",{crng})', "", "", ""],   # 8
+        ["", "", "", "", ""],                                                           # 9
+        ["Itemized activities (only entries with hours > 0)", "", "", "", ""],          # 10
+        ["Date", "Title", "Journal", "Hours", "Credits"],                              # 11
+    ]
     ws.update(range_name="A1", values=rows, value_input_option="USER_ENTERED")
+
+    # One spilling FILTER drives the whole detail list. Columns are reordered to
+    # Date | Title | Journal | Hours | Credits, and only Hours>0 rows pass through.
+    cols = ",".join(f"{A}!{c}2:{c}" for c in ("A", "D", "E", "B", "C"))
+    detail = (f'=IFERROR(FILTER({{{cols}}},{hrng}>0),'
+              f'"No activities with hours > 0 yet.")')
+    ws.update(range_name=f"A{DETAIL_START}", values=[[detail]],
+              value_input_option="USER_ENTERED")
 
     # Formatting
     ws.merge_cells("A1:E1", merge_type="MERGE_ALL")
@@ -414,16 +418,17 @@ def refresh_report(sh=None) -> str:
     ws.format("B6:B8", _cell(bold=True, size=12, color=NAVY, align="CENTER"))
     ws.format("A10", _cell(bold=True, size=12, color=NAVY))
     ws.format("A11:E11", _cell(bold=True, size=12, color=WHITE, bg=NAVY, align="CENTER"))
-    if ndata:
-        ws.format(f"A{DETAIL_START}:E{last}", _cell(size=12, valign="TOP"))
-        ws.format(f"B{DETAIL_START}:B{last}", {"wrapStrategy": "WRAP"})
-        ws.format(f"A{DETAIL_START}:A{last}", {"horizontalAlignment": "CENTER"})
-        ws.format(f"D{DETAIL_START}:E{last}", {"horizontalAlignment": "CENTER"})
+    # Style a generous block (within the grid) so spilled rows are formatted too.
+    end = ws.row_count
+    ws.format(f"A{DETAIL_START}:E{end}", _cell(size=12, valign="TOP"))
+    ws.format(f"B{DETAIL_START}:B{end}", {"wrapStrategy": "WRAP"})
+    ws.format(f"A{DETAIL_START}:A{end}", {"horizontalAlignment": "CENTER"})
+    ws.format(f"D{DETAIL_START}:E{end}", {"horizontalAlignment": "CENTER"})
     _set_col_widths(sh, ws, {0: 120, 1: 380, 2: 150, 3: 80, 4: 110})
 
     # Note: Google Sheets has no persistent print-area via API; the report lives on
     # one contiguous tab, so File ▸ Print ▸ "Current sheet" captures all of it.
-    logger.info(f"Rebuilt '{REPORT_SHEET}' ({ndata} itemized rows)")
+    logger.info(f"Rebuilt '{REPORT_SHEET}' (dynamic Hours>0 filter)")
     return sh.url
 
 
