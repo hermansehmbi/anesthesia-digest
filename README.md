@@ -7,8 +7,8 @@ Automated email service covering 10 leading anesthesia journals. Runs free on Gi
 | Day | Email |
 |-----|-------|
 | **Monday** | New **open-access** articles (most clinically relevant one per journal, chosen by Claude in a single batched call), journal podcast cards, and a ~15 min AI **two-host** audio summary played inline via GitHub Pages |
-| **Saturday** | Week's top articles + 10 AI-generated CME questions, plus a button to an interactive online quiz with instant grading, explanations, and a downloadable PDF certificate (RCPSC Section 2 & 3) |
-| **1st of month** | Top 5 monthly articles + MOC Excel tracker attached |
+| **Saturday** | Week's top articles + 10 AI-generated self-assessment questions, plus a button to an interactive online quiz with instant grading, explanations, and a downloadable PDF completion record |
+| **1st of month** | Top 5 monthly articles + Self-Assessment Tracker attached |
 
 ## Audio summary (two-host podcast)
 
@@ -33,9 +33,9 @@ Each Saturday the digest builds an interactive, mobile-friendly quiz of **10
 single-best-answer** questions from the week's articles and publishes it at a
 dated URL under `docs/cme/`. Readers select answers, press **Submit Test** to get
 their score with the correct answer + explanation revealed under each question
-(nothing is revealed before submit), then can **Download a PDF certificate**
-(built client-side with [jsPDF](https://github.com/parallax/jsPDF)) for their
-RCPSC Section 3 records. The Saturday email shows the questions for preview and
+(nothing is revealed before submit), then can **Download a PDF completion record**
+(built client-side with [jsPDF](https://github.com/parallax/jsPDF)) for their own
+self-learning records (self-reportable under RCPSC MOC Section 2). The Saturday email shows the questions for preview and
 links straight to that week's quiz. Past quizzes stay live:
 
 > Quiz list: **https://&lt;your-username&gt;.github.io/&lt;repo-name&gt;/cme/**
@@ -146,9 +146,9 @@ Open Terminal, navigate to your repo, run `claude`, and ask in plain English:
 
 ## Modes
 
-**`MODE = "api"`** (default) — Full features: AI audio podcast, AI CME questions, article digest, MOC tracking.
+**`MODE = "api"`** (default) — Full features: AI audio podcast, AI self-assessment questions, article digest, Self-Assessment Tracker.
 
-**`MODE = "free"`** — No AI: article links, podcast links, MOC tracking only. $0/month total.
+**`MODE = "free"`** — No AI: article links, podcast links, Self-Assessment Tracker only. $0/month total.
 
 Change in `config.py` → `MODE`.
 

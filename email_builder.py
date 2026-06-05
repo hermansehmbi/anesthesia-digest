@@ -212,7 +212,7 @@ def build_saturday_email(articles_this_week: list,
     week_start = today - timedelta(days=today.weekday())
     date_str = today.strftime("%B %d, %Y")
 
-    subject = f"Anesthesia Weekly CME — {today.strftime('%b %d')}"
+    subject = f"Anesthesia Weekly Review & Self-Assessment — {today.strftime('%b %d')}"
 
     # Prominent call-to-action linking to the interactive quiz + certificate.
     quiz_cta = ""
@@ -221,9 +221,9 @@ def build_saturday_email(articles_this_week: list,
     <tr><td style="padding:18px 20px 4px;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#1a5276,#2e86c1);border-radius:12px;">
         <tr><td style="padding:22px 22px;text-align:center;">
-          <div style="font-family:{FONT};font-size:{FS_HEAD}px;font-weight:bold;color:#ffffff;">&#127891; Take this week's CME quiz</div>
-          <div style="font-family:{FONT};font-size:{FS_BODY}px;color:#cfe3f2;margin:8px 0 16px;line-height:{LH};">10 single-best-answer questions · instant score &amp; explanations · downloadable certificate</div>
-          <a href="{quiz_url}" style="display:inline-block;background:#ffffff;color:#1a5276;text-decoration:none;font-family:{FONT};font-size:{FS_BODY}px;font-weight:bold;padding:14px 28px;border-radius:24px;">Take the CME Quiz &amp; Get Certificate &#8594;</a>
+          <div style="font-family:{FONT};font-size:{FS_HEAD}px;font-weight:bold;color:#ffffff;">&#127891; Take this week's self-assessment</div>
+          <div style="font-family:{FONT};font-size:{FS_BODY}px;color:#cfe3f2;margin:8px 0 16px;line-height:{LH};">10 single-best-answer questions · instant score &amp; explanations · downloadable completion record</div>
+          <a href="{quiz_url}" style="display:inline-block;background:#ffffff;color:#1a5276;text-decoration:none;font-family:{FONT};font-size:{FS_BODY}px;font-weight:bold;padding:14px 28px;border-radius:24px;">Take the Self-Assessment &amp; Get Certificate &#8594;</a>
         </td></tr>
       </table>
     </td></tr>"""
@@ -235,7 +235,7 @@ def build_saturday_email(articles_this_week: list,
         highlights = f"""
     <tr><td style="padding:18px 20px 6px;">
         <h2 style="margin:0;font-family:{FONT};font-size:{FS_HEAD}px;color:#1a5276;">📋 This Week's Articles</h2>
-        <p style="font-family:{FONT};font-size:{FS_BODY}px;color:#999;margin:5px 0 0;">This week's CME quiz is based on these articles</p>
+        <p style="font-family:{FONT};font-size:{FS_BODY}px;color:#999;margin:5px 0 0;">This week's self-assessment is based on these articles</p>
     </td></tr>"""
         for i, art in enumerate(top, 1):
             oa = f' <span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:3px;font-family:{FONT};font-size:{FS_FOOT}px;">OA</span>' if art["is_open_access"] else ""
@@ -277,17 +277,18 @@ def build_saturday_email(articles_this_week: list,
     moc_html = f"""
     <tr><td style="padding:8px 20px;"><hr style="border:none;border-top:1px solid #eee;"></td></tr>
     <tr><td style="padding:16px 20px;background:#f8f9fa;">
-        <strong style="font-family:{FONT};color:#1a5276;font-size:{FS_HEAD}px;">📊 MOC Tracking</strong>
+        <strong style="font-family:{FONT};color:#1a5276;font-size:{FS_HEAD}px;">📊 Self-Assessment Tracker</strong>
         <p style="font-family:{FONT};font-size:{FS_BODY}px;color:#555;margin:7px 0 0;line-height:{LH};">
-            Log your self-learning for Royal College MOC. Your Excel tracker is updated monthly.<br>
-            <strong>Section 2:</strong> 2 credits/hour for reading articles ·
-            <strong>Section 3:</strong> 2 credits/hour for self-assessment with feedback
+            Your self-assessment tracker is updated monthly. Time you spend reading and
+            reflecting on these articles may be eligible for self-reporting under
+            <strong>RCPSC MOC Section&nbsp;2 (Self-Learning)</strong> — you are responsible
+            for confirming your own eligibility.
         </p>
     </td></tr>"""
 
     html = _wrap(f"""
     <tr><td style="background:linear-gradient(135deg,#1a5276,#148f77);padding:24px 20px;text-align:center;">
-        <h1 style="margin:0;font-family:{FONT};color:#fff;font-size:{FS_TITLE}px;">Weekly CME & Review</h1>
+        <h1 style="margin:0;font-family:{FONT};color:#fff;font-size:{FS_TITLE}px;">Weekly Review & Self-Assessment</h1>
         <p style="margin:7px 0 0;font-family:{FONT};color:rgba(255,255,255,0.85);font-size:{FS_META}px;">{date_str} · Week of {week_start.strftime('%b %d')}</p>
     </td></tr>
     {highlights}
@@ -301,7 +302,7 @@ def build_saturday_email(articles_this_week: list,
 def build_monthly_email(articles: list, top5: list) -> tuple[str, str]:
     """Build 1st-of-month email with top 5 and MOC tracker attached."""
     today = datetime.now()
-    subject = f"Anesthesia Monthly Digest & MOC Tracker — {today.strftime('%B %Y')}"
+    subject = f"Anesthesia Monthly Digest & Self-Assessment Tracker — {today.strftime('%B %Y')}"
 
     top5_html = ""
     for i, art in enumerate(top5, 1):
@@ -317,7 +318,7 @@ def build_monthly_email(articles: list, top5: list) -> tuple[str, str]:
 
     html = _wrap(f"""
     <tr><td style="background:linear-gradient(135deg,#1a5276,#7d3c98);padding:24px 20px;text-align:center;">
-        <h1 style="margin:0;font-family:{FONT};color:#fff;font-size:{FS_TITLE}px;">Monthly Digest & MOC Update</h1>
+        <h1 style="margin:0;font-family:{FONT};color:#fff;font-size:{FS_TITLE}px;">Monthly Digest & Self-Assessment Tracker</h1>
         <p style="margin:6px 0 0;font-family:{FONT};color:rgba(255,255,255,0.8);font-size:{FS_META}px;">{today.strftime('%B %Y')} · {len(articles)} articles published across 10 journals</p>
     </td></tr>
     <tr><td style="padding:18px 20px 6px;">
@@ -326,8 +327,8 @@ def build_monthly_email(articles: list, top5: list) -> tuple[str, str]:
     </td></tr>
     {top5_html}
     <tr><td style="padding:16px 20px;background:#f8f9fa;font-family:{FONT};font-size:{FS_BODY}px;color:#555;line-height:{LH};">
-        Your MOC Excel tracker is attached with this month's entries pre-filled.
-        Fill in your <strong>Hours</strong> and <strong>Credits</strong> for articles you actually read.
+        Your Self-Assessment Tracker is attached with this month's entries pre-filled.
+        Fill in your <strong>Hours</strong> and <strong>Credits (self-reported)</strong> for articles you actually read.
     </td></tr>""")
 
     return subject, html

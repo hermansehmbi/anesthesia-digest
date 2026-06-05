@@ -1,8 +1,10 @@
 """
 Anesthesia Journal Digest — CME Question Generator
 ====================================================
-Uses Claude API to generate RCPSC-style CME questions from the week's articles.
-For Section 2 (self-learning) and Section 3 (self-assessment) credits.
+Uses Claude API to generate clinical self-assessment questions from the week's
+articles. This is a self-assessment tool to support self-directed learning.
+Time spent reading/reflecting is self-reportable under RCPSC MOC Section 2
+(Self-Learning) at the physician's discretion.
 """
 
 from __future__ import annotations
@@ -128,9 +130,10 @@ def generate_cme_questions(articles: list, num_questions: int = 10,
         logger.info(f"CME grounding: {used}/{len(candidates)} from Monday's "
                     f"Deep Dive summaries, rest from full text")
 
-    prompt = f"""You are writing CME (Continuing Medical Education) self-assessment questions
-suitable for RCPSC (Royal College of Physicians and Surgeons of Canada) Maintenance of
-Certification (Section 2 self-learning and Section 3 self-assessment).
+    prompt = f"""You are writing clinical self-assessment questions on recent anesthesia
+literature for practising anesthesiologists. These support self-directed study (the kind a
+physician may self-report under RCPSC Section 2 Self-Learning); do not state or imply that
+completing them awards any formal credit.
 
 TOPIC GUIDANCE (internal only — for choosing what to test): favor topics that matter at the
 bedside for a generalist anesthesiologist (airway, analgesia, obstetric anesthesia, regional

@@ -277,12 +277,10 @@ def _track_cme(cme: list):
 
 
 def _track_monthly(fallback_articles: list) -> bool:
-    """Update Monthly Top 5 + live Summary in Google Sheets. Returns True if the
+    """Refresh the live Summary & Report in Google Sheets. Returns True if the
     Google path was used; False means the xlsx fallback ran (attach it)."""
-    month = datetime.now().strftime("%Y-%m")
     if gsheets.is_configured():
         try:
-            gsheets.update_monthly_top5(month)
             url = gsheets.refresh_summary()
             logger.info(f"MOC mode: Google Sheets (live) → {url}")
             return True

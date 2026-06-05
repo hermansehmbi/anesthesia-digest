@@ -11,6 +11,7 @@ fulltext_cache.json
 weekly_summaries.json
 summaries_cache.json
 moc_tracker.xlsx
+self_assessment_tracker.xlsx
 .env
 
 # Google service-account keys — NEVER commit (use the GitHub Secret instead).

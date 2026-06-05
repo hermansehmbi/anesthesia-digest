@@ -87,7 +87,7 @@ def build_quiz_index(quizzes: list[tuple[str, str]]) -> str:
             label = iso_date
         items += (
             f'      <li><a href="{html.escape(filename)}">'
-            f'Weekly CME — {label}</a></li>\n'
+            f'Weekly Self-Assessment — {label}</a></li>\n'
         )
     if not items:
         items = '      <li class="empty">No quizzes published yet.</li>\n'
@@ -159,7 +159,7 @@ function drawSeal(doc, cx, cy, gold, wax){
   doc.setLineWidth(0.7); doc.circle(cx, cy, R * 0.55, 'S');
   doc.setFont('times', 'bold'); doc.setFontSize(12); doc.setTextColor(255, 246, 236);
   doc.text('AD', cx, cy - 1, {align:'center'});
-  doc.setFontSize(6); doc.text('SECTION 3', cx, cy + 9, {align:'center'});
+  doc.setFontSize(5); doc.text('SELF-ASSESSMENT', cx, cy + 9, {align:'center'});
 }
 
 // opts: {name, score, total, completedAt(Date), certId?, verCode?}
@@ -179,6 +179,7 @@ function generateCertificate(opts){
   var dateStr = now.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
   var timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
   var stamp = dateStr + ' at ' + timeStr;
+  var weekOf = (opts.weekOf || dateStr);   // the literature week this self-assessment covers
 
   var doc = new JsPDF({orientation:'landscape', unit:'pt', format:'letter'});
   var W = doc.internal.pageSize.getWidth();
@@ -197,16 +198,16 @@ function generateCertificate(opts){
 
   // Title + flourish
   doc.setFont('times', 'bold'); doc.setFontSize(34); doc.setTextColor(navy[0], navy[1], navy[2]);
-  doc.text('CME Completion Certificate', W / 2, 108, {align:'center'});
+  doc.text('Certificate of Completion', W / 2, 108, {align:'center'});
   doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1);
   doc.line(W / 2 - 160, 122, W / 2 + 160, 122);
   doc.circle(W / 2 - 168, 122, 2, 'F'); doc.circle(W / 2 + 168, 122, 2, 'F');
 
   doc.setFont('times', 'italic'); doc.setFontSize(16); doc.setTextColor(ink[0], ink[1], ink[2]);
-  doc.text('Anesthesia Journal Digest — Weekly CME', W / 2, 148, {align:'center'});
+  doc.text('Self-Assessment Activity', W / 2, 148, {align:'center'});
 
   doc.setFont('times', 'normal'); doc.setFontSize(13);
-  doc.text('This is to certify that', W / 2, 192, {align:'center'});
+  doc.text('This certifies that', W / 2, 192, {align:'center'});
 
   doc.setFont('times', 'bold'); doc.setFontSize(26); doc.setTextColor(navy[0], navy[1], navy[2]);
   doc.text(name || '—', W / 2, 226, {align:'center'});
@@ -215,8 +216,8 @@ function generateCertificate(opts){
   doc.line(W / 2 - nameW / 2, 236, W / 2 + nameW / 2, 236);
 
   doc.setFont('times', 'normal'); doc.setFontSize(13); doc.setTextColor(ink[0], ink[1], ink[2]);
-  doc.text("has completed a " + total + "-question self-assessment based on this week's", W / 2, 266, {align:'center'});
-  doc.text('featured open-access anesthesia literature, achieving a score of', W / 2, 284, {align:'center'});
+  doc.text('completed a self-assessment based on the week of ' + weekOf, W / 2, 266, {align:'center'});
+  doc.text('anesthesia literature (' + total + ' questions), with a score of', W / 2, 284, {align:'center'});
 
   doc.setFont('times', 'bold'); doc.setFontSize(20); doc.setTextColor(30, 110, 70);
   doc.text(score + ' / ' + total + '    (' + pct + '%)', W / 2, 314, {align:'center'});
@@ -230,7 +231,7 @@ function generateCertificate(opts){
   // H-34) with margin. Disclaimer is drawn line-by-line, then the ID row, so
   // nothing overruns or hides behind the frame.
   doc.setFont('times', 'italic'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
-  var disc = 'Anesthesia Digest is an automated, AI-generated educational service delivering weekly summaries of open-access anesthesia literature. This certificate reflects self-assessment completion and is suitable for RCPSC Section 3 self-learning records. Not affiliated with any journal or accrediting body.';
+  var disc = 'This is a self-assessment completion record. Time spent reading and reflecting on the literature may be eligible for self-reporting under RCPSC MOC Section 2 (Self-Learning); confirm your own eligibility.';
   var lines = doc.splitTextToSize(disc, W - 160);
   var lh = 11;                          // line spacing (pt)
   var discLast = H - 74;                // baseline of the LAST disclaimer line
@@ -244,7 +245,7 @@ function generateCertificate(opts){
   doc.text('Certificate ID:  ' + certId, 72, H - 50);
   doc.text('Verification:  ' + ver, W - 72, H - 50, {align:'right'});
 
-  doc.save('CME_Certificate_' + certId + '.pdf');
+  doc.save('Certificate_of_Completion_' + certId + '.pdf');
   return {certId: certId, verCode: ver};
 }
 """
@@ -257,7 +258,7 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anesthesia Digest — Weekly CME (%%PRETTY_DATE%%)</title>
+<title>Anesthesia Digest — Weekly Review & Self-Assessment (%%PRETTY_DATE%%)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root { --navy:#1a5276; --blue:#2e86c1; --green:#1e8449; --red:#c0392b;
@@ -323,7 +324,7 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>&#127891; Anesthesia Digest — Weekly CME</h1>
+    <h1>&#127891; Anesthesia Digest — Weekly Review &amp; Self-Assessment</h1>
     <p>%%PRETTY_DATE%% · %%TOTAL%% single-best-answer questions</p>
   </header>
   <main>
@@ -338,9 +339,10 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
     </div>
 
     <div class="intro">
-      Answer all %%TOTAL%% questions, then press <strong>Submit Test</strong> to see your score
-      and the explanations. This is a self-assessment activity suitable for
-      <strong>RCPSC Section 3</strong> credits.
+      Answer all the questions, then press <strong>Submit Test</strong> to see your score and the
+      explanations. This is a self-assessment tool to support your own learning. Time spent reading
+      and reflecting on the literature may be eligible for self-reporting under
+      <strong>RCPSC MOC Section&nbsp;2 (Self-Learning)</strong> — confirm your own eligibility.
     </div>
 
     <form id="quizForm">%%QUESTIONS_HTML%%
@@ -439,7 +441,7 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
       alert("Please enter your full name and credentials before downloading the certificate.");
       return;
     }
-    var info = generateCertificate({name:name, score:lastScore, total:TOTAL, completedAt:new Date()});
+    var info = generateCertificate({name:name, score:lastScore, total:TOTAL, completedAt:new Date(), weekOf:QUIZ_DATE});
     if (info){
       var box = document.getElementById("certinfo");
       box.style.display = "block";
@@ -456,7 +458,7 @@ _INDEX_TEMPLATE = r"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anesthesia Digest — Weekly CME Quizzes</title>
+<title>Anesthesia Digest — Weekly Review & Self-Assessment</title>
 <style>
   body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
          background:#f4f6f9; color:#2c3e50; font-size:16px; }
@@ -480,8 +482,8 @@ _INDEX_TEMPLATE = r"""<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>&#127891; Weekly CME Quizzes</h1>
-    <p>Anesthesia Journal Digest · self-assessment for RCPSC Section 3</p>
+    <h1>&#127891; Weekly Self-Assessments</h1>
+    <p>Anesthesia Journal Digest · self-assessment to support your own learning</p>
   </header>
   <main>
     <ul>
@@ -521,7 +523,7 @@ _CERT_PREVIEW_TEMPLATE = r"""<!DOCTYPE html>
 <body>
   <main class="card">
     <div class="seal">&#127891;</div>
-    <h1>CME Certificate — Design Preview</h1>
+    <h1>Certificate of Completion — Design Preview</h1>
     <p>Click below to generate a sample certificate PDF (<strong>Dr. Sample, MD, FRCPC</strong>,
        score <strong>8 / 10</strong>) with the current date and time, a sample certificate ID,
        and an auditable verification code — so you can preview the classical design locally.</p>
@@ -538,7 +540,8 @@ _CERT_PREVIEW_TEMPLATE = r"""<!DOCTYPE html>
       name: "Dr. Sample, MD, FRCPC",
       score: 8,
       total: 10,
-      completedAt: new Date()
+      completedAt: new Date(),
+      weekOf: "June 02, 2025"
     });
     if (info){
       document.getElementById("meta").textContent =

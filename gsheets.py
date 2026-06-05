@@ -1,25 +1,28 @@
 """
-Anesthesia Journal Digest — Live MOC tracking in Google Sheets (Tier 1)
-=======================================================================
-Rolling, never-resetting MOC tracker in a Google Sheet, plus a Drive folder
-structure for future certificate storage.
+Anesthesia Journal Digest — Live Self-Assessment Tracker in Google Sheets
+=========================================================================
+Rolling, never-resetting self-assessment tracker in a Google Sheet, plus a Drive
+folder structure for future certificate storage.
 
 Auth: a Google Cloud SERVICE ACCOUNT. Two environment variables / GitHub Secrets:
   - GOOGLE_SERVICE_ACCOUNT_JSON : the full service-account key JSON (as a string)
-  - GOOGLE_DRIVE_FOLDER_ID      : ID of a Drive folder ("Anesthesia Digest MOC")
-                                  that YOU created and shared (Editor) with the
+  - GOOGLE_DRIVE_FOLDER_ID      : ID of a Drive folder shared (Editor) with the
                                   service account's client_email.
+  - GOOGLE_SHEET_ID (optional)  : open this sheet directly by key.
 
-On first use this creates, inside that folder:
-  - a "Certificates" subfolder (for later use)
-  - a "MOC Tracker" spreadsheet with tabs: Activity Log, CME Log, Summary,
-    Monthly Top 5
+Three tabs (all text Arial, 12pt base; titles/headers larger):
+  1. "About"            — what it is + how to use it (RCPSC MOC Section 2
+                          self-reporting; not accredited).
+  2. "Activity Log"     — Date | Hours | Credits (self-reported) | Title |
+                          Journal | APA Reference. Append-only; user-fillable.
+  3. "Summary & Report" — print-ready: a colored "print for your MOC submission"
+                          banner + auto-summed totals, then an itemized credits
+                          table mirroring every Activity Log entry.
 
 Design:
-  - APPEND-ONLY logs (manual edits to Hours/Notes/Score persist).
-  - De-duplicated by date so re-runs never double-log.
-  - Summary uses LIVE formulas (SUMPRODUCT by month) referencing the logs, so it
-    auto-updates when you edit Hours by hand.
+  - APPEND-ONLY Activity Log (manual edits to Hours/Notes persist).
+  - De-duplicated by date so re-runs never double-log a digest.
+  - Totals + the itemized table are LIVE formulas over the Activity Log.
 If anything Google-related fails, callers fall back to the local xlsx tracker.
 """
 
@@ -34,28 +37,38 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
 
-SPREADSHEET_NAME = "MOC Tracker"
+SPREADSHEET_NAME = "MOC Tracker"   # existing live file name (kept for lookup)
 CERT_FOLDER_NAME = "Certificates"
 
+ABOUT_SHEET = "About"
 ACTIVITY_SHEET = "Activity Log"
-CME_SHEET = "CME Log"
-SUMMARY_SHEET = "Summary"
-TOP5_SHEET = "Monthly Top 5"
+REPORT_SHEET = "Summary & Report"
 
-ACTIVITY_HEADERS = ["Email Date", "Section", "Journal", "Title", "DOI",
-                    "Open Access", "In Email", "Hours", "Credits", "Notes"]
-CME_HEADERS = ["Date", "Activity", "# Questions", "Score", "Hours", "Credits"]
-TOP5_HEADERS = ["Rank", "Digest Date", "Journal", "Title", "Impact Factor",
-                "DOI", "Open Access"]
+# Activity Log column order: Date | Hours | Credits | Title | Journal | APA
+ACTIVITY_HEADERS = ["Date", "Hours", "Credits (self-reported)", "Title",
+                    "Journal", "APA Reference"]
 
-# Bounded ranges for the Summary formulas (plenty for years of weekly logging).
-_LOG_MAXROW = 5000
+# Bounded ranges for the live Summary formulas (plenty for years of logging).
+_LOG_MAXROW = 2000
+
+# Base font everywhere is Arial 12 (titles/headers kept proportionally larger).
+FONT = "Arial"
+BASE = 12
+
+# Colours (Sheets API wants 0–1 floats).
+NAVY = {"red": 0.102, "green": 0.322, "blue": 0.463}   # 1A5276
+REDCTA = {"red": 0.753, "green": 0.224, "blue": 0.169}  # C0392B
+LIGHT = {"red": 0.918, "green": 0.945, "blue": 0.973}  # EAF1F8
+WHITE = {"red": 1, "green": 1, "blue": 1}
+GREY = {"red": 0.53, "green": 0.53, "blue": 0.53}
 
 
 def is_configured() -> bool:
-    """True only if both the key and the target folder id are present."""
-    return bool(os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
-                and os.environ.get("GOOGLE_DRIVE_FOLDER_ID"))
+    """True only if the key plus a way to locate the sheet are present."""
+    has_key = bool(os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON"))
+    has_target = bool(os.environ.get("GOOGLE_SHEET_ID")
+                      or os.environ.get("GOOGLE_DRIVE_FOLDER_ID"))
+    return has_key and has_target
 
 
 # ── Auth / handles ───────────────────────────────────────────────────────────
@@ -73,7 +86,7 @@ def _open():
     creds = _creds()
     gc = gspread.authorize(creds)
     drive = build("drive", "v3", credentials=creds, cache_discovery=False)
-    folder_id = os.environ["GOOGLE_DRIVE_FOLDER_ID"]
+    folder_id = os.environ.get("GOOGLE_DRIVE_FOLDER_ID", "")
     return gc, drive, folder_id
 
 
@@ -89,6 +102,8 @@ def _find_in_folder(drive, folder_id, name, mime):
 
 
 def _ensure_cert_folder(drive, folder_id):
+    if not folder_id:
+        return None
     fid = _find_in_folder(drive, folder_id, CERT_FOLDER_NAME,
                           "application/vnd.google-apps.folder")
     if fid:
@@ -102,232 +117,320 @@ def _ensure_cert_folder(drive, folder_id):
     return f["id"]
 
 
-def _ensure_spreadsheet(gc, drive, folder_id):
-    # A service account on a PERSONAL Google account has no Drive storage quota,
-    # so it cannot CREATE a file it would own (you'd get "storage quota
-    # exceeded"). Instead we open a sheet YOU created (the SA can edit a file you
-    # own without using quota). Prefer an explicit GOOGLE_SHEET_ID, else find the
-    # 'MOC Tracker' sheet by name inside the shared folder.
+def _open_spreadsheet(gc, drive, folder_id):
+    # Prefer an explicit GOOGLE_SHEET_ID; else find by name in the shared folder.
     sheet_id = os.environ.get("GOOGLE_SHEET_ID", "").strip()
     if sheet_id:
         return gc.open_by_key(sheet_id)
-
-    sid = _find_in_folder(drive, folder_id, SPREADSHEET_NAME,
-                          "application/vnd.google-apps.spreadsheet")
-    if sid:
-        return gc.open_by_key(sid)
-
+    if folder_id:
+        sid = _find_in_folder(drive, folder_id, SPREADSHEET_NAME,
+                              "application/vnd.google-apps.spreadsheet")
+        if sid:
+            return gc.open_by_key(sid)
     raise RuntimeError(
-        f"'{SPREADSHEET_NAME}' spreadsheet not found and a service account can't "
-        f"create one on a personal Google account (no storage quota). Create an "
-        f"empty Google Sheet named '{SPREADSHEET_NAME}' inside the shared folder "
-        f"(or set the GOOGLE_SHEET_ID secret to a sheet you created), then re-run."
-    )
+        "Could not locate the tracker spreadsheet. Set GOOGLE_SHEET_ID, or share "
+        f"a sheet named '{SPREADSHEET_NAME}' in the GOOGLE_DRIVE_FOLDER_ID folder.")
 
 
-def _ensure_ws(sh, title, headers, rows=200):
+def connect():
+    """Open and return the tracker spreadsheet handle."""
+    gc, drive, folder_id = _open()
+    _ensure_cert_folder(drive, folder_id)
+    return _open_spreadsheet(gc, drive, folder_id)
+
+
+# ── APA reference ────────────────────────────────────────────────────────────
+
+def _apa_authors(raw: str) -> str:
+    names = [n.strip() for n in (raw or "").replace(" and ", ";").split(";") if n.strip()]
+    out = []
+    for n in names:
+        parts = n.split()
+        if len(parts) == 1:
+            out.append(parts[0]); continue
+        surname = parts[-1]
+        initials = " ".join(f"{p[0].upper()}." for p in parts[:-1] if p)
+        out.append(f"{surname}, {initials}".strip())
+    if not out:
+        return ""
+    if len(out) == 1:
+        return out[0]
+    if len(out) <= 20:
+        return ", ".join(out[:-1]) + ", & " + out[-1]
+    return ", ".join(out[:19]) + ", … " + out[-1]
+
+
+def apa_reference(art: dict) -> str:
+    """Single-line APA-style reference from an article dict."""
+    authors = _apa_authors(art.get("authors", ""))
+    date_str = str(art.get("date_str") or art.get("date") or "")
+    year = date_str[:4] if len(date_str) >= 4 and date_str[:4].isdigit() else "n.d."
+    title = (art.get("title") or "").strip().rstrip(".")
+    journal = art.get("journal") or art.get("journal_abbr") or ""
+    doi = (art.get("doi") or "").strip()
+    link = f"https://doi.org/{doi}" if doi else (art.get("url") or "")
+    ref = (f"{authors} " if authors else "") + f"({year}). {title}. {journal}."
+    if link:
+        ref += f" {link}"
+    return ref.strip()
+
+
+def _activity_row(art: dict, date: str) -> list:
+    """One Activity Log row in the new layout. Credits is a self-reported formula."""
+    return [date, "", "__CREDITS__",
+            (art.get("title", "") or "")[:300],
+            art.get("journal_abbr", "") or art.get("journal", ""),
+            apa_reference(art)]
+
+
+# ── Formatting helpers ───────────────────────────────────────────────────────
+
+def _cell(*, bold=None, italic=None, size=BASE, color=None, bg=None,
+          align=None, valign=None, wrap=None):
+    tf = {"fontFamily": FONT, "fontSize": size}
+    if bold is not None:
+        tf["bold"] = bold
+    if italic is not None:
+        tf["italic"] = italic
+    if color is not None:
+        tf["foregroundColor"] = color
+    fmt = {"textFormat": tf}
+    if bg is not None:
+        fmt["backgroundColor"] = bg
+    if align is not None:
+        fmt["horizontalAlignment"] = align
+    if valign is not None:
+        fmt["verticalAlignment"] = valign
+    if wrap is not None:
+        fmt["wrapStrategy"] = wrap
+    return fmt
+
+
+def _set_col_widths(sh, ws, widths: dict):
+    """widths: {0-based col index: pixels}. One batch request."""
+    reqs = []
+    for col, px in widths.items():
+        reqs.append({"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS",
+                      "startIndex": col, "endIndex": col + 1},
+            "properties": {"pixelSize": px}, "fields": "pixelSize"}})
+    if reqs:
+        sh.batch_update({"requests": reqs})
+
+
+def _unmerge_all(sh, ws):
+    sh.batch_update({"requests": [{"unmergeCells": {"range": {"sheetId": ws.id}}}]})
+
+
+# ── Structure ────────────────────────────────────────────────────────────────
+
+def _get_or_add_ws(sh, title, rows=200, cols=8):
     import gspread
     try:
         return sh.worksheet(title)
     except gspread.WorksheetNotFound:
-        ws = sh.add_worksheet(title=title, rows=rows, cols=max(12, len(headers)))
-        ws.update(range_name="A1", values=[headers],
+        return sh.add_worksheet(title=title, rows=rows, cols=cols)
+
+
+def ensure_about(sh):
+    """Create/refresh the About tab (Arial ≥14)."""
+    ws = _get_or_add_ws(sh, ABOUT_SHEET, rows=60, cols=4)
+    ws.clear()
+    _unmerge_all(sh, ws)
+    blocks = [
+        ("Self-Assessment Tracker", "TITLE"),
+        ("Anesthesia Journal Digest", "SUB"),
+        ("What this is", "H"),
+        ("A simple log for your own self-directed study of the anesthesia literature. "
+         "Use it to record the articles you read and reflect on each week, the time you "
+         "spend, and the self-reported credits you choose to claim.", "P"),
+        ("Purpose", "H"),
+        ("It keeps a tidy, printable record of self-learning that may be eligible for "
+         "self-reporting under RCPSC MOC Section 2 (Self-Learning). Logging an activity "
+         "here is a personal record only — you are responsible for confirming your own "
+         "eligibility before submitting anything to the Royal College.", "P"),
+        ("How to use it", "H"),
+        ("1. Open the “Activity Log” tab. Each row is one activity; new article picks "
+         "are added automatically, and you can add your own rows at the bottom.", "P"),
+        ("2. Enter the Hours you spent. The Credits (self-reported) column fills in "
+         "automatically at the Section 2 rate of 2 credits per hour (copy the formula "
+         "down for rows you add).", "P"),
+        ("3. The “Summary & Report” tab auto-totals your hours, credits, and entry "
+         "count — nothing to recalculate by hand.", "P"),
+        ("4. To submit: open “Summary & Report”, then File ▸ Print ▸ Current sheet, and "
+         "save as PDF. It prints the totals cover page plus the itemized list.", "P"),
+        ("Credits are self-reported (not accredited). RCPSC Section 2 (Self-Learning) is "
+         "self-reported at the physician's discretion.", "NOTE"),
+    ]
+    values = [[b[0]] for b in blocks]
+    ws.update(range_name="A1", values=values, value_input_option="USER_ENTERED")
+    # Formatting per row
+    for i, (_, kind) in enumerate(blocks, 1):
+        rng = f"A{i}"
+        if kind == "TITLE":
+            ws.format(rng, _cell(bold=True, size=18, color=NAVY))
+        elif kind == "SUB":
+            ws.format(rng, _cell(italic=True, size=12, color=GREY))
+        elif kind == "H":
+            ws.format(rng, _cell(bold=True, size=14, color=NAVY))
+        elif kind == "NOTE":
+            ws.format(rng, _cell(italic=True, size=12, color=GREY, wrap="WRAP"))
+        else:
+            ws.format(rng, _cell(size=12, wrap="WRAP", valign="TOP"))
+    _set_col_widths(sh, ws, {0: 900})
+    return ws
+
+
+def ensure_activity(sh):
+    """Ensure the Activity Log exists with the new headers + formatting."""
+    ws = _get_or_add_ws(sh, ACTIVITY_SHEET, rows=400, cols=6)
+    existing = ws.row_values(1)
+    if existing[:6] != ACTIVITY_HEADERS:
+        ws.update(range_name="A1", values=[ACTIVITY_HEADERS],
                   value_input_option="USER_ENTERED")
-        ws.format(f"A1:{chr(64 + len(headers))}1", {"textFormat": {"bold": True}})
-        return ws
+    format_activity(sh, ws)
+    return ws
 
 
-def _structure(gc=None, drive=None, folder_id=None):
-    """Ensure folder + spreadsheet + all tabs exist. Returns the spreadsheet."""
-    import gspread
-    if gc is None:
-        gc, drive, folder_id = _open()
-    _ensure_cert_folder(drive, folder_id)
-    sh = _ensure_spreadsheet(gc, drive, folder_id)
-    _ensure_ws(sh, ACTIVITY_SHEET, ACTIVITY_HEADERS)
-    _ensure_ws(sh, CME_SHEET, CME_HEADERS)
-    _ensure_ws(sh, SUMMARY_SHEET, ["Month"], rows=120)
-    _ensure_ws(sh, TOP5_SHEET, TOP5_HEADERS, rows=20)
-    # Remove the default empty "Sheet1" gspread creates with a new spreadsheet.
-    try:
-        sh.del_worksheet(sh.worksheet("Sheet1"))
-    except gspread.WorksheetNotFound:
-        pass
-    return sh
+def format_activity(sh, ws):
+    ws.freeze(rows=1)
+    ws.format("A1:F1", _cell(bold=True, size=12, color=WHITE, bg=NAVY,
+                             align="CENTER", valign="MIDDLE"))
+    ws.format(f"A2:F{_LOG_MAXROW}", _cell(size=12, valign="TOP"))
+    ws.format(f"A2:C{_LOG_MAXROW}", {"horizontalAlignment": "CENTER"})
+    ws.format(f"D2:D{_LOG_MAXROW}", {"wrapStrategy": "WRAP"})
+    ws.format(f"F2:F{_LOG_MAXROW}", {"wrapStrategy": "WRAP"})
+    _set_col_widths(sh, ws, {0: 96, 1: 70, 2: 160, 3: 380, 4: 150, 5: 540})
 
 
 # ── Logging operations ───────────────────────────────────────────────────────
 
-def log_digest(selected: list, email_date: str) -> str:
-    """APPEND one Activity Log row per featured article. Dedup by email_date.
+def _next_row(ws) -> int:
+    return len(ws.get_all_values()) + 1
 
-    Returns the spreadsheet URL. Raises on any API/auth failure (caller falls
-    back to xlsx).
-    """
-    gc, drive, folder_id = _open()
-    sh = _structure(gc, drive, folder_id)
-    ws = sh.worksheet(ACTIVITY_SHEET)
+
+def log_digest(selected: list, email_date: str) -> str:
+    """APPEND one Activity Log row per featured article. Dedup by date."""
+    sh = connect()
+    ws = ensure_activity(sh)
 
     if email_date in set(ws.col_values(1)):
         logger.info(f"Activity Log already has {email_date} — skip (no double-log)")
-        _refresh_summary(sh)
+        refresh_report(sh)
         return sh.url
 
-    start = len(ws.get_all_values()) + 1  # next empty row (1-based)
+    start = _next_row(ws)
     rows = []
     for i, art in enumerate(selected):
         r = start + i
-        rows.append([
-            email_date,
-            "Section 2",
-            art.get("journal_abbr", ""),
-            (art.get("title", "") or "")[:300],
-            art.get("doi", ""),
-            "Yes" if art.get("is_open_access") else "No",
-            "TRUE",            # In Email check
-            "",                # Hours — you fill
-            f"=H{r}*2",        # Credits = Hours × 2 (Section 2: 2 credits/hr)
-            "",                # Notes — you fill
-        ])
+        row = _activity_row(art, email_date)
+        row[2] = f'=IF(B{r}="","",B{r}*2)'   # Credits (self-reported) = Hours × 2
+        rows.append(row)
     ws.append_rows(rows, value_input_option="USER_ENTERED")
     logger.info(f"Appended {len(rows)} rows to '{ACTIVITY_SHEET}' for {email_date}")
-    _refresh_summary(sh)
+    format_activity(sh, ws)
+    refresh_report(sh)
     return sh.url
 
 
-def log_cme(date: str, num_questions: int, activity: str = "Weekly CME self-assessment") -> str:
-    """APPEND one CME Log row. Dedup by date. Returns the spreadsheet URL."""
-    gc, drive, folder_id = _open()
-    sh = _structure(gc, drive, folder_id)
-    ws = sh.worksheet(CME_SHEET)
+def log_cme(date: str, num_questions: int,
+            activity: str = "Weekly self-assessment") -> str:
+    """APPEND one self-assessment row to the Activity Log. Dedup by date+marker.
 
-    if date in set(ws.col_values(1)):
-        logger.info(f"CME Log already has {date} — skip (no double-log)")
-        _refresh_summary(sh)
-        return sh.url
+    Self-reportable under RCPSC MOC Section 2 (Self-Learning) at the physician's
+    discretion (Section 2 = 2 credits/hr).
+    """
+    sh = connect()
+    ws = ensure_activity(sh)
 
-    r = len(ws.get_all_values()) + 1
-    row = [date, activity, num_questions,
-           "",            # Score — you fill in
-           "",            # Hours — you fill in
-           f"=E{r}*2"]    # Credits = Hours × 2 (Section 3: 2 credits/hr)
+    title = f"{activity} — {num_questions} questions"
+    existing = ws.get_all_values()
+    for row in existing[1:]:
+        if len(row) >= 4 and row[0] == date and row[3] == title:
+            logger.info(f"Activity Log already has self-assessment for {date} — skip")
+            refresh_report(sh)
+            return sh.url
+
+    r = _next_row(ws)
+    row = [date, "", f'=IF(B{r}="","",B{r}*2)', title, "Multiple journals",
+           "Self-directed reading & reflection of the week's featured articles."]
     ws.append_rows([row], value_input_option="USER_ENTERED")
-    logger.info(f"Appended CME Log row for {date}")
-    _refresh_summary(sh)
+    logger.info(f"Appended self-assessment row for {date}")
+    format_activity(sh, ws)
+    refresh_report(sh)
     return sh.url
 
 
-def update_monthly_top5(month: str) -> str:
-    """Rewrite 'Monthly Top 5' from that month's Monday open-access picks.
+# ── Summary & Report ─────────────────────────────────────────────────────────
 
-    Reads the Activity Log rows whose Email Date is in ``month`` (YYYY-MM),
-    ranks by journal impact factor (tiebreaker), keeps 5. Returns the URL.
-    """
-    from config import JOURNALS
-    if_by_abbr = {j["abbreviation"]: j["impact_factor"] for j in JOURNALS}
+def refresh_report(sh=None) -> str:
+    """Rebuild the print-ready 'Summary & Report' tab: banner + live totals, then
+    an itemized table mirroring every Activity Log entry. Returns the URL."""
+    from datetime import datetime
+    if sh is None:
+        sh = connect()
+    al = ensure_activity(sh)
+    ndata = max(0, len([r for r in al.get_all_values()[1:] if any(c.strip() for c in r)]))
 
-    gc, drive, folder_id = _open()
-    sh = _structure(gc, drive, folder_id)
-    log = sh.worksheet(ACTIVITY_SHEET)
-    records = log.get_all_records()  # list of dicts keyed by header
-
-    month_rows = [row for row in records
-                  if str(row.get("Email Date", "")).startswith(month)]
-    ranked = sorted(
-        month_rows,
-        key=lambda row: if_by_abbr.get(row.get("Journal", ""), 0.0),
-        reverse=True,
-    )[:5]
-
-    out = [TOP5_HEADERS]
-    for rank, row in enumerate(ranked, 1):
-        out.append([
-            rank,
-            row.get("Email Date", ""),
-            row.get("Journal", ""),
-            row.get("Title", ""),
-            if_by_abbr.get(row.get("Journal", ""), ""),
-            row.get("DOI", ""),
-            row.get("Open Access", ""),
-        ])
-    ws = sh.worksheet(TOP5_SHEET)
+    ws = _get_or_add_ws(sh, REPORT_SHEET, rows=400, cols=6)
     ws.clear()
-    ws.update(range_name="A1", values=out, value_input_option="USER_ENTERED")
-    ws.format("A1:G1", {"textFormat": {"bold": True}})
-    logger.info(f"Updated '{TOP5_SHEET}' for {month}: {len(ranked)} articles")
+    _unmerge_all(sh, ws)
+
+    A = f"'{ACTIVITY_SHEET}'"
+    stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    rows = []
+    rows.append(["PRINT THIS PAGE FOR YOUR MOC SUBMISSION  →  File ▸ Print", "", "", "", ""])  # 1
+    rows.append(["", "", "", "", ""])                                                           # 2
+    rows.append(["Self-Assessment Tracker — Summary & Report", "", "", "", ""])                 # 3
+    rows.append([f"Last updated: {stamp}", "", "", "", ""])                                     # 4
+    rows.append(["", "", "", "", ""])                                                           # 5
+    rows.append(["Total entries logged", f"=COUNTA({A}!A2:A{_LOG_MAXROW})", "", "", ""])        # 6
+    rows.append(["Total hours", f"=SUM({A}!B2:B{_LOG_MAXROW})", "", "", ""])                    # 7
+    rows.append(["Total credits (self-reported)", f"=SUM({A}!C2:C{_LOG_MAXROW})", "", "", ""])  # 8
+    rows.append(["", "", "", "", ""])                                                           # 9
+    rows.append(["Itemized activities (backup for the totals above)", "", "", "", ""])          # 10
+    rows.append(["Date", "Title", "Journal", "Hours", "Credits"])                               # 11
+    DETAIL_START = 12
+    for k in range(ndata):
+        i = 2 + k  # Activity Log row
+        rows.append([
+            f'=IF({A}!A{i}="","",{A}!A{i})',
+            f'=IF({A}!A{i}="","",{A}!D{i})',
+            f'=IF({A}!A{i}="","",{A}!E{i})',
+            f'=IF({A}!A{i}="","",{A}!B{i})',
+            f'=IF({A}!A{i}="","",{A}!C{i})',
+        ])
+    last = DETAIL_START + ndata - 1 if ndata else 11
+    ws.update(range_name="A1", values=rows, value_input_option="USER_ENTERED")
+
+    # Formatting
+    ws.merge_cells("A1:E1", merge_type="MERGE_ALL")
+    ws.format("A1:E1", _cell(bold=True, size=14, color=WHITE, bg=REDCTA,
+                             align="CENTER", valign="MIDDLE"))
+    ws.merge_cells("A3:E3", merge_type="MERGE_ALL")
+    ws.format("A3", _cell(bold=True, size=14, color=NAVY))
+    ws.format("A4", _cell(italic=True, size=12, color=GREY))
+    ws.format("A6:A8", _cell(bold=True, size=12))
+    ws.format("B6:B8", _cell(bold=True, size=12, color=NAVY, align="CENTER"))
+    ws.format("A10", _cell(bold=True, size=12, color=NAVY))
+    ws.format("A11:E11", _cell(bold=True, size=12, color=WHITE, bg=NAVY, align="CENTER"))
+    if ndata:
+        ws.format(f"A{DETAIL_START}:E{last}", _cell(size=12, valign="TOP"))
+        ws.format(f"B{DETAIL_START}:B{last}", {"wrapStrategy": "WRAP"})
+        ws.format(f"A{DETAIL_START}:A{last}", {"horizontalAlignment": "CENTER"})
+        ws.format(f"D{DETAIL_START}:E{last}", {"horizontalAlignment": "CENTER"})
+    _set_col_widths(sh, ws, {0: 120, 1: 380, 2: 150, 3: 80, 4: 110})
+
+    # Note: Google Sheets has no persistent print-area via API; the report lives on
+    # one contiguous tab, so File ▸ Print ▸ "Current sheet" captures all of it.
+    logger.info(f"Rebuilt '{REPORT_SHEET}' ({ndata} itemized rows)")
     return sh.url
 
 
-# ── Live summary ─────────────────────────────────────────────────────────────
-
-def _months_present(sh) -> list:
-    """Distinct YYYY-MM across both logs, sorted ascending."""
-    months = set()
-    for sheet, col in ((ACTIVITY_SHEET, 1), (CME_SHEET, 1)):
-        try:
-            vals = sh.worksheet(sheet).col_values(col)[1:]  # skip header
-        except Exception:
-            vals = []
-        for v in vals:
-            v = str(v).strip()
-            if len(v) >= 7:
-                months.add(v[:7])
-    return sorted(months)
-
-
-def _refresh_summary(sh):
-    """Rewrite the Summary tab with LIVE per-month formulas referencing the logs.
-
-    Month labels + structure are regenerated each run, but every count/total is a
-    formula over the logs, so manual Hours edits flow through automatically.
-    """
-    months = _months_present(sh)
-    A = f"'{ACTIVITY_SHEET}'!$A$2:$A${_LOG_MAXROW}"
-    AH = f"'{ACTIVITY_SHEET}'!$H$2:$H${_LOG_MAXROW}"
-    C = f"'{CME_SHEET}'!$A$2:$A${_LOG_MAXROW}"
-    CE = f"'{CME_SHEET}'!$E$2:$E${_LOG_MAXROW}"
-
-    header = ["Month", "S2 Articles", "S2 Hours", "S2 Credits",
-              "CME Activities", "S3 Hours", "S3 Credits"]
-    values = [header]
-    first_data_row = 2
-    for idx, m in enumerate(months):
-        r = first_data_row + idx
-        mref = f"$A{r}"
-        values.append([
-            m,
-            f'=SUMPRODUCT((LEFT({A},7)={mref})*1)',
-            f'=SUMPRODUCT((LEFT({A},7)={mref})*IFERROR({AH}*1,0))',
-            f"=C{r}*2",
-            f'=SUMPRODUCT((LEFT({C},7)={mref})*1)',
-            f'=SUMPRODUCT((LEFT({C},7)={mref})*IFERROR({CE}*1,0))',
-            f"=F{r}*2",
-        ])
-    total_r = first_data_row + len(months)
-    if months:
-        rng = f"{first_data_row}:{total_r - 1}"
-        values.append([
-            "TOTAL",
-            f"=SUM(B{rng})", f"=SUM(C{rng})", f"=SUM(D{rng})",
-            f"=SUM(E{rng})", f"=SUM(F{rng})", f"=SUM(G{rng})",
-        ])
-    else:
-        values.append(["TOTAL", 0, 0, 0, 0, 0, 0])
-
-    ws = sh.worksheet(SUMMARY_SHEET)
-    ws.clear()
-    ws.update(range_name="A1", values=values, value_input_option="USER_ENTERED")
-    ws.format("A1:G1", {"textFormat": {"bold": True}})
-    ws.format(f"A{total_r}:G{total_r}", {"textFormat": {"bold": True}})
-
-
+# Back-compat aliases for existing callers.
 def refresh_summary() -> str:
-    """Public: ensure structure and refresh the live Summary. Returns URL."""
-    sh = _structure()
-    _refresh_summary(sh)
-    return sh.url
+    return refresh_report()
 
 
 def spreadsheet_url() -> str:
-    """Ensure structure exists and return the spreadsheet URL."""
-    return _structure().url
+    return connect().url
