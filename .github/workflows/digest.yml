@@ -65,14 +65,17 @@ jobs:
       # Restore-only (no post-job auto-save) so the explicit Save steps below are
       # the single writer per key — avoids the "Cache save failed / unable to
       # reserve cache" collision from double-saving the same key.
+      # monday_featured.json / weekly_summaries.json are NOT cached here — they
+      # are committed to the repo (see "Persist digest state" below) so the
+      # Saturday CME run always finds Monday's article set from a fresh checkout,
+      # independent of the best-effort Actions cache. Only the bulky optimization
+      # files stay in the cache.
       - name: Restore article cache
         uses: actions/cache/restore@v4
         with:
           path: |
             articles_cache.json
-            monday_featured.json
             fulltext_cache.json
-            weekly_summaries.json
             summaries_cache.json
           key: cache-${{ github.run_id }}
           restore-keys: cache-
@@ -105,15 +108,34 @@ jobs:
       - name: Run
         run: python main.py ${{ steps.cmd.outputs.command }}
 
+      # Commit the Monday -> Saturday hand-off files to the repo so they survive
+      # regardless of the Actions cache (which is best-effort and was invalidated
+      # by a path-list change, breaking a Saturday CME run). The Monday digest
+      # writes these; Saturday reads them from the checkout. Best-effort: a
+      # failure here never fails the run (the email already sent in "Run").
+      - name: Persist digest state (Monday -> Saturday handoff)
+        if: success()
+        continue-on-error: true
+        run: |
+          git add -f monday_featured.json weekly_summaries.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No digest-state changes to commit."
+          else
+            git commit -m "Update digest state ($(date -u +%F)) [skip ci]"
+            for i in 1 2 3; do
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME:-main}" \
+                && git push origin "HEAD:${GITHUB_REF_NAME:-main}" && break
+              echo "push attempt $i failed; retrying..."; sleep 5
+            done
+          fi
+
       - name: Save article cache
         if: always()
         uses: actions/cache/save@v4
         with:
           path: |
             articles_cache.json
-            monday_featured.json
             fulltext_cache.json
-            weekly_summaries.json
             summaries_cache.json
           key: cache-${{ github.run_id }}
 

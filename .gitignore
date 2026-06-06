@@ -5,10 +5,10 @@ podcast.mp3
 podcast_script.txt
 *.mp3
 *_script.txt
+# monday_featured.json and weekly_summaries.json are intentionally TRACKED (the
+# Monday -> Saturday hand-off survives a wiped Actions cache). The rest stay out.
 articles_cache.json
-monday_featured.json
 fulltext_cache.json
-weekly_summaries.json
 summaries_cache.json
 moc_tracker.xlsx
 self_assessment_tracker.xlsx
