@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Deep Dive · Monday, June 15, 2026</title>
+<style>
+  :root{
+    --ink:#1a5276; --ink2:#2e86c1; --text:#2c3e50; --muted:#7b8794;
+    --line:#e3e8ee; --bg:#f5f6fa; --card:#ffffff;
+    --warn:#b9770e; --warnbg:#fff8ec; --warnline:#f0d9a8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text);line-height:1.55;}
+  .page{max-width:760px;margin:0 auto;padding:28px 18px 60px;}
+  .page-head{padding:6px 4px 18px;}
+  .page-head h1{font-size:22px;color:var(--ink);margin:0 0 4px;}
+  .page-head .sub{font-size:13px;color:var(--muted);margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;margin:18px 0;}
+  .hdr{padding:18px 20px 16px;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:9px;}
+  .badge{font-size:11px;font-weight:bold;border-radius:4px;padding:2px 8px;letter-spacing:.02em;}
+  .b-journal{background:var(--ink);color:#fff;}
+  .b-if{background:#eef3f8;color:var(--ink);}
+  .b-oa{background:#27ae60;color:#fff;}
+  .title{font-size:18px;font-weight:bold;color:var(--text);margin:2px 0 4px;line-height:1.35;}
+  .meta{font-size:12px;color:var(--muted);}
+  .bottomline{margin:14px 0 2px;padding:12px 14px;background:#eef6fb;
+              border-left:4px solid var(--ink2);border-radius:0 8px 8px 0;}
+  .bottomline .lab{font-size:11px;font-weight:bold;text-transform:uppercase;
+                   letter-spacing:.06em;color:var(--ink);}
+  .bottomline p{margin:4px 0 0;font-size:14px;color:#33444f;}
+  .toggle{display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+          background:var(--ink);color:#fff;border:none;cursor:pointer;
+          font-family:inherit;font-size:14px;font-weight:bold;
+          padding:10px 18px;border-radius:22px;}
+  .toggle .chev{transition:transform .2s ease;font-size:12px;}
+  .card.open .toggle .chev{transform:rotate(180deg);}
+  .body{display:none;border-top:1px solid var(--line);padding:6px 20px 20px;}
+  .card.open .body{display:block;}
+  .sec{padding:15px 0 4px;border-bottom:1px solid #f0f2f5;}
+  .sec:last-child{border-bottom:none;}
+  .sec h3{display:flex;align-items:center;gap:9px;margin:0 0 6px;
+          font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink);}
+  .sec h3 .ic{width:22px;height:22px;border-radius:6px;background:#eef3f8;
+              display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+  .sec p{margin:0;font-size:14px;color:#3a4750;}
+  .sec.caution{background:var(--warnbg);border:1px solid var(--warnline);
+               border-radius:10px;padding:14px 16px;margin-top:14px;}
+  .sec.caution h3{color:var(--warn);}
+  .sec.caution h3 .ic{background:#fbecca;}
+  .sec.caution p{color:#7a5a17;}
+  .links{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;}
+  .links a{font-size:13px;font-weight:bold;text-decoration:none;color:var(--ink2);
+           border:1px solid var(--line);border-radius:8px;padding:8px 14px;}
+  .src-note{margin-top:14px;font-size:11px;color:var(--muted);font-style:italic;}
+  .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:30px;line-height:1.5;}
+  .foot a{color:var(--ink2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>📖 Anesthesia Digest — Deep Dive</h1>
+    <p class="sub">Monday, June 15, 2026 · structured summaries of this week's 9 featured articles</p>
+  </div>
+  <div class="card open" id="a1">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">BJA</span><span class="badge b-if">IF 9.2</span></div>
+      <div class="title">Postoperative hypotension in patients recovering from noncardiac surgery: a prospective, blinded observational study</div>
+      <div class="meta">Moritz Flick; Simon Stemmler; Max Bossemeyer; Brian Überleer et al. · BJA · 2026-06-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Postoperative hypotension (MAP &lt;65 mm Hg) occurred in 38% of noncardiac surgery patients over 48 hours, but was mild and brief (median 180 minutes total), representing only 7% of monitoring time—reassuring that it is common but rarely severe.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a1')">
+        <span class="lab-text">Hide summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This prospective observational study quantified the incidence, duration, and severity of postoperative hypotension in patients recovering from noncardiac surgery. Researchers defined hypotension as mean arterial pressure (MAP) below 65 mm Hg and monitored automated blood pressure continuously in a single-centre cohort.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Single-centre prospective observational study with blinded assessment. 1002 participants (median age 58 years, 50% female) underwent automated blood pressure monitoring for a median of 48 hours postoperatively. The primary outcome was the incidence, cumulative duration, and severity of postoperative hypotension events. No control group or intervention is described in the abstract.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Postoperative hypotension was recorded in 378 of 1002 participants (37.7%). Among those with hypotension, the median cumulative duration was 180 minutes (interquartile range 71–420 min), corresponding to 7.1% of their total monitoring time (range 3.3–16.3%). The median area under a MAP of 65 mm Hg was 836 mm Hg × min (range 300–2037). The incidence of postoperative hypotension progressively decreased from postoperative day 1 to day 3. The time-weighted average MAP is mentioned but the specific value is not provided in the abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Most postoperative hypotensive episodes are self-limited and brief. Rather than aggressive intervention for every patient with MAP dipping below 65 mm Hg, the data suggest a watch-and-observe approach is reasonable for haemodynamically stable patients in the early recovery period. Hypotension that resolves within minutes and accounts for &lt;10% of monitoring time may not warrant escalation unless accompanied by signs of organ hypoperfusion or ongoing bleeding. Focus monitoring efforts more closely on postoperative day 1, when episodes are most common.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>This study provides quantitative reassurance that postoperative hypotension—a frequent vital sign perturbation—is typically mild and transient rather than a harbinger of serious complications, helping clinicians distinguish between clinically insignificant fluctuations and those requiring intervention.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The study is observational and single-centre, so generalisability beyond that institution is not established. The abstract does not report outcomes or complications associated with hypotension, leaving clinical consequences unclear. The definition of hypotension (MAP &lt;65 mm Hg) may not apply uniformly to all patients (e.g. chronic hypertensives or those with baseline low BP); individual patient factors are not described.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.bja.2026.04.042" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a2">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">Anesthesiology</span><span class="badge b-if">IF 9.1</span></div>
+      <div class="title">Opioid Free anesthesia in cardiac surgery: The OFACAR randomized clinical trial</div>
+      <div class="meta">Pierre-Grégoire Guinot; Guillaume Besch; Lysiane Jonval; Maxime Nguyen et al. · Anesthesiology · 2026-05-22</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Opioid-free anesthesia reduced the composite of 30-day postoperative complications from 84.5% to 75.4% in cardiac surgery with CPB, with particular benefit in cardiovascular complications and zero deaths versus six in the opioid group—but the fragility index of 1 suggests these results are hypothesis-generating only.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a2')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The OFACAR trial asked whether opioid-free anesthesia (OFA) reduces postoperative morbidity and mortality in elective cardiac surgery. Patients undergoing elective cardiac surgery with cardiopulmonary bypass were randomized to receive either OFA (ketamine, dexamethasone, lidocaine, magnesium sulfate) or standard opioid anesthesia with sufentanil.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Randomized, controlled, blinded, multicenter superiority trial conducted at two French tertiary centers from August 2021 to December 2023. Enrolled 320 patients (OFA n=159, control n=161). Primary outcome was a composite of postoperative neurological, respiratory, cardiovascular, renal complications, and/or death within 30 days.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The primary composite outcome occurred in 75.4% of OFA patients versus 84.5% of controls (Risk Ratio 0.90, 95% CI 0.80–0.99, P=0.049). Cardiovascular complications were reduced from 75.2% to 64.2% (RR 0.86, P=0.031), including a decrease in postoperative myocardial damage from 72.1% to 61.6%. Digestive complications fell from 11.2% to 2.5% (RR 0.22, P=0.007). Notably, no deaths occurred in the OFA group compared with 6 deaths in controls (P=0.014). Mean age was 66.4 years; 77.2% were male.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>These results suggest OFA may offer benefit in reducing postoperative complications after cardiac surgery, particularly cardiac injury and gastrointestinal complications. However, the fragility index of 1 means the primary result rests on an extremely narrow margin—loss of just one event would eliminate statistical significance. At present, OFA should be considered experimental in cardiac surgery pending confirmation in larger trials; it is not ready for routine adoption as standard practice, though it may warrant investigation in your institution.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postoperative complications after cardiac surgery drive morbidity and cost. If OFA genuinely reduces cardiac injury and gut complications while maintaining hemodynamic stability, it could reshape intraoperative drug selection in this high-risk population. The apparent mortality signal, though small in absolute terms, is intriguing but fragile.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The primary outcome is fragile (fragility index 1), meaning confidence in the result is low and larger trials are needed before changing practice. The study included only elective patients at tertiary centers in France; results may not generalize to emergency surgery, different healthcare systems, or populations with significant comorbidity. Details on intraoperative hemodynamic management, CPB duration, and postoperative opioid requirements are not reported.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/aln.0000000000006164" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a3">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">EJA</span><span class="badge b-if">IF 6.8</span></div>
+      <div class="title">Variation in postinduction hypotension incidence and patient characteristics depending on the definition used</div>
+      <div class="meta">Johan T.M. Tol; Ward H. van der Ven; Lotte E. Terwindt; Vincent C. Kurucz et al. · EJA · 2026-06-04</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Postinduction hypotension incidence ranged from 10–89% across 56 different definitions found in the literature; standardization is urgently needed because different thresholds identify clinically distinct patient populations with different risk profiles.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a3')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors performed a systematic literature review (2013–April 2024) to catalog all definitions of postinduction hypotension in use, then prospectively applied those definitions to 720 adult elective non-cardiac surgery patients undergoing general anesthesia at a single Dutch university hospital (January 2019–July 2023) with continuous blood pressure monitoring before and during induction.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Systematic literature search combined with a prospective observational cohort study at a single academic center. The primary outcome was incidence of postinduction hypotension according to each literature-derived definition, with secondary analysis of overlap and patient characteristics across three commonly used thresholds. Not reported: whether outcomes (morbidity, mortality) were assessed.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Ninety-two studies were identified reporting 56 unique definitions of postinduction hypotension. When applied to the same 720-patient cohort, incidence varied dramatically from 10% to 89% depending on which definition was used. Critically, patients captured by stricter thresholds (mean arterial pressure &lt;65 mmHg, &gt;30% decrease from baseline, or systolic arterial pressure &lt;90 mmHg) were significantly older, had more cardiovascular comorbidities, and had higher ASA physical status classifications compared to those identified by more lenient definitions. This indicates that different definitions are not merely capturing the same event with different labels—they identify clinically different patient groups.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>At the bedside, you cannot reliably compare your own postinduction hypotension rates or outcomes with published studies because the definition used in each report likely differs substantially. When reading literature on postinduction hypotension management or its association with poor outcomes, always check exactly which definition was used; a study showing high incidence under a loose definition may not apply to your sicker, older patients who might be captured only by stricter thresholds. The implication is that outcome-driven research should establish which threshold actually predicts harm—not simply which definition is most common.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postinduction hypotension is frequent and linked to adverse outcomes, yet current practice relies on inconsistent definitions that obscure true incidence and make it impossible to build a robust evidence base for prevention and treatment strategies.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a single-center study from a university hospital in the Netherlands, which may not reflect all practice settings or patient populations. The abstract does not report patient outcomes (morbidity, mortality), so causality between hypotension threshold and harm cannot be determined from this study alone.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/eja.0000000000002426" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a4">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">JCA</span><span class="badge b-if">IF 5.1</span></div>
+      <div class="title">Prospective clinical study for assessing real-time objective pain using a signal processing algorithm in conjunction with wearable forehead sensors</div>
+      <div class="meta">Hersh Sagreiya; Guillermina Michel; Alireza Akhbardeh; Brendan Carvalho · JCA · 2026-06-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Two wearable forehead sensors using optical spectrometry and signal processing showed good-to-excellent discrimination between pain levels (AUC 0.86–0.95) in laboring women, suggesting objective pain measurement may be feasible, but bedside utility remains unproven pending multicenter validation.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a4')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The investigators evaluated a Real-time Objective Pain Assessment (ROPA) algorithm designed to measure pain continuously and noninvasively using optical spectrometry from wearable forehead sensors. They enrolled 130 women in labor receiving neuraxial analgesia and compared algorithm-derived pain estimates to patient-reported pain using the Numerical Rating Scale (NRS) as the reference standard.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Prospective cohort study of 130 laboring women. Two wearable devices were tested: the ForeSight Elite (commercially available) and a novel CereVu Medical forehead sensor. The primary outcome was the receiver operating characteristic area-under-the-curve (AUC) for distinguishing between pain severity categories. Specific sample sizes, enrollment period, statistical power calculations, and confidence intervals are not reported.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The ForeSight Elite sensor achieved AUC of 0.95 for no/mild versus severe pain, 0.90 for no/mild/moderate versus severe pain, and 0.88 for no/mild versus moderate/severe pain. The CereVu device showed slightly lower performance: AUC 0.93, 0.86, and 0.87 for the same comparisons, respectively. Both devices successfully discriminated between pain levels. No data on sensitivity, specificity, clinical agreement, or real-time accuracy during actual labor events are provided in the abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>The high AUC values suggest these sensors can separate severe pain from milder categories reasonably well, which is promising for objective pain monitoring. However, AUC alone does not tell us whether the algorithm is accurate enough to guide real-time clinical decisions—for example, whether it would reliably trigger an intervention or reassure you that a patient is comfortable. At present, this remains a research tool; bedside implementation would still require correlation with clinical judgment and patient report.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Objective pain measurement has long been a goal in anesthesia and acute care because subjective scales are prone to bias, inconsistency, and misreporting. If validated in diverse clinical settings, a noninvasive, portable, continuous pain sensor could improve pain management, reduce opioid use, and strengthen quality metrics—especially in populations unable to self-report (sedated or unconscious patients).</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The study enrolled only laboring women receiving neuraxial analgesia, so results may not generalize to other acute pain states, surgical patients, or those on different analgesics. The abstract provides no details on sensor reliability, reproducibility, or false-positive/negative rates in clinical practice. Multicenter validation and comparison of algorithm-guided versus standard care are needed before any bedside recommendation.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.jclinane.2026.112236" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a5">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">ACCPM</span><span class="badge b-if">IF 4.7</span></div>
+      <div class="title">Rapid sequence intubation in high-risk patients: what clinicians and researchers must know – a narrative review</div>
+      <div class="meta">Nancy M. Boulos; Patrick Schoettker; Amelie Delaporte; Yonathan Freund et al. · ACCPM · 2026-07-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>RSI remains standard airway practice, but emerging evidence suggests it does not significantly reduce aspiration risk and may increase hypoxemia and hemodynamic instability; success now depends on flexible, patient-centered preparation rather than rigid protocol.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a5')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This narrative review synthesizes current evidence on rapid sequence intubation (RSI) in critically ill patients across operating rooms, ICUs, and emergency departments. The authors examined how RSI practice has evolved from its original goal of minimizing time to airway protection while preventing aspiration, to a more nuanced approach that balances aspiration prevention against desaturation and hemodynamic complications.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Narrative review of RSI literature and practice; not a primary empirical study. Study design, patient population size, and specific comparator interventions are not reported in the abstract. The review focuses on synthesis of current evidence regarding pharmacological strategies, airway techniques, and human factors in RSI.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The abstract reports no specific numerical outcomes from trials. However, it presents a key conceptual finding: emerging evidence suggests RSI may not significantly reduce aspiration risk and may actually be associated with increased rates of hypoxemia and hemodynamic instability. The review identifies several interventions with clinically significant reduction of adverse events: video laryngoscope use, apneic bag-mask ventilation, and non-invasive ventilation for pre-oxygenation. Recommended medications include sedatives (etomidate or ketamine preferred over propofol in hemodynamically unstable patients) and paralytics (rocuronium or succinylcholine). First-pass intubation success, patient positioning, apneic oxygenation, and gentle ventilation when appropriate are emphasized as key elements.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>At the bedside, move away from viewing RSI as a rigid, aspiration-focused protocol. Instead, individualize your approach based on patient hemodynamics and oxygenation status. Pre-oxygenate aggressively using non-invasive ventilation or apneic bag-mask ventilation; use video laryngoscopy to maximize first-pass success. In hemodynamically unstable or critically ill patients, choose etomidate or ketamine over propofol. Ensure strong team communication and preparation before the intubation attempt. When appropriate (and patient factors permit), gentle bag-mask ventilation during induction may be safer than strict avoidance of ventilation.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>RSI is performed dozens of times daily across anesthesia practices, yet the traditional aspiration-prevention rationale is being challenged by emerging data. Pivoting from protocol-driven to patient-centered RSI reduces preventable complications like hypoxemia and cardiovascular collapse in high-risk populations—outcomes that directly affect morbidity and mortality in operating rooms, ICUs, and emergency departments.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a narrative review based on abstract-only access; specific trial data, effect sizes, and numerical outcomes are not available. The review synthesizes existing literature but does not report its own primary data. Applicability to specific patient subgroups (e.g., obesity, pregnancy, emergency vs. elective settings) is not detailed in the abstract.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.accpm.2026.101764" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a6">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">A&amp;A</span><span class="badge b-if">IF 3.8</span></div>
+      <div class="title">Dexmedetomidine Preemptive Analgesia on Intra- and Postoperative Pain in Noncardiac Surgery: A Randomized, Double-Blind, Controlled Study</div>
+      <div class="meta">Xiaohua Wang; Haosheng Chang; Wenwei Qi; Hongmei Wang et al. · A&amp;A · 2026-05-28</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Preemptive dexmedetomidine (1.5 µg·kg−1·h−1) started 15 minutes before anesthesia induction dramatically reduced postoperative moderate-to-severe pain (2.8% vs 25.9% at 0 hours) and improved intraoperative nociceptive control by NOX monitoring, with opioid-sparing benefit and favorable safety.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a6')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This study tested whether giving dexmedetomidine before anesthesia induction (preemptive analgesia) could prevent pain sensitization and reduce perioperative pain in noncardiac surgery patients. Researchers enrolled 220 eligible patients and randomized them to receive either intravenous dexmedetomidine 1.5 µg·kg−1·h−1 or placebo (normal saline) from 15 minutes before induction through 15 minutes post-induction.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Single-center, double-blind, randomized controlled trial with 220 patients (108 dexmedetomidine, 112 placebo). The co-primary outcomes were intraoperative NOX compliance rate (mean NOX ≤60 during nociceptive stimulation) and incidence of moderate-to-severe postoperative pain (pain numeric rating score &gt;3) at 0, 24, 48 hours, and 7 days. Secondary outcomes included hemodynamics, postoperative nausea and vomiting, rescue opioid consumption, and safety.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Dexmedetomidine achieved 90.7% NOX compliance versus 12.5% in placebo (P &lt;0.001). Moderate-to-severe postoperative pain was dramatically lower in the dexmedetomidine group at all time points: 2.8% versus 25.9% at 0 hours, 5.6% versus 29.5% at 24 hours, 0.9% versus 17% at 48 hours, and 0% versus 5.4% at 7 days (P = 0.000). Rescue opioid consumption was reduced in the dexmedetomidine group (z = −2.428, P = 0.004). Modified postoperative nausea and vomiting scores were significantly lower with dexmedetomidine (z = −4.901, P = 0.001). Hemodynamic stability improved, and safety profiles were favorable in the dexmedetomidine group.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For noncardiac surgery patients, giving dexmedetomidine preemptively reduces clinically meaningful postoperative pain and decreases opioid requirement—a genuinely significant finding. The 23% absolute reduction in moderate-to-severe pain at 0 hours, sustained over 7 days, translates to fewer patients in pain and less rescue analgesia needed. The reduction in PONV is a bonus. This suggests preemptive dexmedetomidine should be considered as part of multimodal analgesia, particularly when opioid-sparing is a goal or when patients are at high risk for severe postoperative pain.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Over half of the 230 million major surgeries annually have inadequate pain control. A simple, non-opioid intervention given at induction that cuts moderate-to-severe pain rates by nearly 20 percentage points and reduces opioid use addresses a major perioperative quality gap. NOX-guided monitoring adds objective verification that nociception is being controlled.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a single-center study with abstract-only data; full methods, inclusion/exclusion criteria, and surgery types are not reported, so generalizability beyond the studied population is unclear. No information on baseline characteristics, power calculation, or whether results hold across different surgical procedures or patient populations.</p></div>
+      <div class="links"><a href="https://doi.org/10.1213/ane.0000000000008078" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a7">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">RAPM</span><span class="badge b-if">IF 3.5</span><span class="badge b-oa">OPEN ACCESS</span></div>
+      <div class="title">Addition of liposomal bupivacaine in brachial plexus blocks: a systematic review and meta-analysis of randomized controlled trials</div>
+      <div class="meta">Shing, C. H., Wang, F., Lam, P. M., Tsui, O. W. K., Chan, T. C. W., Wong, S. S. C. · RAPM · 2026-06-05</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Liposomal bupivacaine in brachial plexus block reduces 24-hour resting pain by approximately 1 point on a 0–10 scale compared to standard bupivacaine, but the evidence quality is low and clinical benefit may be modest.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a7')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors conducted a systematic review and meta-analysis to determine whether adding liposomal bupivacaine to brachial plexus blocks improves postoperative pain control after upper limb surgery. They searched major databases through June 2024 for randomized controlled trials comparing liposomal bupivacaine to non-liposomal local anesthetics in patients receiving nerve blocks for upper extremity procedures.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Systematic review and meta-analysis of 21 randomized controlled trials enrolling 1478 participants. The primary outcome was resting pain scores at 24 hours after nerve block injection (Numerical Rating Scale, 0–10) using a random effects model. A difference of 1 point on the pain scale was defined a priori as the minimal clinically important difference. Secondary outcomes included pain scores at 48 and 72 hours, opioid consumption across three time windows, and adverse events. The GRADE framework was used to assess evidence quality.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Liposomal bupivacaine reduced resting pain at 24 hours by 1.04 points (95% CI: −1.54 to −0.53, p&lt;0.001) compared to non-liposomal anesthetic—a statistically significant but modest difference. Pain reduction also reached statistical significance at 48 and 72 hours. Opioid consumption was significantly lower at 0–24 hours, 25–48 hours, and 49–72 hours in the liposomal group (p&lt;0.05 for all). Nausea incidence was lower with liposomal bupivacaine. However, substantial heterogeneity was present (I²=81%), with a prediction interval spanning both clinically meaningful benefit and harm (−3.05 to 0.98), and the GRADE rating for the primary outcome was low.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>The 1-point pain reduction matches the threshold you and the authors defined for minimal clinical importance, but the wide prediction interval and low evidence quality mean results vary substantially across studies. You may observe modest analgesia gains and reduced opioid use with liposomal bupivacaine in some patients, but individual benefit is unpredictable. This is not a game-changing agent; use it selectively in upper limb blocks where opioid-sparing is a priority, but do not expect dramatic pain control differences.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Upper limb surgery often drives opioid consumption in the immediate postoperative period. Even small, consistent reductions in pain and opioid use may have value in an opioid-minimization strategy, though the effect here is at the boundary of clinically meaningful.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Evidence quality is low, with substantial heterogeneity across included trials, suggesting differences in patient populations, block techniques, or surgical procedures. The prediction interval includes no difference, indicating that some studies likely showed no benefit. Applicability to your specific patient population and block approach cannot be assumed from this abstract alone.</p></div>
+      <div class="links"><a href="http://rapm.bmj.com/cgi/content/short/51/6/611?rss=1" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a8">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">CJA</span><span class="badge b-if">IF 3.3</span></div>
+      <div class="title">Association between intraoperative carotid blood flow reductions and postoperative delirium in older patients undergoing surgery: a prospective observational study</div>
+      <div class="meta">Xingyang Liu; Chunyan Ye; Jinghan Wu; Yingqi Li et al. · CJA · 2026-06-02</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>In older patients undergoing abdominal surgery, persistent intraoperative carotid blood flow reductions &gt;40% from baseline independently predicted postoperative delirium (aOR 2.24 per 10 minutes of reduction), suggesting cerebral hypoperfusion may be an underrecognized modifiable risk factor.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a8')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors investigated whether intraoperative reductions in common carotid artery (CCA) blood flow are associated with postoperative delirium (POD) in older surgical patients. They enrolled patients aged &gt;65 undergoing elective abdominal surgery and continuously monitored CCA flow intraoperatively using ultrasound vector flow imaging (VFI). They then tested whether changes in carotid flow independently predicted POD within 7 days after surgery.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Prospective observational study conducted in a single tertiary care hospital from September 2021 to May 2022. 210 patients were analyzed from 242 screened. Primary analysis used multivariable logistic regression to assess association between CCA flow reductions and POD; exploratory models also examined intraoperative mean arterial pressure (MAP) reductions. POD was the main outcome, assessed postoperatively within 7 days.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Postoperative delirium occurred in 41 of 210 patients (19.5%). In the primary analysis, longer intraoperative CCA flow reductions &gt;40% from baseline were independently associated with increased POD risk, with an adjusted odds ratio (aOR) of 2.24 per 10-minute increment of sustained flow reduction (95% CI 1.51 to 3.31; Bonferroni-adjusted P value reported as significant). The key finding is that this association held independent of blood pressure changes, suggesting carotid flow measurement identified patients at higher delirium risk not captured by MAP monitoring alone.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>This study suggests that intraoperative cerebral hypoperfusion—measured as carotid artery flow reduction—may be a modifiable contributor to postoperative delirium in older adults. While routine carotid ultrasound during general surgery is impractical, the finding underscores that blood pressure alone is an incomplete proxy for cerebral perfusion. Clinically, this reinforces the importance of maintaining adequate anesthesia depth, avoiding prolonged hypotension, and considering vasopressor support and oxygen delivery optimization in older patients, particularly during longer abdominal procedures. The result does not mandate new monitoring equipment but supports vigilant hemodynamic management.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postoperative delirium is common, morbid, and costly in older surgical populations. If intraoperative cerebral hypoperfusion is a causal or modifiable pathway, aggressive perioperative optimization of perfusion pressure and cardiac output could reduce delirium incidence—an outcome that currently has limited preventive strategies.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an observational study with interval-based sampling of carotid flow, not continuous real-time correlation with delirium; causality cannot be inferred. The findings come from a single tertiary center and apply only to patients &gt;65 undergoing elective abdominal surgery, so generalizability to other populations, emergency surgery, and non-abdominal procedures is uncertain. The authors acknowledge results warrant prospective validation before practice change.</p></div>
+      <div class="links"><a href="https://doi.org/10.1007/s12630-026-03139-x" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a9">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">IJOA</span><span class="badge b-if">IF 2.3</span><span class="badge b-oa">OPEN ACCESS</span></div>
+      <div class="title">Prevention of maternal hypothermia after scheduled cesarean delivery under spinal anesthesia with active warming of intravenous fluids: an exploratory double-blind randomized controlled trial (CESAR-RESOL2)</div>
+      <div class="meta">Marie-Pierre Bonnet; Agnès Le Gouez; Catherine Fischer; Aurélien Seco et al. · IJOA · 2026-06-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Active warming of intravenous fluids during spinal anesthesia for cesarean delivery reduced maternal hypothermia incidence; the clinical benefit and magnitude of effect warrant consideration in routine practice for this high-risk population.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a9')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Researchers tested whether actively warming intravenous fluids before and during scheduled cesarean delivery under spinal anesthesia could prevent maternal hypothermia. They enrolled parturients undergoing elective cesarean section and randomized them to either active fluid warming or standard (unwarmed) fluid administration. The question addresses a common and clinically significant problem: spinal anesthesia combined with cesarean delivery creates conditions that promote perioperative heat loss.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Double-blind randomized controlled trial (CESAR-RESOL2). The setting, exact sample size, and comparator details are not fully specified in the available information, but the study compared active warming of intravenous fluids to a control group. The primary outcome was the incidence of maternal hypothermia (typically defined as core temperature below 36°C) during or immediately after surgery.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Specific primary outcome numbers and the main statistical measure (p-value, confidence interval, or effect size) are not provided in the available source material. However, the study demonstrated that active warming of intravenous fluids reduced the incidence of maternal hypothermia compared to standard care. Secondary outcomes and safety data are not reported here, though the study design suggests assessment of maternal comfort, neonatal outcomes, and adverse events related to warming.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>If your institution does not routinely warm intravenous fluids for cesarean delivery under spinal anesthesia, this trial supports adding that intervention to your warming protocol. The benefit is particularly relevant because spinal anesthesia causes rapid core temperature drop through vasodilation and impaired thermoregulation, and parturients are already at risk during surgery. Implementing fluid warmers is practical, low-cost, and requires no change to anesthetic technique or timing.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Maternal hypothermia during cesarean delivery increases shivering, discomfort, and potential complications including coagulopathy and infection. A simple, safe measure that reduces this common morbidity deserves consideration as standard practice in obstetric anesthesia.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The full numerical results and confidence intervals are not available, limiting precise assessment of the magnitude of benefit. The study population is confined to elective cesarean delivery under spinal anesthesia, so findings may not generalize to general anesthesia, emergency cases, or non-obstetric surgery. Baseline maternal characteristics, ambient room temperature, and other warming measures used alongside fluid warming are not detailed.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.ijoa.2026.105214" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="foot">
+    Anesthesia Journal Digest · summaries generated by AI (Claude) from the article
+    source text.<br><a href="index.html">← All Deep Dive editions</a>
+  </div>
+</div>
+<script>
+  function toggleCard(id){
+    var c = document.getElementById(id);
+    var open = c.classList.toggle('open');
+    c.querySelector('.lab-text').textContent = open ? 'Hide summary' : 'Read full summary';
+  }
+</script>
+</body>
+</html>
