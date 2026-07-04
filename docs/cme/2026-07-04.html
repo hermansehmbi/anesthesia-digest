@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Weekly Review & Self-Assessment (July 04, 2026)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root { --navy:#1a5276; --blue:#2e86c1; --green:#1e8449; --red:#c0392b;
+          --bg:#f4f6f9; --card:#ffffff; --line:#e3e8ee; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         background:var(--bg); color:#2c3e50; font-size:16px; line-height:1.6; }
+  header { background:linear-gradient(135deg,var(--navy),var(--blue)); color:#fff;
+           padding:28px 20px; text-align:center; }
+  header h1 { margin:0; font-size:25px; font-family:Georgia,serif; }
+  header p { margin:8px 0 0; font-size:15px; opacity:.92; }
+  main { max-width:780px; margin:0 auto; padding:18px 16px 70px; }
+  .intro { background:#eef5fb; border:1px solid #d6e6f5; border-radius:10px;
+           padding:16px 18px; font-size:15px; color:#34516b; margin-bottom:20px; }
+  .question { background:var(--card); border:1px solid var(--line); border-radius:12px;
+             padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .qnum { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+          color:var(--blue); }
+  .qnum .of { color:#9bb1c4; font-weight:600; }
+  .qtext { font-size:18px; font-weight:600; margin:8px 0 16px; line-height:1.5; }
+  .option { display:flex; align-items:flex-start; gap:12px; padding:13px 14px;
+            border:1px solid var(--line); border-radius:9px; margin:9px 0; cursor:pointer;
+            transition:background .12s,border-color .12s; }
+  .option:hover { background:#f7fafd; }
+  .option input { margin-top:4px; flex:none; width:18px; height:18px; }
+  .opt-letter { font-weight:700; color:var(--navy); flex:none; font-size:16px; }
+  .opt-text { font-size:16px; }
+  .option.correct { border-color:var(--green); background:#eafaf1; }
+  .option.incorrect { border-color:var(--red); background:#fdedec; }
+  .result { margin-top:14px; padding:14px 16px; border-radius:9px; font-size:15.5px;
+            line-height:1.65; }
+  .result.right { background:#eafaf1; border:1px solid #abe2c1; }
+  .result.wrong { background:#fdedec; border:1px solid #f3b7b1; }
+  .result .verdict { font-weight:700; display:block; margin-bottom:6px; font-size:16px; }
+  .result .src { display:block; margin-top:10px; font-size:13.5px; color:#5b6b7a; }
+  .result .src a { color:var(--blue); }
+  .actions { position:sticky; bottom:0; background:linear-gradient(180deg,rgba(244,246,249,0),var(--bg) 32%);
+             padding:18px 0 10px; text-align:center; }
+  button { font:inherit; border:none; border-radius:26px; padding:15px 30px; font-weight:700;
+           font-size:16px; cursor:pointer; }
+  .btn-submit { background:var(--blue); color:#fff; }
+  .btn-submit:disabled { background:#9bb9d1; cursor:default; }
+  .btn-cert { background:var(--green); color:#fff; margin-left:8px; }
+  .scorebar { display:none; background:var(--navy); color:#fff; border-radius:12px;
+              padding:18px 20px; text-align:center; margin-bottom:20px; }
+  .scorebar .pct { font-size:34px; font-weight:800; }
+  .scorebar .detail { font-size:15px; opacity:.92; margin-top:2px; }
+  .namebox { display:none; margin-top:16px; }
+  .namebox label { display:block; font-size:14px; opacity:.92; margin-bottom:7px; }
+  .namebox input { font:inherit; font-size:16px; padding:12px 14px; border-radius:8px;
+                   border:1px solid var(--line); width:340px; max-width:86%; color:#2c3e50; }
+  .certinfo { display:none; margin-top:12px; font-size:13px; opacity:.92; font-family:monospace; }
+  .warn { color:var(--red); font-size:15px; margin-top:12px; display:none; }
+  footer { text-align:center; font-size:12.5px; color:#9bb1c4; padding:26px 16px 44px; }
+  footer a { color:#9bb1c4; }
+  @media (max-width:520px) {
+    .qtext { font-size:17px; }
+    .btn-cert { margin:10px 0 0; }
+    .actions button { width:100%; }
+    .namebox input { width:100%; max-width:100%; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>&#127891; Anesthesia Digest — Weekly Review &amp; Self-Assessment</h1>
+    <p>July 04, 2026 · 8 single-best-answer questions</p>
+  </header>
+  <main>
+    <div class="scorebar" id="scorebar">
+      <div class="pct" id="scorePct">0%</div>
+      <div class="detail" id="scoreDetail"></div>
+      <div class="namebox" id="namebox">
+        <label for="participant">Enter your full name &amp; credentials for the certificate</label>
+        <input type="text" id="participant" placeholder="e.g. Dr. Jane Smith, MD, FRCPC" autocomplete="name">
+      </div>
+      <div class="certinfo" id="certinfo"></div>
+    </div>
+
+    <div class="intro">
+      Answer all the questions, then press <strong>Submit Test</strong> to see your score and the
+      explanations. This is a self-assessment tool to support your own learning. Time spent reading
+      and reflecting on the literature may be eligible for self-reporting under
+      <strong>RCPSC MOC Section&nbsp;2 (Self-Learning)</strong> — confirm your own eligibility.
+    </div>
+
+    <form id="quizForm">
+    <section class="question" id="card0" data-index="0">
+      <div class="qnum">Question 1 <span class="of">of 8</span></div>
+      <div class="qtext">A 32-year-old woman at 28 weeks gestation presents for preoperative assessment before planned cesarean delivery for placenta previa. Her hemoglobin is 9.2 g/dL. Using Patient Blood Management principles for obstetrics, which intervention should be prioritized before surgery to reduce her transfusion risk?</div>
+      <div class="options">
+        <label class="option" for="q0A">
+          <input type="radio" id="q0A" name="q0" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Accept the anemia and proceed to surgery with a low transfusion threshold of 7 g/dL</span>
+        </label>
+        <label class="option" for="q0B">
+          <input type="radio" id="q0B" name="q0" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Initiate iron supplementation and consider erythropoietin to optimize preoperative hemoglobin</span>
+        </label>
+        <label class="option" for="q0C">
+          <input type="radio" id="q0C" name="q0" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Defer surgery until hemoglobin reaches 10.5 g/dL regardless of clinical urgency</span>
+        </label>
+        <label class="option" for="q0D">
+          <input type="radio" id="q0D" name="q0" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Prescribe prophylactic fresh frozen plasma the morning of surgery</span>
+        </label>
+      </div>
+      <div class="result" id="result0" hidden></div>
+    </section>
+    <section class="question" id="card1" data-index="1">
+      <div class="qnum">Question 2 <span class="of">of 8</span></div>
+      <div class="qtext">A 72-year-old woman with chronic knee pain managed on sustained-release opioids for 2 years undergoes total knee arthroplasty. Based on pain trajectory analysis in older surgical patients, which postoperative pain pattern is she at increased risk for compared to opioid-naive peers?</div>
+      <div class="options">
+        <label class="option" for="q1A">
+          <input type="radio" id="q1A" name="q1" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Pain-free recovery by postoperative day 2</span>
+        </label>
+        <label class="option" for="q1B">
+          <input type="radio" id="q1B" name="q1" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Rapid pain decrease in the first 24 hours followed by plateau</span>
+        </label>
+        <label class="option" for="q1C">
+          <input type="radio" id="q1C" name="q1" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Slow, steady decrease in pain over 5 days</span>
+        </label>
+        <label class="option" for="q1D">
+          <input type="radio" id="q1D" name="q1" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Persistent high pain or worsening pain trajectory</span>
+        </label>
+      </div>
+      <div class="result" id="result1" hidden></div>
+    </section>
+    <section class="question" id="card2" data-index="2">
+      <div class="qnum">Question 3 <span class="of">of 8</span></div>
+      <div class="qtext">A 68-year-old man is scheduled for elective total hip arthroplasty under spinal anesthesia with either intrathecal morphine or a femoral nerve block for postoperative analgesia. He has a history of severe pruritus with opioids. Based on comparative evidence, which technique should be favored and why?</div>
+      <div class="options">
+        <label class="option" for="q2A">
+          <input type="radio" id="q2A" name="q2" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Intrathecal morphine, because it reduces opioid consumption by approximately 11 mg morphine equivalent</span>
+        </label>
+        <label class="option" for="q2B">
+          <input type="radio" id="q2B" name="q2" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Intrathecal morphine, because it provides superior pain at rest at 24 hours</span>
+        </label>
+        <label class="option" for="q2C">
+          <input type="radio" id="q2C" name="q2" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Peripheral regional analgesia, because it eliminates the need for any systemic opioids</span>
+        </label>
+        <label class="option" for="q2D">
+          <input type="radio" id="q2D" name="q2" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Peripheral regional analgesia (nerve block), because it provides equivalent 24-hour pain control with significantly less pruritus</span>
+        </label>
+      </div>
+      <div class="result" id="result2" hidden></div>
+    </section>
+    <section class="question" id="card3" data-index="3">
+      <div class="qnum">Question 4 <span class="of">of 8</span></div>
+      <div class="qtext">Your institution is planning to invest in a new ultrasound-guided regional anesthesia simulator for resident training. The educators are deciding between a gamified version (with leaderboards, achievement milestones, and rewards) and a standard non-gamified version with equivalent structured feedback. Which recommendation best reflects the evidence?</div>
+      <div class="options">
+        <label class="option" for="q3A">
+          <input type="radio" id="q3A" name="q3" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Choose the standard simulator, as gamification elements do not improve skill acquisition but both formats promote learning through deliberate practice and expert feedback</span>
+        </label>
+        <label class="option" for="q3B">
+          <input type="radio" id="q3B" name="q3" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Choose the gamified simulator because it significantly accelerates skill acquisition compared to standard simulation</span>
+        </label>
+        <label class="option" for="q3C">
+          <input type="radio" id="q3C" name="q3" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Choose the gamified simulator because it reduces cognitive task load during learning</span>
+        </label>
+        <label class="option" for="q3D">
+          <input type="radio" id="q3D" name="q3" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Choose the gamified simulator for higher participant satisfaction and motivation despite equivalent objective performance</span>
+        </label>
+      </div>
+      <div class="result" id="result3" hidden></div>
+    </section>
+    <section class="question" id="card4" data-index="4">
+      <div class="qnum">Question 5 <span class="of">of 8</span></div>
+      <div class="qtext">A 54-year-old patient with a history of prior anaphylaxis to an unknown trigger is scheduled for elective surgery. Your institution is adopting the new French expert consensus guidelines on perioperative hypersensitivity reactions. Which statement best reflects the evidence level for diagnostic and management recommendations in these guidelines?</div>
+      <div class="options">
+        <label class="option" for="q4A">
+          <input type="radio" id="q4A" name="q4" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">The guidelines provide equal evidence support across all domains, with no distinction between high-, moderate-, and low-evidence recommendations</span>
+        </label>
+        <label class="option" for="q4B">
+          <input type="radio" id="q4B" name="q4" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Forty-eight recommendations are high-evidence, representing the strongest foundation for preoperative risk stratification</span>
+        </label>
+        <label class="option" for="q4C">
+          <input type="radio" id="q4C" name="q4" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Only 6 recommendations meet high level of evidence; the majority are based on moderate evidence or expert opinion and require clinical judgment</span>
+        </label>
+        <label class="option" for="q4D">
+          <input type="radio" id="q4D" name="q4" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">All 70 recommendations are based on high-level randomized trial evidence and can be applied universally without institutional variation</span>
+        </label>
+      </div>
+      <div class="result" id="result4" hidden></div>
+    </section>
+    <section class="question" id="card5" data-index="5">
+      <div class="qnum">Question 6 <span class="of">of 8</span></div>
+      <div class="qtext">During right upper lobe resection under one-lung ventilation with PEEP set at 10 cm H₂O, you perform a brief PEEP reduction to 0 cm H₂O and measure stroke volume by arterial pulse-contour analysis. Stroke volume increases by 17%. What should this finding guide you to do?</div>
+      <div class="options">
+        <label class="option" for="q5A">
+          <input type="radio" id="q5A" name="q5" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Conclude the patient is definitely not fluid-responsive and restrict intravenous fluids</span>
+        </label>
+        <label class="option" for="q5B">
+          <input type="radio" id="q5B" name="q5" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Return PEEP to 10 cm H₂O immediately and avoid any intraoperative fluid administration</span>
+        </label>
+        <label class="option" for="q5C">
+          <input type="radio" id="q5C" name="q5" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Assume the patient is likely fluid-responsive and consider volume loading if hemodynamically indicated</span>
+        </label>
+        <label class="option" for="q5D">
+          <input type="radio" id="q5D" name="q5" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Maintain PEEP at 0 cm H₂O for the remainder of surgery to optimize cardiac output</span>
+        </label>
+      </div>
+      <div class="result" id="result5" hidden></div>
+    </section>
+    <section class="question" id="card6" data-index="6">
+      <div class="qnum">Question 7 <span class="of">of 8</span></div>
+      <div class="qtext">A 52-year-old undergoes open rotator cuff repair under general anesthesia with a brachial plexus block using either standard bupivacaine or liposomal bupivacaine for postoperative analgesia. Which expectation best reflects the evidence for liposomal bupivacaine?</div>
+      <div class="options">
+        <label class="option" for="q6A">
+          <input type="radio" id="q6A" name="q6" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">There is no meaningful difference between liposomal and standard bupivacaine for upper limb block analgesia</span>
+        </label>
+        <label class="option" for="q6B">
+          <input type="radio" id="q6B" name="q6" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Liposomal bupivacaine provides superior analgesia compared to standard bupivacaine with high certainty across all patient populations</span>
+        </label>
+        <label class="option" for="q6C">
+          <input type="radio" id="q6C" name="q6" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Liposomal bupivacaine will eliminate opioid consumption entirely by 24 hours postoperatively</span>
+        </label>
+        <label class="option" for="q6D">
+          <input type="radio" id="q6D" name="q6" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Liposomal bupivacaine will reduce 24-hour resting pain by approximately 1 point on a 0–10 scale with low evidence quality and unpredictable individual benefit</span>
+        </label>
+      </div>
+      <div class="result" id="result6" hidden></div>
+    </section>
+    <section class="question" id="card7" data-index="7">
+      <div class="qnum">Question 8 <span class="of">of 8</span></div>
+      <div class="qtext">A 38-year-old parturient is scheduled for elective cesarean delivery under spinal anesthesia. As part of routine perioperative warming, the anesthesia team is considering actively warming intravenous fluids before and during surgery. What is the primary clinical benefit of this intervention in this population?</div>
+      <div class="options">
+        <label class="option" for="q7A">
+          <input type="radio" id="q7A" name="q7" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Active IV fluid warming reduces maternal hypothermia incidence in a population at high risk due to spinal anesthesia-induced vasodilation and impaired thermoregulation</span>
+        </label>
+        <label class="option" for="q7B">
+          <input type="radio" id="q7B" name="q7" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Active IV fluid warming prevents maternal shivering but has no effect on core temperature</span>
+        </label>
+        <label class="option" for="q7C">
+          <input type="radio" id="q7C" name="q7" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Active IV fluid warming accelerates fetal body temperature and improves Apgar scores</span>
+        </label>
+        <label class="option" for="q7D">
+          <input type="radio" id="q7D" name="q7" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Active IV fluid warming is standard of care but adds significant cost with minimal maternal benefit in cesarean delivery</span>
+        </label>
+      </div>
+      <div class="result" id="result7" hidden></div>
+    </section>
+    </form>
+
+    <p class="warn" id="warn">Please answer all questions before submitting.</p>
+
+    <div class="actions">
+      <button type="button" class="btn-submit" id="submitBtn">Submit Test</button>
+      <button type="button" class="btn-cert" id="certBtn" style="display:none;">Download Certificate</button>
+    </div>
+  </main>
+  <footer>
+    Anesthesia Journal Digest · AI-generated self-assessment · Not affiliated with any journal.<br>
+    <a href="index.html">&#8592; All weekly quizzes</a>
+  </footer>
+
+<script>
+
+function ad2(n){ return ('0' + n).slice(-2); }
+
+// FNV-1a 32-bit hash -> short uppercase base36 code (deterministic & auditable).
+function adHash(str){
+  var h = 0x811c9dc5 >>> 0;
+  for (var i = 0; i < str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return ('0000000' + h.toString(36).toUpperCase()).slice(-7);
+}
+
+function makeCertId(d){
+  var rnd = Math.floor(Math.random() * 0x10000).toString(16).toUpperCase();
+  rnd = ('000' + rnd).slice(-4);
+  return 'AD-' + d.getFullYear() + ad2(d.getMonth() + 1) + ad2(d.getDate()) + '-' + rnd;
+}
+
+function adVerCode(name, ymd, score, total, certId){
+  return adHash(name + '|' + ymd + '|' + score + '/' + total + '|' + certId);
+}
+
+function drawCorners(doc, x1, y1, x2, y2, color){
+  doc.setDrawColor(color[0], color[1], color[2]);
+  doc.setLineWidth(1);
+  var s = 26, o = 44;
+  var pts = [[x1+o,y1+o,1,1],[x2-o,y1+o,-1,1],[x1+o,y2-o,1,-1],[x2-o,y2-o,-1,-1]];
+  for (var i = 0; i < pts.length; i++){
+    var px = pts[i][0], py = pts[i][1], dx = pts[i][2], dy = pts[i][3];
+    doc.line(px, py, px + dx * s, py);
+    doc.line(px, py, px, py + dy * s);
+    doc.circle(px, py, 2.2, 'F');
+    doc.circle(px + dx * s, py, 1.4, 'F');
+    doc.circle(px, py + dy * s, 1.4, 'F');
+  }
+}
+
+function drawSeal(doc, cx, cy, gold, wax){
+  // Rosette of petals, then a stamped disc with initials.
+  doc.setFillColor(wax[0], wax[1], wax[2]);
+  var R = 30;
+  for (var a = 0; a < 360; a += 24){
+    var r = a * Math.PI / 180;
+    var x1 = cx + Math.cos(r) * R,            y1 = cy + Math.sin(r) * R;
+    var x2 = cx + Math.cos(r + 0.27) * (R*0.66), y2 = cy + Math.sin(r + 0.27) * (R*0.66);
+    var x3 = cx + Math.cos(r - 0.27) * (R*0.66), y3 = cy + Math.sin(r - 0.27) * (R*0.66);
+    doc.triangle(x1, y1, x2, y2, x3, y3, 'F');
+  }
+  doc.setFillColor(wax[0], wax[1], wax[2]);
+  doc.circle(cx, cy, R * 0.72, 'F');
+  doc.setDrawColor(gold[0], gold[1], gold[2]);
+  doc.setLineWidth(1.3); doc.circle(cx, cy, R * 0.72, 'S');
+  doc.setLineWidth(0.7); doc.circle(cx, cy, R * 0.55, 'S');
+  doc.setFont('times', 'bold'); doc.setFontSize(12); doc.setTextColor(255, 246, 236);
+  doc.text('AD', cx, cy - 1, {align:'center'});
+  doc.setFontSize(5); doc.text('SELF-ASSESSMENT', cx, cy + 9, {align:'center'});
+}
+
+// opts: {name, score, total, completedAt(Date), certId?, verCode?}
+// Returns {certId, verCode}. Builds and downloads the PDF.
+function generateCertificate(opts){
+  var ns = window.jspdf || {};
+  var JsPDF = ns.jsPDF;
+  if (!JsPDF){ alert('Certificate library failed to load. Check your internet connection and try again.'); return null; }
+
+  var name  = (opts.name || '').trim();
+  var score = opts.score, total = opts.total;
+  var now   = opts.completedAt || new Date();
+  var certId = opts.certId || makeCertId(now);
+  var ymd = now.getFullYear() + '-' + ad2(now.getMonth() + 1) + '-' + ad2(now.getDate());
+  var pct = Math.round(score / total * 100);
+  var ver = opts.verCode || adVerCode(name, ymd, score, total, certId);
+  var dateStr = now.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
+  var timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+  var stamp = dateStr + ' at ' + timeStr;
+  var weekOf = (opts.weekOf || dateStr);   // the literature week this self-assessment covers
+
+  var doc = new JsPDF({orientation:'landscape', unit:'pt', format:'letter'});
+  var W = doc.internal.pageSize.getWidth();
+  var H = doc.internal.pageSize.getHeight();
+  var navy = [26,82,118], gold = [176,141,87], ink = [44,62,80], wax = [140,32,32];
+
+  // Parchment background
+  doc.setFillColor(252, 250, 244); doc.rect(0, 0, W, H, 'F');
+
+  // Decorative double border
+  doc.setDrawColor(navy[0], navy[1], navy[2]); doc.setLineWidth(4);
+  doc.rect(24, 24, W - 48, H - 48);
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1.4);
+  doc.rect(34, 34, W - 68, H - 68);
+  drawCorners(doc, 24, 24, W - 24, H - 24, gold);
+
+  // Title + flourish
+  doc.setFont('times', 'bold'); doc.setFontSize(34); doc.setTextColor(navy[0], navy[1], navy[2]);
+  doc.text('Certificate of Completion', W / 2, 108, {align:'center'});
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1);
+  doc.line(W / 2 - 160, 122, W / 2 + 160, 122);
+  doc.circle(W / 2 - 168, 122, 2, 'F'); doc.circle(W / 2 + 168, 122, 2, 'F');
+
+  doc.setFont('times', 'italic'); doc.setFontSize(16); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Self-Assessment Activity', W / 2, 148, {align:'center'});
+
+  doc.setFont('times', 'normal'); doc.setFontSize(13);
+  doc.text('This certifies that', W / 2, 192, {align:'center'});
+
+  doc.setFont('times', 'bold'); doc.setFontSize(26); doc.setTextColor(navy[0], navy[1], navy[2]);
+  doc.text(name || '—', W / 2, 226, {align:'center'});
+  var nameW = Math.min(460, Math.max(220, doc.getTextWidth(name || '—') + 70));
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(0.8);
+  doc.line(W / 2 - nameW / 2, 236, W / 2 + nameW / 2, 236);
+
+  doc.setFont('times', 'normal'); doc.setFontSize(13); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('completed a self-assessment based on the week of ' + weekOf, W / 2, 266, {align:'center'});
+  doc.text('anesthesia literature (' + total + ' questions), with a score of', W / 2, 284, {align:'center'});
+
+  doc.setFont('times', 'bold'); doc.setFontSize(20); doc.setTextColor(30, 110, 70);
+  doc.text(score + ' / ' + total + '    (' + pct + '%)', W / 2, 314, {align:'center'});
+
+  doc.setFont('times', 'normal'); doc.setFontSize(12); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Completed: ' + stamp, W / 2, 340, {align:'center'});
+
+  drawSeal(doc, W / 2, 384, gold, wax);
+
+  // Bottom block — everything sits clearly INSIDE the inner border (which is at
+  // H-34) with margin. Disclaimer is drawn line-by-line, then the ID row, so
+  // nothing overruns or hides behind the frame.
+  doc.setFont('times', 'italic'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
+  var disc = 'This is a self-assessment completion record. Time spent reading and reflecting on the literature may be eligible for self-reporting under RCPSC MOC Section 2 (Self-Learning); confirm your own eligibility.';
+  var lines = doc.splitTextToSize(disc, W - 160);
+  var lh = 11;                          // line spacing (pt)
+  var discLast = H - 74;                // baseline of the LAST disclaimer line
+  var discFirst = discLast - (lines.length - 1) * lh;
+  for (var li = 0; li < lines.length; li++){
+    doc.text(lines[li], W / 2, discFirst + li * lh, {align:'center'});
+  }
+
+  // Certificate ID (left) + verification code (right) on one row, above the frame.
+  doc.setFont('courier', 'normal'); doc.setFontSize(9.5); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Certificate ID:  ' + certId, 72, H - 50);
+  doc.text('Verification:  ' + ver, W - 72, H - 50, {align:'right'});
+
+  doc.save('Certificate_of_Completion_' + certId + '.pdf');
+  return {certId: certId, verCode: ver};
+}
+
+
+  var QUIZ = [{"correct": "B", "rationale": "Patient Blood Management emphasizes optimizing the patient's own blood preoperatively, and the algorithm addresses anaemia in pregnancy with interventions like iron and erythropoietin. Deferring surgery without clinical justification (option C) contradicts urgency-based obstetric care. Accepting anaemia without optimization (C) ignores the PBM principle of preoperative correction. FFP (D) is not indicated for anaemia and represents reactive rather than proactive management. The review specifically highlights practical algorithms for preoperative anaemia management.", "source_article": "Patient Blood Management in postpartum haemorrhage: a narrative review and expert opinion towards improving patient outcomes during pregnancy and childbirth", "source_journal": "BJA", "source_url": "https://doi.org/10.1016/j.bja.2026.03.070"}, {"correct": "D", "rationale": "Preoperative analgesic use significantly increased odds of both the increase-decrease trajectory and slow increase trajectory (adjusted OR approximately 3.76\u20133.89) compared to the slow decrease pattern, indicating unfavorable pain control. Chronic opioid users are at higher risk for persistent or worsening pain patterns postoperatively. Options C, B, and D represent favorable trajectories (slow decrease or rapid decrease) that occur more frequently in opioid-naive older patients. The study identifies preoperative chronic pain as a predictor of adverse postoperative pain dynamics warranting more intensive multimodal strategies.", "source_article": "Pain Trajectories after Orthopedic Surgery in Older Adults: An Analysis of Predictors and Associations with Postoperative Outcomes", "source_journal": "Anesthesiology", "source_url": "https://doi.org/10.1097/aln.0000000000006083"}, {"correct": "D", "rationale": "The meta-analysis found no difference in resting pain at 24 hours between intrathecal morphine and peripheral regional analgesia (moderate quality evidence), but intrathecal morphine causes substantially more pruritus\u2014a key disadvantage in this patient with opioid-related pruritus history. While intrathecal morphine reduces opioid use by ~11 mg (option A), this benefit does not justify the pruritus trade-off. Pain at 24 hours is equivalent (C is incorrect), and peripheral techniques do not eliminate opioids entirely (D), but they avoid the morphine-specific pruritus burden while maintaining equivalent analgesia.", "source_article": "The analgesic efficacy of intrathecal morphine compared to peripheral regional analgesia in total hip arthroplasty", "source_journal": "EJA", "source_url": "https://doi.org/10.1097/eja.0000000000002436"}, {"correct": "A", "rationale": "The randomized trial found no statistically significant difference in the primary outcome (Global Rating Scale improvement, p = 0.14) or learning curve gradients between gamified and standard simulators. Both groups showed high satisfaction (72\u201392%), indicating that deliberate practice and structured feedback\u2014not game mechanics\u2014drive learning. Gamification offers no measurable skill acquisition advantage (A is incorrect). Satisfaction was equivalent (C overstates gamification benefit), and cognitive task load did not differ (D is wrong). Invest resources in robust feedback rather than gamification features.", "source_article": "Comparison of a gamified versus standard virtual reality simulator to teach ultrasound-guided regional Anaesthesia: A randomised controlled trial", "source_journal": "JCA", "source_url": "https://doi.org/10.1016/j.jclinane.2026.112199"}, {"correct": "C", "rationale": "The consensus panel formulated 70 recommendations: only 6 reached high level of evidence (GRADE 1), 16 achieved moderate level (GRADE 2), and 48 are expert opinion. This distribution means most recommendations require clinician judgment tailored to institutional context and patient factors. Option D overstates uniformity and applicability. Option A incorrectly states equal evidence support across all recommendations. Option B reverses the distribution (the 48 are expert opinion, not high-evidence). Use the 6 high-GRADE recommendations with confidence; apply the others judiciously.", "source_article": "Guidelines: Diagnosis and management of perioperative immediate hypersensitivity reactions 2025", "source_journal": "ACCPM", "source_url": "https://doi.org/10.1016/j.accpm.2026.101867"}, {"correct": "C", "rationale": "A stroke volume increase of approximately 17% from PEEP reduction is consistent with fluid responsiveness; the study showed responders increased 16.7% \u00b1 8.9% versus nonresponders at 4.6% \u00b1 4.3%. This bedside maneuver identifies preload-responsive patients without giving fluid first, allowing targeted volume therapy. Maintaining PEEP at 0 (A) ignores optimal lung recruitment. Concluding non-responsiveness (C) is opposite to the finding. Option B ignores the diagnostic value of the test. The PEEP-reduction maneuver is a fluid-free probe that guides individualized fluid management during one-lung ventilation.", "source_article": "Predictive Ability of Stroke Volume Changes Following Positive End-Expiratory Pressure Reduction on Fluid Responsiveness During One-Lung Ventilation", "source_journal": "A&A", "source_url": "https://doi.org/10.1213/ane.0000000000008149"}, {"correct": "D", "rationale": "The meta-analysis of 21 RCTs (1478 participants) found liposomal bupivacaine reduced resting pain at 24 hours by 1.04 points (statistically significant but modest, matching the minimal clinically important difference threshold). However, evidence quality was low with substantial heterogeneity (I\u00b2 = 81%) and a prediction interval spanning both benefit and harm, meaning individual benefit is unpredictable. Opioid use was lower but not eliminated (B is wrong). Evidence quality is low, not high (C overstates certainty). Option A ignores the modest statistical reduction demonstrated. Liposomal bupivacaine is not a game-changing agent; use selectively for opioid-sparing when modest reduction is valued.", "source_article": "Addition of liposomal bupivacaine in brachial plexus blocks: a systematic review and meta-analysis of randomized controlled trials", "source_journal": "RAPM", "source_url": "http://rapm.bmj.com/cgi/content/short/51/6/611?rss=1"}, {"correct": "A", "rationale": "The CESAR-RESOL2 trial demonstrated that active warming of intravenous fluids reduced maternal hypothermia incidence during scheduled cesarean delivery under spinal anesthesia. Spinal anesthesia causes rapid core temperature drop through vasodilation and impaired thermoregulation, making parturients high-risk; active fluid warming is a practical, low-cost intervention addressing this mechanism. Option C inappropriately attributes primary benefit to fetal temperature. Option B ignores core temperature reduction\u2014the key adverse effect being prevented. Option D underestimates clinical relevance; hypothermia increases shivering, discomfort, and potential complications including coagulopathy and infection.", "source_article": "Prevention of maternal hypothermia after scheduled cesarean delivery under spinal anesthesia with active warming of intravenous fluids: an exploratory double-blind randomized controlled trial (CESAR-RESOL2)", "source_journal": "IJOA", "source_url": "https://doi.org/10.1016/j.ijoa.2026.105214"}];
+  var QUIZ_DATE = "July 04, 2026";
+  var TOTAL = 8;
+  var graded = false;
+  var lastScore = 0;
+
+  function escapeHtml(s){
+    return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  document.getElementById("submitBtn").addEventListener("click", function(){
+    var unanswered = 0;
+    for (var i = 0; i < TOTAL; i++){
+      if (!document.querySelector('input[name="q' + i + '"]:checked')) unanswered++;
+    }
+    if (unanswered > 0 && !graded){
+      document.getElementById("warn").style.display = "block";
+      return;
+    }
+    document.getElementById("warn").style.display = "none";
+    grade();
+  });
+
+  function grade(){
+    var correct = 0;
+    for (var i = 0; i < TOTAL; i++){
+      var chosen = document.querySelector('input[name="q' + i + '"]:checked');
+      var ans = QUIZ[i].correct;
+      var picked = chosen ? chosen.value : null;
+      if (picked === ans) correct++;
+
+      var labels = document.querySelectorAll('#card' + i + ' .option');
+      labels.forEach(function(lab){
+        var val = lab.querySelector("input").value;
+        lab.querySelector("input").disabled = true;
+        if (val === ans) lab.classList.add("correct");
+        else if (chosen && val === picked) lab.classList.add("incorrect");
+      });
+
+      var res = document.getElementById("result" + i);
+      var right = picked === ans;
+      var srcHtml = "";
+      if (QUIZ[i].source_article){
+        var label = (QUIZ[i].source_journal ? QUIZ[i].source_journal + " — " : "") + QUIZ[i].source_article;
+        var url = QUIZ[i].source_url || "#";
+        srcHtml = '<span class="src">Source: <a href="' + url + '" target="_blank" rel="noopener">' +
+                  escapeHtml(label) + '</a></span>';
+      }
+      res.className = "result " + (right ? "right" : "wrong");
+      res.innerHTML = '<span class="verdict">' +
+        (right ? "&#10003; Correct" : "&#10007; Your answer: " + (picked || "—") +
+                 " · Correct answer: " + ans) + '</span>' +
+        escapeHtml(QUIZ[i].rationale) + srcHtml;
+      res.hidden = false;
+    }
+
+    lastScore = correct;
+    graded = true;
+    var pct = Math.round((correct / TOTAL) * 100);
+    document.getElementById("scorePct").textContent = pct + "%";
+    document.getElementById("scoreDetail").textContent = correct + " of " + TOTAL + " correct";
+    document.getElementById("scorebar").style.display = "block";
+    document.getElementById("namebox").style.display = "block";
+    document.getElementById("submitBtn").textContent = "Re-check Answers";
+    document.getElementById("certBtn").style.display = "inline-block";
+    document.getElementById("scorebar").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  document.getElementById("certBtn").addEventListener("click", function(){
+    if (!graded) return;
+    var name = (document.getElementById("participant").value || "").trim();
+    if (!name){
+      var inp = document.getElementById("participant");
+      inp.style.borderColor = "#ffd27f";
+      inp.focus();
+      alert("Please enter your full name and credentials before downloading the certificate.");
+      return;
+    }
+    var info = generateCertificate({name:name, score:lastScore, total:TOTAL, completedAt:new Date(), weekOf:QUIZ_DATE});
+    if (info){
+      var box = document.getElementById("certinfo");
+      box.style.display = "block";
+      box.textContent = "Certificate ID " + info.certId + "  ·  Verification " + info.verCode;
+    }
+  });
+</script>
+</body>
+</html>
