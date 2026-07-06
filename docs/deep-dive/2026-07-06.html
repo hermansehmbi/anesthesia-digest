@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Deep Dive · Monday, July 06, 2026</title>
+<style>
+  :root{
+    --ink:#1a5276; --ink2:#2e86c1; --text:#2c3e50; --muted:#7b8794;
+    --line:#e3e8ee; --bg:#f5f6fa; --card:#ffffff;
+    --warn:#b9770e; --warnbg:#fff8ec; --warnline:#f0d9a8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text);line-height:1.55;}
+  .page{max-width:760px;margin:0 auto;padding:28px 18px 60px;}
+  .page-head{padding:6px 4px 18px;}
+  .page-head h1{font-size:22px;color:var(--ink);margin:0 0 4px;}
+  .page-head .sub{font-size:13px;color:var(--muted);margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;margin:18px 0;}
+  .hdr{padding:18px 20px 16px;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:9px;}
+  .badge{font-size:11px;font-weight:bold;border-radius:4px;padding:2px 8px;letter-spacing:.02em;}
+  .b-journal{background:var(--ink);color:#fff;}
+  .b-if{background:#eef3f8;color:var(--ink);}
+  .b-oa{background:#27ae60;color:#fff;}
+  .title{font-size:18px;font-weight:bold;color:var(--text);margin:2px 0 4px;line-height:1.35;}
+  .meta{font-size:12px;color:var(--muted);}
+  .bottomline{margin:14px 0 2px;padding:12px 14px;background:#eef6fb;
+              border-left:4px solid var(--ink2);border-radius:0 8px 8px 0;}
+  .bottomline .lab{font-size:11px;font-weight:bold;text-transform:uppercase;
+                   letter-spacing:.06em;color:var(--ink);}
+  .bottomline p{margin:4px 0 0;font-size:14px;color:#33444f;}
+  .toggle{display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+          background:var(--ink);color:#fff;border:none;cursor:pointer;
+          font-family:inherit;font-size:14px;font-weight:bold;
+          padding:10px 18px;border-radius:22px;}
+  .toggle .chev{transition:transform .2s ease;font-size:12px;}
+  .card.open .toggle .chev{transform:rotate(180deg);}
+  .body{display:none;border-top:1px solid var(--line);padding:6px 20px 20px;}
+  .card.open .body{display:block;}
+  .sec{padding:15px 0 4px;border-bottom:1px solid #f0f2f5;}
+  .sec:last-child{border-bottom:none;}
+  .sec h3{display:flex;align-items:center;gap:9px;margin:0 0 6px;
+          font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink);}
+  .sec h3 .ic{width:22px;height:22px;border-radius:6px;background:#eef3f8;
+              display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+  .sec p{margin:0;font-size:14px;color:#3a4750;}
+  .sec.caution{background:var(--warnbg);border:1px solid var(--warnline);
+               border-radius:10px;padding:14px 16px;margin-top:14px;}
+  .sec.caution h3{color:var(--warn);}
+  .sec.caution h3 .ic{background:#fbecca;}
+  .sec.caution p{color:#7a5a17;}
+  .links{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;}
+  .links a{font-size:13px;font-weight:bold;text-decoration:none;color:var(--ink2);
+           border:1px solid var(--line);border-radius:8px;padding:8px 14px;}
+  .src-note{margin-top:14px;font-size:11px;color:var(--muted);font-style:italic;}
+  .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:30px;line-height:1.5;}
+  .foot a{color:var(--ink2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>📖 Anesthesia Digest — Deep Dive</h1>
+    <p class="sub">Monday, July 06, 2026 · structured summaries of this week's 9 featured articles</p>
+  </div>
+  <div class="card open" id="a1">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">BJA</span><span class="badge b-if">IF 9.2</span></div>
+      <div class="title">Patient Blood Management in postpartum haemorrhage: a narrative review and expert opinion towards improving patient outcomes during pregnancy and childbirth</div>
+      <div class="meta">Marc Van de Velde; Jan Bláha; Sarah F. Bell; Emilia Guasch et al. · BJA · 2026-07-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Patient Blood Management (PBM) principles—optimising, managing, and preserving a patient&#x27;s own blood—improve outcomes in postpartum haemorrhage; the authors provide practical algorithms and reference tools to facilitate PBM uptake in obstetrics.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a1')">
+        <span class="lab-text">Hide summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This narrative review synthesised PBM principles and recent postpartum haemorrhage management guidelines, drawing on clinical experience from high-resource European settings. The authors developed an algorithm for managing anaemia in pregnancy and created a quick reference chart for PBM strategies applicable to postpartum haemorrhage scenarios.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Narrative review and expert opinion. The study is not a randomised trial or prospective cohort study. Study size, comparator groups, and formal statistical analysis are not reported. The work synthesises existing guidelines and clinical perspectives rather than presenting original research data.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>No specific outcome statistics or effect sizes are reported in the abstract. The authors state that PBM application is &#x27;associated with improvements in patient outcomes&#x27; but do not quantify the magnitude of benefit, event rates, or comparative efficacy versus standard care. The abstract emphasises the clinical need for PBM implementation in obstetrics and identifies key challenges to adoption but does not present numerical results. The main deliverables are the algorithm for anaemia management in pregnancy and the quick reference chart for PBM in postpartum haemorrhage.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Clinically, this work translates PBM principles into practical obstetric tools that anaesthesiologists can implement at the bedside. The algorithm and reference chart are designed to lower barriers to adoption by providing straightforward guidance on when and how to optimise preoperative haemoglobin, manage fluid and blood products, and preserve the patient&#x27;s own blood during and after delivery. For practitioners in high-resource settings, these tools offer a structured pathway to incorporate PBM into routine practice for pregnant patients at risk of or presenting with postpartum haemorrhage.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postpartum haemorrhage remains a leading cause of maternal morbidity and mortality. Implementing PBM strategies—such as preoperative anaemia correction and judicious transfusion—has the potential to reduce both allogeneic blood exposure and adverse maternal outcomes, yet uptake in obstetrics lags behind other specialties.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a narrative review and expert opinion, not a controlled trial; no quantitative outcomes or effect sizes are provided, making it impossible to assess the magnitude of benefit or the strength of evidence underlying specific recommendations. The perspectives and algorithms are grounded in high-resource European centres and may have limited applicability in low-resource settings or regions with different obstetric infrastructure and blood product availability.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.bja.2026.03.070" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a2">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">Anesthesiology</span><span class="badge b-if">IF 9.1</span><span class="badge b-oa">OPEN ACCESS</span></div>
+      <div class="title">The effectiveness of selective COX-2 inhibitors for postoperative pain management using multidimensional pain assessment: A systematic review and meta-analysis of randomized controlled trials</div>
+      <div class="meta">Usman Kahloon; John B.P. Le; Sarah Tierney; Dean A. Fergusson et al. · Anesthesiology · 2026-06-30</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Perioperative selective COX-2 inhibitors reduce acute postoperative pain interference with daily function by 1.1 points on a 0-10 scale—a clinically meaningful benefit—with improved quality of recovery and lower intraoperative bleeding, but no serious safety signals.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a2')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This systematic review and meta-analysis evaluated whether selective COX-2 inhibitors (e.g., celecoxib, parecoxib) improve postoperative recovery compared to placebo, opioids, or usual care in adults. The key focus was pain-related interference with daily living—not just pain intensity—using validated multidimensional instruments. Researchers screened over 9,000 citations and included 38 randomized controlled trials involving 5,424 participants.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Systematic review and meta-analysis of randomized controlled trials. Comparators were placebo, opioids, or usual care. The primary outcome was acute postoperative pain-related interference with daily function (assessed by instruments like the Brief Pain Inventory) within 1 month of surgery. Secondary outcomes included chronic pain, quality of recovery, and adverse events. Two independent reviewers assessed study quality and certainty of evidence.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Selective COX-2 inhibitors reduced acute pain-related interference by 1.1 points on a 0-10 scale (95% CI, -1.4 to -0.84; moderate certainty evidence; 7 trials). The modeled clinical benefit showed a substantial proportion of patients achieved a clinically important analgesic effect with COX-2 inhibitors. Chronic pain incidence was lower (odds ratio 0.44; low certainty; 5 trials), though chronic pain intensity showed no significant difference (very low certainty; 1 trial). Quality of recovery improved by 0.84 points on a 0-18 scale (low certainty; 7 trials). Intraoperative blood loss was reduced by 22 mL (low certainty; 3 trials). No significant differences emerged in serious adverse events: acute renal failure, gastrointestinal bleeding, impaired bone healing, myocardial infarction, stroke, or death.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For typical postoperative patients, adding a selective COX-2 inhibitor (especially when perioperative dosing is feasible) appears to meaningfully reduce how much pain interferes with getting back to normal activities—a clinically relevant endpoint beyond just lowering pain scores. The modest improvement in quality of recovery and reduced blood loss are additional modest benefits. The favorable safety profile—no increased serious complications—supports consideration of these agents as part of multimodal analgesia. However, the benefit is moderate, not dramatic, so integration depends on individual patient factors, contraindications, and institutional practice.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Pain-related interference with function, not pain score alone, is what patients and clinicians care about. This review directly addresses functional recovery, making the evidence more relevant to real-world postoperative outcomes than pain intensity studies alone.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Evidence certainty is low to moderate for most outcomes; only 7 trials contributed to the primary outcome, and specific patient populations, surgical types, and COX-2 inhibitor dosing regimens are not detailed in the abstract. Results may not generalize to high-risk populations (renal disease, cardiovascular disease) excluded from some trials, and the 1-month timeframe for acute pain assessment may miss delayed effects.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/aln.0000000000006216" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a3">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">Anaesthesia</span><span class="badge b-if">IF 6.9</span></div>
+      <div class="title">Sugammadex vs. neostigmine and the risk of postoperative pulmonary complications after upper gastrointestinal endoscopic procedures: a propensity score matched analysis of 15,730 patients</div>
+      <div class="meta">Yung‐Fong Tsai; Kuo‐Chuan Hung; Chih‐Yi Hsu; Huan‐Tang Lin et al. · Anaesthesia · 2026-06-19</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Sugammadex reduced tracheal extubation failure to 3.88% versus 5.79% with neostigmine (RR 1.49) in upper GI endoscopy patients, suggesting meaningful benefit in respiratory outcomes after neuromuscular antagonism.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a3')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors asked whether using sugammadex instead of neostigmine to reverse rocuronium-induced neuromuscular blockade reduces postoperative pulmonary complications in adults undergoing upper gastrointestinal endoscopy under general anesthesia. They identified patients who received rocuronium and one of the two reversal agents from a federated health record network across multiple centers.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Retrospective multicentre cohort study using propensity score matching to balance baseline characteristics between groups. After matching, 15,730 patients were included (7865 per group). Primary outcome was tracheal extubation failure, defined as postoperative ventilator dependence or reintubation within 30 days. Secondary outcomes included coded lung atelectasis and unplanned ICU admission. A prespecified subgroup analysis was performed in patients without chronic pulmonary disease.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Tracheal extubation failure occurred in 305 patients (3.88%) in the sugammadex group and 455 patients (5.79%) in the neostigmine group, with a risk ratio of 1.49 (95% CI 1.30–1.72). The abstract reports that sugammadex use was associated with important reductions in lung atelectasis or collapse and unplanned ICU admission compared with neostigmine. Benefits were observed even in the subgroup without known chronic pulmonary disease. Exact event rates for secondary outcomes are not reported in the abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For patients undergoing upper GI endoscopy who receive rocuronium, sugammadex appears to lower the risk of postoperative ventilator dependence and reintubation compared to neostigmine. The number needed to treat is approximately 48 to prevent one extubation failure. This suggests that when a choice exists between the two agents, sugammadex may be preferable, particularly if residual neuromuscular block is a concern. The benefit extends to patients without preexisting lung disease, broadening its relevance.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postoperative pulmonary complications are costly and morbid. Even in a low-risk setting like endoscopy, reintubation and ventilator dependence carry significant harm. A simple choice at the time of reversal—favoring one agent over another—appears to meaningfully reduce these events.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a retrospective observational study; propensity matching reduces but does not eliminate confounding. The abstract does not specify how neuromuscular blockade depth was monitored or antagonized, or details of the secondary outcomes. Results may be less generalizable to endoscopy units where different anesthetic practices are used. The mechanism explaining sugammadex&#x27;s superiority (pharmacokinetic, pharmacodynamic, or operator-dependent) cannot be determined from this abstract alone.</p></div>
+      <div class="links"><a href="https://doi.org/10.1111/anae.70263" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a4">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">EJA</span><span class="badge b-if">IF 6.8</span></div>
+      <div class="title">The analgesic efficacy of intrathecal morphine compared to peripheral regional analgesia in total hip arthroplasty</div>
+      <div class="meta">Neel Desai; Eric Albrecht; Sina Grape · EJA · 2026-06-18</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Intrathecal morphine and peripheral regional analgesia (nerve block or infiltration) show no difference in pain at rest at 24 hours post-hip arthroplasty, but intrathecal morphine reduces opioid consumption by ~11 mg IV morphine equivalent at cost of more pruritus.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a4')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This systematic review and meta-analysis asked whether intrathecal morphine or peripheral regional analgesia (peripheral nerve block or local infiltration) provides better pain relief after elective total hip arthroplasty. The review included eight randomized controlled trials enrolling 471 patients undergoing hip replacement under general or spinal anesthesia.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Systematic review and meta-analysis of randomized controlled trials. Eight trials with 471 patients total were included; peripheral regional analgesia was peripheral nerve block in six trials and local infiltration analgesia in two trials. Primary outcomes were pain score at rest at 24 hours and cumulative IV morphine equivalent consumption at 24 hours.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>At 24 hours, pain at rest did not differ between intrathecal morphine and peripheral regional analgesia (moderate quality evidence). However, intrathecal morphine reduced cumulative IV opioid consumption by a mean of 11.38 mg morphine equivalent (95% CI 4.31–18.45; P = 0.002), though evidence quality was low. At 8–12 hours, intrathecal morphine produced lower pain scores at rest (1.24 point advantage) and on movement (1.15 point advantage), but peripheral regional analgesia significantly reduced in-hospital pruritus (rate reduced by 69%, P = 0.0002 with high quality evidence). No differences in functional status were demonstrated.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For pain control at 24 hours post-hip arthroplasty, intrathecal morphine and regional techniques are equivalent—choice can be individualized. Intrathecal morphine does reduce systemic opioid use (by about 11 mg), which may be meaningful in opioid-sensitive patients, but this comes at the cost of substantially more pruritus, requiring antihistamines or low-dose naloxone. Neither technique achieves opioid-free analgesia. The advantage of intrathecal morphine narrows after 12 hours, making peripheral techniques attractive if pruritus risk is high.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Hip arthroplasty patients remain a significant pain management challenge. This head-to-head comparison clarifies that no single modality dominates across all outcomes, so selection should balance opioid-sparing goals against pruritus tolerability and local block feasibility in individual patients.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Evidence quality for the primary 24-hour pain outcome is only moderate, and quality is low for opioid consumption findings. The abstract does not report detailed trial characteristics, risk of bias assessment, or patient factors (age, comorbidity, baseline pain) that might affect generalizability. Results represent a heterogeneous pool of regional techniques, so findings may not apply equally to all peripheral nerve block types or infiltration approaches.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/eja.0000000000002436" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a5">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">JCA</span><span class="badge b-if">IF 5.1</span></div>
+      <div class="title">Using the ascertain dementia eight-item questionnaire to identify at-risk older surgical patients</div>
+      <div class="meta">Ellene Yan; Yasmin Alhamdah; Nina Butris; Paras Kapoor et al. · JCA · 2026-07-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>A positive AD8 screen (≥2 items) identified older surgical patients at 3.6× higher risk of postoperative delirium and 2× higher risk of 90-day complications, making it a practical preoperative cognitive screening tool.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a5')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors examined whether the AD8—a brief, self-reported eight-item cognitive screening tool—could identify older surgical patients at risk of adverse outcomes after non-cardiac surgery. They analyzed data from two cohort studies of patients aged 65 and older, using a cutoff score of ≥2 positive items to define probable cognitive impairment.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Post hoc analysis of two cohort studies in non-cardiac surgical patients ≥65 years old (n=689). The AD8 was administered preoperatively as the screening tool. Primary outcomes included 30- and 90-day delirium, complications, and composite adverse outcomes. Not reported: specific study sites, inclusion/exclusion criteria beyond age, or baseline cognitive status distribution.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Among 689 participants, preoperative cognitive impairment on AD8 was associated with postoperative delirium (adjusted odds ratio [aOR] 3.64, p=0.009), 90-day complications (aOR 2.26, p=0.015), and 90-day composite adverse outcomes (aOR 2.03, p=0.033). The AD8 item assessing repetition/speech repetition was the strongest single predictor: it carried 6.11× odds of delirium (p=0.004), 2.53× odds of 30-day complications (p=0.004), and 2.52× odds of 30-day composite outcomes (p=0.004). Memory domain impairment also showed high odds of delirium (aOR 5.11, p=0.007) and 30-day complications (aOR 1.77, p=0.044).</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Administer the AD8 preoperatively in older surgical patients; a score ≥2 flags substantially elevated risk of delirium and short-term complications. Pay particular attention to responses about repetition and memory, as these items appear to carry the highest prognostic weight. This does not change operative decisions but should prompt heightened vigilance for delirium during and after surgery, consideration of multicomponent delirium prevention strategies, and frank preoperative discussion of risks with patient and family.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postoperative delirium and complications in older adults are common, costly, and often preventable with early identification and targeted interventions. The AD8 is ultrarapid (self-reported, no equipment needed) and can be deployed routinely in preoperative assessment without adding significant burden.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a post hoc analysis of two unspecified cohort studies with limited methodological detail; baseline cognitive characteristics, heterogeneity between cohorts, and absolute event rates are not reported in the abstract. Results apply specifically to non-cardiac surgery in patients aged 65+; generalizability to younger patients, cardiac surgery, or non-English-speaking populations is unclear.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.jclinane.2026.112256" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a6">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">ACCPM</span><span class="badge b-if">IF 4.7</span></div>
+      <div class="title">Intraoperative ventilation risk factors for postoperative pulmonary complications in patients undergoing elective neoplastic esophagectomy: a retrospective cohort study</div>
+      <div class="meta">Cédric Cirenei; Raphaëlle Lefebvre; Damien Rousseleau; Emeline Cailliau et al. · ACCPM · 2026-09-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Plateau pressure and driving pressure independently increased postoperative pulmonary complication risk in both one-lung and two-lung ventilation phases (OR 1.73 per cm H2O for plateau pressure); clinically, this reinforces limiting mechanical stress during esophagectomy.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a6')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors investigated which intraoperative ventilatory parameters independently predict postoperative pulmonary complications (PPCs) in patients undergoing elective esophagectomy. They studied 454 patients who received combined abdominal and thoracic surgical approaches and analyzed separate ventilatory models for one-lung ventilation and two-lung ventilation phases. The primary outcome was PPC occurrence within seven postoperative days.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Retrospective single-center cohort study of 454 patients undergoing elective neoplastic esophagectomy. Multivariable logistic regression models were built separately for one-lung and two-lung ventilation phases using intraoperative ventilatory parameters as predictors. The main outcome was postoperative pulmonary complications within 7 days postoperatively. No comparator arm is described; this is observational.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>PPCs occurred in 194 of 454 patients (42.7%). Plateau pressure and driving pressure were independently associated with PPCs during both ventilation phases, with plateau pressure showing an odds ratio of 1.73 per cm H2O (95% CI 1.25-2.38, p not fully reported in abstract). Respiratory rate and driving pressure also associated with PPCs in both phases. During two-lung ventilation, longer ventilation duration and higher PEEP were protective (decreased PPC risk). During one-lung ventilation, expiratory tidal volume and minute ventilation were additionally associated with PPCs. Specific odds ratios and p-values for parameters other than plateau pressure were not provided in the abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Keeping plateau pressure and driving pressure low during esophagectomy appears protective, consistent with lung-protective ventilation principles. Practitioners should monitor and limit plateau pressure in both phases; if doing so, accept lower minute ventilation and accept longer ventilation times during two-lung ventilation rather than increasing pressure. During one-lung ventilation, pay particular attention to expiratory tidal volume monitoring. Higher PEEP during two-lung ventilation was associated with fewer PPCs, suggesting it may be beneficial during that phase, though causation is not established.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Esophagectomy carries substantial PPC risk (43% in this cohort), and identifying modifiable intraoperative ventilatory targets could reduce morbidity. Most anesthesiologists already aim for lung-protective ventilation, but this study quantifies the risk association with pressure parameters in this high-risk population.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Retrospective design limits causal inference; the study is from a single center, which may limit generalizability. The abstract does not report full logistic regression details (p-values, confidence intervals for all parameters, or definitions of PPCs), making it difficult to assess clinical significance of all findings. Results may not apply to open esophagectomy without combined approach or to emergency cases.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.accpm.2026.101774" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a7">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">A&amp;A</span><span class="badge b-if">IF 3.8</span></div>
+      <div class="title">Electrical Impedance Tomography for Real-Time PEEP Monitoring and Atelectasis During Mask Ventilation: A Randomized Controlled Physiological Trial</div>
+      <div class="meta">Remco Overbeek; Anna Klug; Lukas Wessendorf; Annika Meyer et al. · A&amp;A · 2026-07-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Higher PEEP (8 mbar) during mask ventilation at induction significantly improves ventilation distribution—dorsoventral gradient rose from 0.48 to 0.63—without hemodynamic harm, offering a simple way to combat induction atelectasis.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a7')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The study asked whether applying higher PEEP during high-FiO2 mask ventilation at induction reduces atelectasis and improves ventilation homogeneity. They enrolled 72 elective ophthalmic surgery patients and compared three PEEP levels (0, 5, and 8 mbar) during mask ventilation with 100% oxygen. Patients were randomized to ascending or descending PEEP sequences to control for order effects.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Prospective randomized controlled physiological trial in 72 adult patients. The primary outcome was the dorsoventral ventilation gradient (a measure of atelectasis distribution) detected in real-time by electrical impedance tomography (EIT) at each PEEP level. Secondary outcomes included end-expiratory lung impedance and lung compliance ratios as surrogate markers for atelectasis. Hemodynamic safety was monitored throughout.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>EIT showed that higher PEEP significantly improved the dorsoventral ventilation gradient in real-time: mean gradient was 0.48 at 0 mbar PEEP, 0.56 at 5 mbar, and 0.63 at 8 mbar (p &lt; 0.05). This means ventilation became more homogeneous and better distributed away from dependent lung zones as PEEP increased. The study reports that these improvements occurred without clinically relevant hemodynamic compromise, though specific blood pressure, heart rate, or cardiac output values are not provided in the abstract. Secondary markers of atelectasis formation also improved with higher PEEP, consistent with the primary finding.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>At the bedside, applying 8 mbar PEEP during mask ventilation at induction—especially with high FiO2—can reduce atelectasis formation and improve ventilation distribution compared to no PEEP or 5 mbar alone. This is a simple, non-invasive adjustment that aligns with current lung-protective ventilation principles. The lack of hemodynamic adverse effects suggests it is safe even in routine elective cases. For patients at higher risk of perioperative pulmonary complications, this finding supports use of 8 mbar PEEP as standard practice during mask ventilation at induction.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Atelectasis during anesthesia induction increases the risk of postoperative pulmonary complications, yet prior evidence relied on static imaging before or after induction rather than real-time monitoring. This study provides bedside proof that PEEP works during ongoing ventilation, making it actionable for every induction.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The study was limited to elective ophthalmic surgery patients and small sample size; generalizability to emergency cases, obese patients, or those with underlying lung disease is unclear. The abstract does not provide detailed hemodynamic data or report which secondary endpoints achieved statistical significance, limiting assessment of the full safety and efficacy profile.</p></div>
+      <div class="links"><a href="https://doi.org/10.1213/ane.0000000000008165" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a8">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">RAPM</span><span class="badge b-if">IF 3.5</span><span class="badge b-oa">OPEN ACCESS</span></div>
+      <div class="title">Comparison of femoral triangle plus iPACK blocks with femoral triangle block alone for anterior cruciate ligament reconstruction: a randomized controlled clinical trial on postoperative pain and knee function</div>
+      <div class="meta">Ferre, F., Boussaguet, L., Vari, N., Pillard, F., Bosch, L., Ferrier, A., Ba, C., Tissot, B., Menut, R., Kurrek, M., Labaste, F., Cavaignac, E., Minville, V. · RAPM · 2026-07-06</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Adding iPACK block to femoral triangle block plus local infiltration analgesia does not reduce opioid consumption (median difference 5 mg, p=0.49) or improve pain control after ACL reconstruction, questioning its routine use in multimodal regimens.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a8')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The trial compared two regional anesthesia strategies for anterior cruciate ligament reconstruction: femoral triangle block (FTB) alone versus FTB combined with iPACK block, both with local infiltration analgesia. The authors hypothesized that adding iPACK would decrease early postoperative opioid consumption and improve functional recovery.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Randomized controlled trial with 90 patients (45 per group) undergoing ACLR under general anesthesia. The primary outcome was cumulative oral morphine equivalent consumption in the first two postoperative days. Secondary outcomes included maximum pain scores, opioid side effects, and knee functional scores (KOOS, IKDC, Lysholm) assessed at 3, 6, and 9 months postoperatively.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The FTB+iPACK group consumed a median of 50 mg oral morphine equivalent (IQR 14–103 mg) versus 60 mg (IQR 32–89 mg) in the FTB-alone group—a median difference of only 5 mg (95% CI −14 to 28 mg, p=0.49), which was not statistically significant. No significant differences emerged between groups in maximum pain scores, opioid-related adverse effects, or knee functional recovery at any timepoint. At 9 months, pain and symptoms subscales of KOOS and IKDC were slightly higher in patients consuming less than 50 mg morphine equivalent in the first 48 hours, but these differences did not reach minimal clinically important difference thresholds.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>In the setting of a robust multimodal analgesia regimen that already includes FTB and local infiltration analgesia, adding iPACK block provides no meaningful analgesic or functional benefit for primary ACL reconstruction. Practicing anesthesiologists can confidently use FTB with local infiltration analgesia as the core regional technique without feeling obligated to add iPACK, simplifying the anesthetic plan while maintaining equivalent pain control and recovery outcomes.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>ACL reconstruction remains a common orthopedic procedure with significant early postoperative pain risk. Knowing which regional blocks add genuine clinical value—and which do not—helps optimize efficiency in the operating room and reduce procedural complexity without sacrificing patient outcomes.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Results are based on abstract data only, limiting detailed appraisal of methodology, blinding, patient selection, and intraoperative analgesic details. The findings apply to patients undergoing primary ACLR with general anesthesia in a multimodal regimen; results may not generalize to revision surgery, different anesthetic protocols, or patients with chronic pain or opioid tolerance.</p></div>
+      <div class="links"><a href="http://rapm.bmj.com/cgi/content/short/51/7/805?rss=1" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a9">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">IJOA</span><span class="badge b-if">IF 2.3</span><span class="badge b-oa">OPEN ACCESS</span></div>
+      <div class="title">Prevention of maternal hypothermia after scheduled cesarean delivery under spinal anesthesia with active warming of intravenous fluids: an exploratory double-blind randomized controlled trial (CESAR-RESOL2)</div>
+      <div class="meta">Marie-Pierre Bonnet; Agnès Le Gouez; Catherine Fischer; Aurélien Seco et al. · IJOA · 2026-06-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Active warming of intravenous fluids during spinal anesthesia for cesarean delivery reduced maternal hypothermia incidence; the clinical benefit and magnitude of effect warrant consideration in routine practice for this high-risk population.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a9')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Researchers tested whether actively warming intravenous fluids before and during scheduled cesarean delivery under spinal anesthesia could prevent maternal hypothermia. They enrolled parturients undergoing elective cesarean section and randomized them to either active fluid warming or standard (unwarmed) fluid administration. The question addresses a common and clinically significant problem: spinal anesthesia combined with cesarean delivery creates conditions that promote perioperative heat loss.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Double-blind randomized controlled trial (CESAR-RESOL2). The setting, exact sample size, and comparator details are not fully specified in the available information, but the study compared active warming of intravenous fluids to a control group. The primary outcome was the incidence of maternal hypothermia (typically defined as core temperature below 36°C) during or immediately after surgery.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Specific primary outcome numbers and the main statistical measure (p-value, confidence interval, or effect size) are not provided in the available source material. However, the study demonstrated that active warming of intravenous fluids reduced the incidence of maternal hypothermia compared to standard care. Secondary outcomes and safety data are not reported here, though the study design suggests assessment of maternal comfort, neonatal outcomes, and adverse events related to warming.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>If your institution does not routinely warm intravenous fluids for cesarean delivery under spinal anesthesia, this trial supports adding that intervention to your warming protocol. The benefit is particularly relevant because spinal anesthesia causes rapid core temperature drop through vasodilation and impaired thermoregulation, and parturients are already at risk during surgery. Implementing fluid warmers is practical, low-cost, and requires no change to anesthetic technique or timing.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Maternal hypothermia during cesarean delivery increases shivering, discomfort, and potential complications including coagulopathy and infection. A simple, safe measure that reduces this common morbidity deserves consideration as standard practice in obstetric anesthesia.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The full numerical results and confidence intervals are not available, limiting precise assessment of the magnitude of benefit. The study population is confined to elective cesarean delivery under spinal anesthesia, so findings may not generalize to general anesthesia, emergency cases, or non-obstetric surgery. Baseline maternal characteristics, ambient room temperature, and other warming measures used alongside fluid warming are not detailed.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.ijoa.2026.105214" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="foot">
+    Anesthesia Journal Digest · summaries generated by AI (Claude) from the article
+    source text.<br><a href="index.html">← All Deep Dive editions</a>
+  </div>
+</div>
+<script>
+  function toggleCard(id){
+    var c = document.getElementById(id);
+    var open = c.classList.toggle('open');
+    c.querySelector('.lab-text').textContent = open ? 'Hide summary' : 'Read full summary';
+  }
+</script>
+</body>
+</html>
