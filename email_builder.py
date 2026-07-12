@@ -12,7 +12,7 @@ same size in all three, etc.).
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # ── Standard typography (shared by ALL emails) ───────────────────────────────
 # Web-safe stack so it renders the same in every mail client.
@@ -20,7 +20,7 @@ FONT = "Arial, Helvetica, sans-serif"
 
 # One size hierarchy, used consistently across all three email types.
 FS_TITLE = 22   # Main email title (the colored header banner)
-FS_HEAD  = 17   # Section headings: journal names, "This Week's Articles", etc.
+FS_HEAD  = 17   # Section headings: journal names, "This Month's Articles", etc.
 FS_LINK  = 15   # Article titles / primary links / episode titles
 FS_BODY  = 14   # Body text, descriptions, abstracts, button labels
 FS_META  = 12   # Metadata: dates, authors, impact factor, durations
@@ -209,10 +209,9 @@ def build_saturday_email(articles_this_week: list,
                          deepdive_url: str | None = None) -> tuple[str, str]:
     """Build Saturday CME email. Returns (subject, html)."""
     today = datetime.now()
-    week_start = today - timedelta(days=today.weekday())
     date_str = today.strftime("%B %d, %Y")
 
-    subject = f"Anesthesia Weekly Review & Self-Assessment — {today.strftime('%b %d')}"
+    subject = f"Anesthesia Monthly Review & Self-Assessment — {today.strftime('%b %Y')}"
 
     # Prominent call-to-action linking to the interactive quiz + certificate.
     quiz_cta = ""
@@ -221,21 +220,21 @@ def build_saturday_email(articles_this_week: list,
     <tr><td style="padding:18px 20px 4px;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#1a5276,#2e86c1);border-radius:12px;">
         <tr><td style="padding:22px 22px;text-align:center;">
-          <div style="font-family:{FONT};font-size:{FS_HEAD}px;font-weight:bold;color:#ffffff;">&#127891; Take this week's self-assessment</div>
+          <div style="font-family:{FONT};font-size:{FS_HEAD}px;font-weight:bold;color:#ffffff;">&#127891; Take this month's self-assessment</div>
           <div style="font-family:{FONT};font-size:{FS_BODY}px;color:#cfe3f2;margin:8px 0 16px;line-height:{LH};">10 single-best-answer questions · instant score &amp; explanations · downloadable completion record</div>
           <a href="{quiz_url}" style="display:inline-block;background:#ffffff;color:#1a5276;text-decoration:none;font-family:{FONT};font-size:{FS_BODY}px;font-weight:bold;padding:14px 28px;border-radius:24px;">Take the Self-Assessment &amp; Get Certificate &#8594;</a>
         </td></tr>
       </table>
     </td></tr>"""
 
-    # Week's highlights
+    # Month's highlights
     highlights = ""
     if articles_this_week:
         top = sorted(articles_this_week, key=lambda a: a["impact_factor"], reverse=True)[:10]
         highlights = f"""
     <tr><td style="padding:18px 20px 6px;">
-        <h2 style="margin:0;font-family:{FONT};font-size:{FS_HEAD}px;color:#1a5276;">📋 This Week's Articles</h2>
-        <p style="font-family:{FONT};font-size:{FS_BODY}px;color:#999;margin:5px 0 0;">This week's self-assessment is based on these articles</p>
+        <h2 style="margin:0;font-family:{FONT};font-size:{FS_HEAD}px;color:#1a5276;">📋 This Month's Articles</h2>
+        <p style="font-family:{FONT};font-size:{FS_BODY}px;color:#999;margin:5px 0 0;">This month's self-assessment is based on these articles</p>
     </td></tr>"""
         for i, art in enumerate(top, 1):
             oa = f' <span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:3px;font-family:{FONT};font-size:{FS_FOOT}px;">OA</span>' if art["is_open_access"] else ""
@@ -263,7 +262,7 @@ def build_saturday_email(articles_this_week: list,
           </td>
           <td style="padding:18px 20px;">
             <div style="font-family:{FONT};font-size:{FS_HEAD}px;font-weight:bold;color:#ffffff;line-height:1.3;">&#128214; Read the Deep Dive first</div>
-            <div style="font-family:{FONT};font-size:{FS_BODY}px;color:#d6f0e0;margin-top:6px;line-height:{LH};">This quiz is based on the structured summaries of this week's articles. If you haven't read them yet, do so now — then the questions will be straightforward.</div>
+            <div style="font-family:{FONT};font-size:{FS_BODY}px;color:#d6f0e0;margin-top:6px;line-height:{LH};">This quiz is based on the structured summaries of this month's articles. If you haven't read them yet, do so now — then the questions will be straightforward.</div>
             <div style="margin-top:12px;">
               <span style="display:inline-block;background:#27ae60;color:#ffffff;font-family:{FONT};font-size:{FS_BODY}px;font-weight:bold;padding:9px 20px;border-radius:22px;">Open the summaries &#8594;</span>
             </div>
@@ -288,8 +287,8 @@ def build_saturday_email(articles_this_week: list,
 
     html = _wrap(f"""
     <tr><td style="background:linear-gradient(135deg,#1a5276,#148f77);padding:24px 20px;text-align:center;">
-        <h1 style="margin:0;font-family:{FONT};color:#fff;font-size:{FS_TITLE}px;">Weekly Review & Self-Assessment</h1>
-        <p style="margin:7px 0 0;font-family:{FONT};color:rgba(255,255,255,0.85);font-size:{FS_META}px;">{date_str} · Week of {week_start.strftime('%b %d')}</p>
+        <h1 style="margin:0;font-family:{FONT};color:#fff;font-size:{FS_TITLE}px;">Monthly Review & Self-Assessment</h1>
+        <p style="margin:7px 0 0;font-family:{FONT};color:rgba(255,255,255,0.85);font-size:{FS_META}px;">{date_str} · {today.strftime('%B %Y')} anesthesia literature</p>
     </td></tr>
     {highlights}
     {deepdive_ref}

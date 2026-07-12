@@ -1,7 +1,7 @@
 """
 Anesthesia Journal Digest — CME Question Generator
 ====================================================
-Uses Claude API to generate clinical self-assessment questions from the week's
+Uses Claude API to generate clinical self-assessment questions from the month's
 articles. This is a self-assessment tool to support self-directed learning.
 Time spent reading/reflecting is self-reportable under RCPSC MOC Section 2
 (Self-Learning) at the physician's discretion.
@@ -24,9 +24,9 @@ _LETTERS = ["A", "B", "C", "D"]
 def generate_cme_questions(articles: list, num_questions: int = 10,
                            summaries: list | None = None) -> list[dict] | None:
     """
-    Generate CME-style MCQs from the week's articles.
+    Generate CME-style MCQs from the month's articles.
 
-    If ``summaries`` (the Monday Deep Dive summaries) are provided, each question
+    If ``summaries`` (the digest's Deep Dive summaries) are provided, each question
     is grounded in the SAME structured summary the reader saw — keeping the quiz
     and the Deep Dive consistent and skipping a redundant full-text re-fetch.
     Articles without a matching summary fall back to the cached full text.
@@ -142,7 +142,7 @@ HARD RULE: NEVER write the phrase "community anesthesiologist" (or "community an
 or "community anesthetist") anywhere in a question, option, or explanation. That phrase is
 internal guidance only and must not appear in the output.
 
-ARTICLES FOR THIS WEEK (each has source text — full text if open access, otherwise abstract):
+ARTICLES FOR THIS MONTH (each has source text — full text if open access, otherwise abstract):
 {articles_text}
 
 Generate EXACTLY {num_questions} single-best-answer multiple-choice questions — ONE question

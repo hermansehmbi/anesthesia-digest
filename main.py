@@ -44,7 +44,7 @@ WEEKLY_SUMMARIES_FILE = "weekly_summaries.json"
 
 
 def run_digest(preview=False):
-    """Monday (weekly): articles + podcasts + audio (if API mode)."""
+    """Monthly digest (1st): articles + podcasts + audio (if API mode)."""
     logger.info("=" * 50)
     logger.info("DIGEST — fetching articles and podcasts")
     logger.info("=" * 50)
@@ -66,7 +66,7 @@ def run_digest(preview=False):
 
     logger.info(f"Total: {len(all_articles)} articles, {len(all_pods)} podcast eps")
 
-    # Cache the full set first so Saturday's weekly review sees everything.
+    # Cache the full set first so the month's review sees everything.
     _cache_articles(all_articles)
 
     # Digest email shows a tight selection: the single most clinically relevant
@@ -153,7 +153,7 @@ def run_saturday(preview=False):
     summaries = wk.get("summaries") or None
     deepdive_url = wk.get("deepdive_url") or None
 
-    # Free mode has no CME — just a weekly highlights review of Monday's set.
+    # Free mode has no CME — just a highlights review of the month's set.
     if MODE != "api":
         subject, html = build_saturday_email(week, cme_questions=None, quiz_url=None,
                                              deepdive_url=deepdive_url)

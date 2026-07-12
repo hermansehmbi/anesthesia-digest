@@ -72,7 +72,7 @@ def publish_episode(audio_file: str, date_obj: datetime | None = None,
 
 def publish_cme_quiz(questions: list[dict], date_obj: datetime | None = None,
                      push: bool = True) -> str | None:
-    """Write the week's interactive quiz to docs/cme/<date>.html, refresh the
+    """Write the month's interactive quiz to docs/cme/<date>.html, refresh the
     docs/cme/index.html listing, commit + push, and return the quiz's public
     GitHub Pages URL.
     """
@@ -118,7 +118,7 @@ def publish_cme_quiz(questions: list[dict], date_obj: datetime | None = None,
 
 def publish_deepdive(summaries: list, date_obj: datetime | None = None,
                      push: bool = True) -> str | None:
-    """Write the week's Deep Dive summaries to docs/deep-dive/<date>.html, refresh
+    """Write the month's Deep Dive summaries to docs/deep-dive/<date>.html, refresh
     the docs/deep-dive/index.html listing, commit + push, and return the page's
     public GitHub Pages URL.
     """

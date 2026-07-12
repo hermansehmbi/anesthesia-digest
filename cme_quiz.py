@@ -1,7 +1,7 @@
 """
 Anesthesia Journal Digest — Interactive CME Quiz Page Builder
 ==============================================================
-Builds a self-contained, mobile-friendly HTML quiz page from the week's CME
+Builds a self-contained, mobile-friendly HTML quiz page from the month's CME
 questions. The page:
   - shows all questions with selectable options (large, readable type),
   - reveals nothing until the user clicks "Submit Test",
@@ -28,6 +28,7 @@ from datetime import datetime
 def build_quiz_page(questions: list[dict], date_obj: datetime) -> str:
     """Return a complete interactive HTML quiz page for the given questions."""
     pretty_date = date_obj.strftime("%B %d, %Y")
+    month_year = date_obj.strftime("%B %Y")
     iso_date = date_obj.strftime("%Y-%m-%d")
     total = len(questions)
 
@@ -69,6 +70,7 @@ def build_quiz_page(questions: list[dict], date_obj: datetime) -> str:
 
     page = _PAGE_TEMPLATE
     page = page.replace("%%PRETTY_DATE%%", pretty_date)
+    page = page.replace("%%MONTH_YEAR%%", month_year)
     page = page.replace("%%ISO_DATE%%", iso_date)
     page = page.replace("%%TOTAL%%", str(total))
     page = page.replace("%%QUESTIONS_HTML%%", questions_html)
@@ -82,12 +84,12 @@ def build_quiz_index(quizzes: list[tuple[str, str]]) -> str:
     items = ""
     for iso_date, filename in quizzes:
         try:
-            label = datetime.strptime(iso_date, "%Y-%m-%d").strftime("%B %d, %Y")
+            label = datetime.strptime(iso_date, "%Y-%m-%d").strftime("%B %Y")
         except ValueError:
             label = iso_date
         items += (
             f'      <li><a href="{html.escape(filename)}">'
-            f'Weekly Self-Assessment — {label}</a></li>\n'
+            f'Monthly Self-Assessment — {label}</a></li>\n'
         )
     if not items:
         items = '      <li class="empty">No quizzes published yet.</li>\n'
@@ -179,7 +181,7 @@ function generateCertificate(opts){
   var dateStr = now.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
   var timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
   var stamp = dateStr + ' at ' + timeStr;
-  var weekOf = (opts.weekOf || dateStr);   // the literature week this self-assessment covers
+  var periodOf = (opts.periodOf || dateStr);   // the literature period this self-assessment covers
 
   var doc = new JsPDF({orientation:'landscape', unit:'pt', format:'letter'});
   var W = doc.internal.pageSize.getWidth();
@@ -216,7 +218,7 @@ function generateCertificate(opts){
   doc.line(W / 2 - nameW / 2, 236, W / 2 + nameW / 2, 236);
 
   doc.setFont('times', 'normal'); doc.setFontSize(13); doc.setTextColor(ink[0], ink[1], ink[2]);
-  doc.text('completed a self-assessment based on the week of ' + weekOf, W / 2, 266, {align:'center'});
+  doc.text('completed a self-assessment based on the ' + periodOf, W / 2, 266, {align:'center'});
   doc.text('anesthesia literature (' + total + ' questions), with a score of', W / 2, 284, {align:'center'});
 
   doc.setFont('times', 'bold'); doc.setFontSize(20); doc.setTextColor(30, 110, 70);
@@ -258,7 +260,7 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anesthesia Digest — Weekly Review & Self-Assessment (%%PRETTY_DATE%%)</title>
+<title>Anesthesia Digest — Monthly Review & Self-Assessment (%%PRETTY_DATE%%)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root { --navy:#1a5276; --blue:#2e86c1; --green:#1e8449; --red:#c0392b;
@@ -324,7 +326,7 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>&#127891; Anesthesia Digest — Weekly Review &amp; Self-Assessment</h1>
+    <h1>&#127891; Anesthesia Digest — Monthly Review &amp; Self-Assessment</h1>
     <p>%%PRETTY_DATE%% · %%TOTAL%% single-best-answer questions</p>
   </header>
   <main>
@@ -357,7 +359,7 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
   </main>
   <footer>
     Anesthesia Journal Digest · AI-generated self-assessment · Not affiliated with any journal.<br>
-    <a href="index.html">&#8592; All weekly quizzes</a>
+    <a href="index.html">&#8592; All monthly quizzes</a>
   </footer>
 
 <script>
@@ -365,6 +367,7 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
 
   var QUIZ = %%QUIZ_JSON%%;
   var QUIZ_DATE = "%%PRETTY_DATE%%";
+  var QUIZ_MONTH = "%%MONTH_YEAR%%";
   var TOTAL = %%TOTAL%%;
   var graded = false;
   var lastScore = 0;
@@ -441,7 +444,7 @@ _PAGE_TEMPLATE = r"""<!DOCTYPE html>
       alert("Please enter your full name and credentials before downloading the certificate.");
       return;
     }
-    var info = generateCertificate({name:name, score:lastScore, total:TOTAL, completedAt:new Date(), weekOf:QUIZ_DATE});
+    var info = generateCertificate({name:name, score:lastScore, total:TOTAL, completedAt:new Date(), periodOf:QUIZ_MONTH});
     if (info){
       var box = document.getElementById("certinfo");
       box.style.display = "block";
@@ -458,7 +461,7 @@ _INDEX_TEMPLATE = r"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anesthesia Digest — Weekly Review & Self-Assessment</title>
+<title>Anesthesia Digest — Monthly Review & Self-Assessment</title>
 <style>
   body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
          background:#f4f6f9; color:#2c3e50; font-size:16px; }
@@ -482,7 +485,7 @@ _INDEX_TEMPLATE = r"""<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>&#127891; Weekly Self-Assessments</h1>
+    <h1>&#127891; Monthly Self-Assessments</h1>
     <p>Anesthesia Journal Digest · self-assessment to support your own learning</p>
   </header>
   <main>
@@ -530,7 +533,7 @@ _CERT_PREVIEW_TEMPLATE = r"""<!DOCTYPE html>
     <button type="button" id="previewBtn">Generate Sample Certificate</button>
     <div class="meta" id="meta"></div>
     <p class="note">This is a design preview only. Real certificates are issued from the
-       weekly quiz after you submit your answers.</p>
+       monthly quiz after you submit your answers.</p>
   </main>
 <script>
 %%CERT_JS%%
@@ -541,7 +544,7 @@ _CERT_PREVIEW_TEMPLATE = r"""<!DOCTYPE html>
       score: 8,
       total: 10,
       completedAt: new Date(),
-      weekOf: "June 02, 2025"
+      periodOf: "June 2025"
     });
     if (info){
       document.getElementById("meta").textContent =
