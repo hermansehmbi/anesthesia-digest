@@ -73,11 +73,14 @@ GITHUB_PAGES_URL = os.environ.get("GITHUB_PAGES_URL", "")
 DOCS_DIR = "docs"
 AUDIO_SUBDIR = "audio"
 
-# ── Initial Run Settings ─────────────────────────────────────────────────────
-# For the first few weeks, pull from older issues so emails aren't empty.
-# Set to 30 to get the last month of articles; reduce to 7 once running
-# (the digest runs weekly on Monday, so 7 days covers a full week).
-INITIAL_LOOKBACK_DAYS = 30  # Change to 7 after the first 2-3 weeks
+# ── Article Lookback Window ──────────────────────────────────────────────────
+# The digest runs MONTHLY (1st of the month), so it looks back a full month to
+# capture every article published since the previous digest — never just one
+# week. 31 days covers the longest possible gap between two 1st-of-month runs
+# (a 31-day month), so no issue is ever missed, with only minimal overlap.
+MONTHLY_LOOKBACK_DAYS = 31
+# Kept for the very first backfill run so early emails aren't empty.
+INITIAL_LOOKBACK_DAYS = 30
 
 # ── Journal Registry ─────────────────────────────────────────────────────────
 JOURNALS = [
@@ -219,6 +222,9 @@ BONUS_PODCASTS = [
 ]
 
 # ── Schedule Reference ───────────────────────────────────────────────────────
-# Monday        → weekly digest (articles + podcasts + audio if API)
-# Saturday      → weekly CME questions (API) + week's highlights
-# 1st of month  → monthly top-5 + MOC tracker attachment
+# Everything runs once a month, split across three dates:
+#   1st   → digest   → the month's articles + podcasts + audio + Deep Dive (API)
+#   7th   → saturday → CME self-assessment, locked to the 1st's article set
+#                      (read from monday_featured.json committed to the repo)
+#   25th  → monthly  → monthly top-5 + MOC / Google Sheet summary refresh, after
+#                      the digest (1st) and self-assessment (7th) are both logged

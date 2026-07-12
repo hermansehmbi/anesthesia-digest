@@ -1,12 +1,14 @@
 """
 Anesthesia Journal Digest — Main
 ==================================
+Runs monthly (see .github/workflows): digest on the 1st, CME on the 7th,
+monthly reconciliation on the 25th.
 Usage:
-    python main.py digest          # Monday weekly article digest
-    python main.py saturday        # Saturday CME + week highlights
+    python main.py digest          # Monthly article digest (+ podcast + Deep Dive)
+    python main.py saturday        # CME self-assessment for the month's articles
     python main.py monthly         # Monthly top-5 + MOC tracker
     python main.py preview         # Preview digest locally (no email)
-    python main.py preview-sat     # Preview Saturday email locally
+    python main.py preview-sat     # Preview self-assessment email locally
     python main.py preview-month   # Preview monthly email locally
 """
 
@@ -18,7 +20,7 @@ from pathlib import Path
 
 from config import (
     JOURNALS, BONUS_PODCASTS, RECIPIENT_EMAIL, SENDER_EMAIL,
-    MODE, INITIAL_LOOKBACK_DAYS,
+    MODE, INITIAL_LOOKBACK_DAYS, MONTHLY_LOOKBACK_DAYS,
 )
 from fetcher import fetch_articles, fetch_podcast_episodes, fetch_bonus_podcasts
 from article_selector import select_digest_articles
@@ -31,11 +33,13 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 CACHE_FILE = "articles_cache.json"
-# The EXACT final list of articles emailed in the most recent Monday digest.
-# Saturday CME reads ONLY from this file — no re-fetching, no new articles.
+# The EXACT final list of articles emailed in the most recent digest (now the
+# month's featured set). The CME step reads ONLY from this file — no re-fetching,
+# no new articles — so the self-assessment is locked to that month's digest.
+# (Filename kept as-is to preserve the CI cache path.)
 MONDAY_FEATURED_FILE = "monday_featured.json"
-# Monday's Deep Dive summaries + the published page URL. Saturday reuses these to
-# ground the CME questions (Option B) and to link the same page in the CME email.
+# The digest's Deep Dive summaries + the published page URL. The CME step reuses
+# these to ground its questions (Option B) and to link the same page in the email.
 WEEKLY_SUMMARIES_FILE = "weekly_summaries.json"
 
 
@@ -45,11 +49,11 @@ def run_digest(preview=False):
     logger.info("DIGEST — fetching articles and podcasts")
     logger.info("=" * 50)
 
-    since = INITIAL_LOOKBACK_DAYS
-    # The digest runs once a week (Monday), so once past the initial backfill
-    # period look back a full week to cover everything since the last digest.
-    if since <= 7:
-        since = 7
+    # The digest now runs once a month (on the 1st), so look back a full month
+    # to cover every article published since the previous month's digest — never
+    # just the past week. Use the larger initial-backfill window if it exceeds a
+    # month (e.g. for the very first run).
+    since = max(INITIAL_LOOKBACK_DAYS, MONTHLY_LOOKBACK_DAYS)
 
     all_articles = []
     for j in JOURNALS:
@@ -70,8 +74,8 @@ def run_digest(preview=False):
     selected = select_digest_articles(all_articles, per_journal=1, max_total=10)
     logger.info(f"Selected {len(selected)} articles for the digest email")
 
-    # Save the EXACT final list emailed in this Monday digest (overwrite). The
-    # Saturday CME reads only from this so it tests precisely these articles.
+    # Save the EXACT final list emailed in this month's digest (overwrite). The
+    # CME step reads only from this so it tests precisely these articles.
     _write_monday_featured(selected)
 
     # Rolling MOC log: append these articles (Google Sheets, or xlsx fallback).
@@ -133,18 +137,18 @@ def run_digest(preview=False):
 
 
 def run_saturday(preview=False):
-    """Saturday: CME questions built from EXACTLY this week's Monday digest."""
+    """CME self-assessment built from EXACTLY this month's digest articles."""
     logger.info("=" * 50)
-    logger.info("SATURDAY — CME and weekly review")
+    logger.info("SELF-ASSESSMENT — CME for the month's articles")
     logger.info("=" * 50)
 
-    # Locked to Monday's digest: read ONLY the exact articles that were emailed
-    # Monday. No re-fetching, no newly-appeared articles.
+    # Locked to the month's digest: read ONLY the exact articles that were emailed
+    # in this month's digest. No re-fetching, no newly-appeared articles.
     week = _load_monday_featured()
-    logger.info(f"Monday digest articles: {len(week)} "
+    logger.info(f"Monthly digest articles: {len(week)} "
                 f"(locked to {MONDAY_FEATURED_FILE})")
 
-    # Monday's Deep Dive summaries + page URL (for CME grounding and the email link).
+    # The digest's Deep Dive summaries + page URL (for CME grounding and the link).
     wk = _load_weekly_summaries()
     summaries = wk.get("summaries") or None
     deepdive_url = wk.get("deepdive_url") or None
@@ -162,8 +166,8 @@ def run_saturday(preview=False):
     # API mode: CME is required. Never send a question-less email — if anything
     # fails, flag it (non-zero exit) so the failure is visible instead of silent.
     if not week:
-        logger.error(f"No Monday digest articles in {MONDAY_FEATURED_FILE} — "
-                     "run the Monday digest first. NOT sending a CME email.")
+        logger.error(f"No digest articles in {MONDAY_FEATURED_FILE} — "
+                     "run the digest first. NOT sending a CME email.")
         if not preview:
             sys.exit(1)
         return
@@ -171,8 +175,8 @@ def run_saturday(preview=False):
     cme = None
     try:
         from cme_generator import generate_cme_questions
-        # One question per Monday article (no repeats). Usually 10; fewer if a
-        # journal had no open-access article that week. Grounded in Monday's
+        # One question per featured article (no repeats). Usually 10; fewer if a
+        # journal had no open-access article that month. Grounded in the digest's
         # Deep Dive summaries when available (Option B), else cached full text.
         cme = generate_cme_questions(week, num_questions=len(week),
                                      summaries=summaries)
@@ -334,7 +338,7 @@ def _load_cached(days=7) -> list:
 
 
 def _write_monday_featured(selected: list):
-    """Overwrite monday_featured.json with the EXACT list emailed this Monday."""
+    """Overwrite monday_featured.json with the EXACT list emailed this month."""
     out = []
     for art in selected:
         copy = dict(art)
@@ -347,7 +351,7 @@ def _write_monday_featured(selected: list):
 
 
 def _load_monday_featured() -> list:
-    """Load the exact Monday digest article list (or [] if none yet)."""
+    """Load the exact monthly digest article list (or [] if none yet)."""
     p = Path(MONDAY_FEATURED_FILE)
     if not p.exists():
         return []
@@ -358,7 +362,7 @@ def _load_monday_featured() -> list:
 
 
 def _write_weekly_summaries(summaries: list | None, deepdive_url: str | None):
-    """Persist Monday's Deep Dive summaries + page URL for Saturday to reuse."""
+    """Persist the digest's Deep Dive summaries + page URL for the CME step."""
     payload = {
         "date": datetime.now().strftime("%Y-%m-%d"),
         "deepdive_url": deepdive_url,
@@ -371,7 +375,7 @@ def _write_weekly_summaries(summaries: list | None, deepdive_url: str | None):
 
 
 def _load_weekly_summaries() -> dict:
-    """Load Monday's Deep Dive summaries payload (or {} if none yet)."""
+    """Load the digest's Deep Dive summaries payload (or {} if none yet)."""
     p = Path(WEEKLY_SUMMARIES_FILE)
     if not p.exists():
         return {}

@@ -2,12 +2,17 @@ name: Anesthesia Digest
 
 on:
   schedule:
-    # Monday 11:00 UTC (7:00 AM ET summer) — weekly digest
-    - cron: '0 11 * * 1'
-    # Saturday 12:00 UTC (8:00 AM ET) — weekly CME
-    - cron: '0 12 * * 6'
-    # 1st of each month 13:00 UTC (9:00 AM ET) — monthly MOC
-    - cron: '0 13 1 * *'
+    # 1st of each month, 11:00 UTC (7:00 AM ET summer) — the monthly digest
+    # (email + podcast + Deep Dive).
+    - cron: '0 11 1 * *'
+    # 7th of each month, 11:00 UTC — the CME self-assessment (email + quiz page),
+    # locked to the article set the digest published on the 1st (read from the
+    # monday_featured.json / weekly_summaries.json committed to the repo below).
+    - cron: '0 11 7 * *'
+    # 25th of each month, 11:00 UTC — the monthly reconciliation email (top-5 +
+    # MOC "fill in your hours" reminder) and Google Sheet / MOC summary refresh,
+    # after the month's digest (1st) and self-assessment (7th) are both logged.
+    - cron: '0 11 25 * *'
 
   workflow_dispatch:
     inputs:
@@ -21,7 +26,8 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # Headroom for the heaviest run (the 1st: digest incl. podcast + Deep Dive).
+    timeout-minutes: 30
 
     # Needed so the digest run can commit the published podcast episode +
     # player page to /docs and push it for GitHub Pages.
@@ -66,10 +72,10 @@ jobs:
       # the single writer per key — avoids the "Cache save failed / unable to
       # reserve cache" collision from double-saving the same key.
       # monday_featured.json / weekly_summaries.json are NOT cached here — they
-      # are committed to the repo (see "Persist digest state" below) so the
-      # Saturday CME run always finds Monday's article set from a fresh checkout,
-      # independent of the best-effort Actions cache. Only the bulky optimization
-      # files stay in the cache.
+      # are committed to the repo (see "Persist digest state" below) so the CME
+      # run (7th) always finds the digest's (1st) article set from a fresh
+      # checkout, independent of the best-effort Actions cache. Only the bulky
+      # optimization files stay in the cache.
       - name: Restore article cache
         uses: actions/cache/restore@v4
         with:
@@ -87,33 +93,37 @@ jobs:
           key: moc-${{ github.run_id }}
           restore-keys: moc-
 
-      - name: Determine command
-        id: cmd
+      - name: Run
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "command=${{ github.event.inputs.command }}" >> $GITHUB_OUTPUT
+            # Manual run: send only the single email chosen in the dropdown.
+            python main.py "${{ github.event.inputs.command }}"
           else
-            DAY=$(date -u +%u)
             DOM=$(date -u +%d)
-            HOUR=$(date -u +%H)
-            if [ "$DOM" = "01" ] && [ "$HOUR" -ge 13 ]; then
-              echo "command=monthly" >> $GITHUB_OUTPUT
-            elif [ "$DAY" = "6" ]; then
-              echo "command=saturday" >> $GITHUB_OUTPUT
+            if [ "$DOM" = "07" ]; then
+              # 7th of the month: the CME self-assessment. It reads ONLY the
+              # month's featured articles + Deep Dive summaries the digest wrote
+              # on the 1st (from the repo checkout) — no re-fetching.
+              python main.py saturday
+            elif [ "$DOM" = "25" ]; then
+              # 25th of the month: the monthly reconciliation email + MOC /
+              # Google Sheet summary refresh, once the month's digest (1st) and
+              # self-assessment (7th) are both logged to the sheet.
+              python main.py monthly
             else
-              echo "command=digest" >> $GITHUB_OUTPUT
+              # 1st of the month: the digest fetches the month's articles and
+              # writes monday_featured.json + the Deep Dive summaries, which the
+              # 7th's CME run then reuses.
+              python main.py digest
             fi
           fi
 
-      - name: Run
-        run: python main.py ${{ steps.cmd.outputs.command }}
-
-      # Commit the Monday -> Saturday hand-off files to the repo so they survive
-      # regardless of the Actions cache (which is best-effort and was invalidated
-      # by a path-list change, breaking a Saturday CME run). The Monday digest
-      # writes these; Saturday reads them from the checkout. Best-effort: a
-      # failure here never fails the run (the email already sent in "Run").
-      - name: Persist digest state (Monday -> Saturday handoff)
+      # Commit the digest (1st) -> CME (7th) hand-off files to the repo so they
+      # survive regardless of the Actions cache (which is best-effort and was
+      # invalidated by a path-list change, breaking a CME run). The digest writes
+      # these; the CME run reads them from the checkout. Best-effort: a failure
+      # here never fails the run (the email already sent in "Run").
+      - name: Persist digest state (digest -> CME handoff)
         if: success()
         continue-on-error: true
         run: |
