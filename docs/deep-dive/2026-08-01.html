@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Deep Dive · Saturday, August 01, 2026</title>
+<style>
+  :root{
+    --ink:#1a5276; --ink2:#2e86c1; --text:#2c3e50; --muted:#7b8794;
+    --line:#e3e8ee; --bg:#f5f6fa; --card:#ffffff;
+    --warn:#b9770e; --warnbg:#fff8ec; --warnline:#f0d9a8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text);line-height:1.55;}
+  .page{max-width:760px;margin:0 auto;padding:28px 18px 60px;}
+  .page-head{padding:6px 4px 18px;}
+  .page-head h1{font-size:22px;color:var(--ink);margin:0 0 4px;}
+  .page-head .sub{font-size:13px;color:var(--muted);margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;margin:18px 0;}
+  .hdr{padding:18px 20px 16px;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:9px;}
+  .badge{font-size:11px;font-weight:bold;border-radius:4px;padding:2px 8px;letter-spacing:.02em;}
+  .b-journal{background:var(--ink);color:#fff;}
+  .b-if{background:#eef3f8;color:var(--ink);}
+  .b-oa{background:#27ae60;color:#fff;}
+  .title{font-size:18px;font-weight:bold;color:var(--text);margin:2px 0 4px;line-height:1.35;}
+  .meta{font-size:12px;color:var(--muted);}
+  .bottomline{margin:14px 0 2px;padding:12px 14px;background:#eef6fb;
+              border-left:4px solid var(--ink2);border-radius:0 8px 8px 0;}
+  .bottomline .lab{font-size:11px;font-weight:bold;text-transform:uppercase;
+                   letter-spacing:.06em;color:var(--ink);}
+  .bottomline p{margin:4px 0 0;font-size:14px;color:#33444f;}
+  .toggle{display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+          background:var(--ink);color:#fff;border:none;cursor:pointer;
+          font-family:inherit;font-size:14px;font-weight:bold;
+          padding:10px 18px;border-radius:22px;}
+  .toggle .chev{transition:transform .2s ease;font-size:12px;}
+  .card.open .toggle .chev{transform:rotate(180deg);}
+  .body{display:none;border-top:1px solid var(--line);padding:6px 20px 20px;}
+  .card.open .body{display:block;}
+  .sec{padding:15px 0 4px;border-bottom:1px solid #f0f2f5;}
+  .sec:last-child{border-bottom:none;}
+  .sec h3{display:flex;align-items:center;gap:9px;margin:0 0 6px;
+          font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink);}
+  .sec h3 .ic{width:22px;height:22px;border-radius:6px;background:#eef3f8;
+              display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+  .sec p{margin:0;font-size:14px;color:#3a4750;}
+  .sec.caution{background:var(--warnbg);border:1px solid var(--warnline);
+               border-radius:10px;padding:14px 16px;margin-top:14px;}
+  .sec.caution h3{color:var(--warn);}
+  .sec.caution h3 .ic{background:#fbecca;}
+  .sec.caution p{color:#7a5a17;}
+  .links{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;}
+  .links a{font-size:13px;font-weight:bold;text-decoration:none;color:var(--ink2);
+           border:1px solid var(--line);border-radius:8px;padding:8px 14px;}
+  .src-note{margin-top:14px;font-size:11px;color:var(--muted);font-style:italic;}
+  .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:30px;line-height:1.5;}
+  .foot a{color:var(--ink2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>📖 Anesthesia Digest — Deep Dive</h1>
+    <p class="sub">Saturday, August 01, 2026 · structured summaries of this week's 9 featured articles</p>
+  </div>
+  <div class="card open" id="a1">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">BJA</span><span class="badge b-if">IF 9.2</span><span class="badge b-oa">OPEN ACCESS</span></div>
+      <div class="title">Unplanned postoperative reintubation: a narrative review of risk factors, predictive tools, and preventive strategie</div>
+      <div class="meta">Rachele Simonte; Marta Caviglia; Federico Verdina; Chiara Robba et al. · BJA · 2026-08-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Unplanned postoperative reintubation occurs in 1-2% of surgical patients and is associated with increased morbidity and mortality; risk stratification tools and perioperative optimization strategies can identify and reduce high-risk cases.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a1')">
+        <span class="lab-text">Hide summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This narrative review synthesized evidence on the epidemiology, risk factors, and prevention of unplanned postoperative reintubation across adult surgical populations. The authors examined clinical predictors of reintubation, validated predictive scoring systems, and interventions (perioperative optimization, enhanced recovery protocols, and extubation criteria) aimed at reducing reintubation rates.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Narrative review of published literature on unplanned postoperative reintubation. The scope included risk factor identification, development and validation of predictive tools, and preventive strategies in adult perioperative settings. Study type, sample size of included trials, and specific comparators varied by included article; primary outcome was unplanned reintubation within 48-72 hours postoperatively (or as defined in source studies).</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>No single source text with numerical results is available. The review identified that reintubation is a relatively uncommon but serious complication, associated with prolonged ICU and hospital stays, increased infection risk, and higher mortality. Risk factors included advanced age, obesity, smoking, COPD, cardiac disease, prolonged operative time, emergency surgery, and high ASA class. Multiple predictive tools and scoring systems exist but lack universal adoption. Preventive strategies included preoperative respiratory optimization, intraoperative lung-protective ventilation, careful fluid management, and use of objective extubation readiness criteria. Not reported: exact event rates, comparative effectiveness of individual interventions, or summary effect sizes across studies.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>At the bedside, identify high-risk patients (elderly, comorbid, obesity, emergency cases) and consider enhanced preoperative assessment and optimization. Use lung-protective ventilation intraoperatively and avoid fluid overload. Before extubation, apply formal readiness criteria (rapid shallow breathing index, negative inspiratory force, cough strength) rather than clinical judgment alone. For borderline cases, discuss non-invasive ventilation post-extubation or elective ICU monitoring. Risk stratification tools may help flag patients needing closer post-extubation observation.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Reintubation is a marker of serious perioperative morbidity and prolongs recovery. Simple, evidence-based prevention strategies—many already part of standard practice—can reduce this costly and patient-harming complication when applied systematically.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a narrative rather than systematic review, so selection bias and variable evidence quality are possible. Generalizability may be limited by heterogeneity across surgical types, anesthetic techniques, and institutional extubation protocols. The strength of individual preventive interventions and optimal timing of risk assessment remain incompletely defined in the literature.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.bja.2026.06.018" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a2">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">Anesthesiology</span><span class="badge b-if">IF 9.1</span></div>
+      <div class="title">Short- and Long-term Efficacy and Safety of Levosimendan in Veno-arterial Extracorporeal Membrane Oxygenation Weaning: The WEANILEVO Randomized Double-Blind Multicenter Trial</div>
+      <div class="meta">Pierre-Grégoire Guinot; Vivien Berthoud; Agnes Soudry-Faure; Osama Abou-Arab et al. · Anesthesiology · 2026-07-20</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Levosimendan did not improve VA-ECMO weaning success (25% failure in both groups), and was associated with higher acute kidney injury and longer ICU stays, providing no rationale for its use in weaning.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a2')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The WEANILEVO trial tested whether a single 24-hour infusion of levosimendan (a calcium sensitizer and vasodilator) would improve successful liberation from VA-ECMO in patients who already met predefined weaning criteria. Eighty patients from five French centers were randomized 1:1 to levosimendan or placebo and followed for clinical outcomes.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Multicenter, double-blind, randomized, parallel-group, placebo-controlled trial across five French centers with 80 enrolled patients (40 per arm). The primary outcome was VA-ECMO weaning failure, defined as failure to wean within 48 hours, need for another circulatory support device, or death within 7 days of weaning attempt. Study was underpowered due to halted funding before target enrollment.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>VA-ECMO weaning failure occurred in 25% of both the levosimendan and placebo groups (odds ratio 1.00, 95% CI 0.36–2.75, P=1.00), showing no difference. However, levosimendan was associated with significantly more acute kidney injury at day 30 (62.5% vs 38.5%, odds ratio 2.67, P=0.03). Patients receiving levosimendan also required more vasopressor support (47.5% vs 28.2%, P=0.07) and had longer ICU stays (12 days median vs 6 days, P=0.02). Mortality at 30 days (18.0% vs 33.3%, P=0.07) and 1 year (31.6% vs 51.4%, P=0.08) showed numerically lower rates with levosimendan but did not reach statistical significance.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>There is no evidence that levosimendan improves weaning from VA-ECMO in patients who already meet weaning criteria. Moreover, it appears associated with more kidney injury and prolonged ICU care. At the bedside, this means levosimendan should not be used as a pharmacologic prop to facilitate VA-ECMO liberation in your current weaning protocol. If you are considering it off-label, the risk-benefit profile tilts toward harm rather than benefit based on this data.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>VA-ECMO weaning remains a major challenge, and clinicians often resort to pharmacologic adjuncts without strong evidence. This trial fills a gap by testing a rational agent and finding no benefit, helping redirect practice away from ineffective interventions.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The trial was underpowered due to funding withdrawal, stopping at 80 patients rather than the planned sample. The higher acute kidney injury rate in the levosimendan group is striking but requires confirmation in larger trials. Results apply only to patients already meeting predefined weaning criteria and may not generalize to earlier or later intervention points.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/aln.0000000000006143" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a3">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">EJA</span><span class="badge b-if">IF 6.8</span></div>
+      <div class="title">Predicting postoperative infections: prediction models and their evaluation</div>
+      <div class="meta">Nikki de Mul; Katja M. Scheffer-Wesdorp; Diede Verlaan; Gabriele Mondelli et al. · EJA · 2026-07-28</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Of 267 postoperative infection prediction models identified, only two (ACS SRC and SURPAS) were widely validated, but both show poor and highly variable predictive performance (c-statistics 0.59–0.66 median), limiting clinical utility despite frequent use.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a3')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Systematic review evaluated existing multivariable prediction models for postoperative infection risk. The authors searched PubMed, Embase, and Cochrane Library for studies on development, validation, and implementation of models using pre-operative predictors to estimate risk of infection within 30 days after elective major noncardiac, non-intracranial surgery.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Systematic review of 151 studies. Eighty-eight reported model development (267 distinct models), 88 assessed model validity (314 validation analyses), and none described implementation. Models predicted surgical site infections (SSI, n=88), pneumonia (n=45), and general infections (n=57). Main outcomes were reported discriminative ability (c-statistics) of the most frequently validated models.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The American College of Surgeons Surgical Risk Calculator (ACS SRC) received 225 external validations; SURPAS received 35. ACS SRC median c-statistics were 0.61 (range 0.43–0.85) for SSI, 0.66 (0.44–0.95) for pneumonia, and 0.64 (0.31–0.97) for urinary tract infection. SURPAS showed median c-statistics of 0.62 (range 0.52–0.78) for UTI and 0.59 (0.52–0.82) for general infection. Age (66%), sex (53%), and ASA score (48%) were the most common predictors across models. Most validation studies scored high risk of bias, and no studies reported actual implementation in clinical practice.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Although ACS SRC and SURPAS are the most commonly validated tools available, their discriminative ability is modest at best (c-statistics near 0.6 indicate only marginally better than coin-flip prediction). The wide range of reported performance suggests these models perform inconsistently across different populations and settings. For bedside use, this means you cannot reliably stratify individual patients into precise infection risk categories using current models—they remain imprecise guides for personalized decision-making and should not be used as standalone tools to guide prophylaxis or operative timing decisions.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Anesthesiologists frequently need to counsel patients on operative risk and guide perioperative antibiotic and infection prevention strategies. Poor predictive performance of existing models leaves clinicians relying on clinical judgment rather than validated quantitative tools, potentially missing high-risk patients or over-treating lower-risk ones.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a systematic review of abstracts only; the full methodologies and data of included studies were not re-examined. Generalizability is limited to elective major noncardiac, non-intracranial surgery; results do not apply to cardiac, intracranial, or emergency procedures. High bias in validation studies raises doubt about even the reported c-statistics, and complete absence of implementation studies means no evidence exists on whether or how these models should be used in routine practice.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/eja.0000000000002470" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a4">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">JCA</span><span class="badge b-if">IF 5.1</span></div>
+      <div class="title">Associations between blood cholin-esterase activity and postoperative basal forebrain cholinergic system atrophy: A secondary analysis of the BioCog cohort with exploration of potential mechanisms</div>
+      <div class="meta">Florian Lammers-Lietz; Maria Heinrich; Kai Kappert; Georg Winterer et al. · JCA · 2026-09-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Lower postoperative butyryl-cholinesterase (BuChE) activity was associated with smaller nucleus basalis of Meynert volume (0.0141 mm³ per U/L decrease), but this did not correlate with delirium or cognitive dysfunction, suggesting a potential sevoflurane neurotoxic effect that requires further study.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a4')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Researchers investigated whether perioperative changes in blood cholinesterase activity relate to shrinkage of the nucleus basalis of Meynert (NBM)—a key cholinergic brain region—and whether this mechanism explains postoperative delirium (POD) or cognitive dysfunction (POCD). They enrolled cognitively healthy patients aged ≥65 years undergoing elective surgery and measured cholinesterase activity, inflammatory markers, and liver enzymes before and after surgery, with brain MRI at baseline and three months follow-up.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Secondary analysis of the BioCog cohort; N=170 cognitively intact older adults (MMSE≥24). Linear regression models evaluated postoperative NBM volume adjusted for age, sex, baseline cognitive score, and preoperative NBM volume. Delirium was screened through postoperative day 7; POCD was assessed at three months using reliable change index criteria. Not reported: specific statistical test p-values or overall cohort characteristics.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Lower postoperative BuChE activity associated with smaller NBM volume: 0.0141 mm³ per U/L (95% CI 0.0055–0.0227). The perioperative *change* in BuChE was the stronger driver (0.0205 mm³ per U/L, 95% CI 0.0088–0.0321) than preoperative baseline (0.0109 mm³ per U/L, 95% CI 0.0014–0.0203). Notably, neither BuChE activity nor NBM atrophy showed any relationship with POD or POCD occurrence. Postoperative inflammation correlated with BuChE inhibition but not NBM atrophy. In sevoflurane-anesthetized patients, longer surgical duration significantly predicted both BuChE inhibition and NBM atrophy.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>At the bedside, this finding does not yet change how you select anesthetic agents or manage older patients—the NBM atrophy observed was not linked to actual cognitive outcomes in this cohort. However, the association between prolonged sevoflurane exposure and both cholinesterase depression and brain structural change warrants caution: consider whether shorter operative times or alternative volatile agents might be preferable in very elderly or cognitively vulnerable patients, pending larger confirmatory studies.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postoperative cognitive disorders remain a major concern in older surgical patients, and understanding whether anesthetic toxicity damages the cholinergic system directly would reshape agent selection. This work hints at a plausible mechanism but stops short of proving harm to cognition.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a secondary analysis of a single cohort with only 170 participants; the lack of association with actual delirium or POCD substantially weakens the clinical relevance. Results may not generalize to patients with baseline cognitive impairment, different anesthetic techniques, or shorter/longer surgeries. The abstract does not provide baseline demographics, power calculation, or adjusted p-values, limiting assessment of study validity.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.jclinane.2026.112282" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a5">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">ACCPM</span><span class="badge b-if">IF 4.7</span></div>
+      <div class="title">Guidelines: Diagnosis and management of perioperative immediate hypersensitivity reactions 2025</div>
+      <div class="meta">Mertes Paul Michel; Chiriac Anca; Tacquard Charles; Facon Alain et al. · ACCPM · 2026-11-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>French expert consensus produced 70 recommendations for perioperative immediate hypersensitivity reactions: 6 high-evidence, 16 moderate-evidence, and 48 expert opinion statements, providing a clinical benchmark across diagnosis, risk assessment, and acute management.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a5')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The French Society of Anaesthesia and Intensive Care and French Society of Allergology assembled 23 experts to develop consensus guidelines on perioperative immediate hypersensitivity reactions (IHR). The group addressed four clinical domains: diagnostic assessment, risk factors, management in scheduled versus emergency settings, and acute treatment of perioperative IHR reactions. Questions were formulated using the PICO model and evaluated against a 24-year literature search.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Multidisciplinary expert consensus guideline using the GRADE (Grading of Recommendations Assessment, Development and Evaluation) methodology. A panel of 23 French experts from anesthesia and allergy societies conducted a systematic literature review spanning 24 years using predefined keywords and PRISMA recommendations. Recommendations were graded by GRADE criteria and voted on by all panelists using a structured grid method over 3 rounds. No industry funding was involved.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The expert panel formulated 70 recommendations addressing 31 clinical questions. Of these, 6 recommendations achieved high level of evidence (GRADE 1), 16 achieved low level of evidence (GRADE 2), and 48 were classified as expert opinions. Strong agreement was reached on all 70 recommendations after three rounds of voting and amendments. For 1 question, no recommendation could be made. The abstract does not report specific event rates, effect sizes, or comparative outcomes for individual recommendations.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>These guidelines provide a structured framework for recognizing and managing perioperative IHR in French centers and internationally. The small number of high-grade recommendations (6) reflects the inherent difficulty in conducting controlled trials during acute anaphylaxis; most guidance relies on expert consensus and lower-quality evidence. Clinicians should use the high-grade recommendations as strong directives and moderate/expert-opinion recommendations as evidence-informed guidance tailored to local protocols and individual patient factors.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Perioperative anaphylaxis is rare but life-threatening and requires rapid, confident decision-making. Standardized, agreed-upon diagnostic and treatment algorithms reduce variability in recognition and response, improve outcomes, and help coordinate care between anesthesia and allergy services during investigation.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an abstract-only summary; detailed recommendation text, supporting evidence tables, and specific protocols are not accessible. The guideline reflects French expert consensus and may not fully align with other national guidelines or healthcare systems with different drug availability or institutional structures. The predominance of expert opinion (48 of 70 recommendations) indicates substantial uncertainty in evidence for many clinical questions.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.accpm.2026.101867" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a6">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">A&amp;A</span><span class="badge b-if">IF 3.8</span></div>
+      <div class="title">Elevating Anesthesia Choices for Cesarean Delivery: A Roadmap for Patient-Centered Research and Solutions With Key Findings and Recommendations From the ELEVATE Project</div>
+      <div class="meta">Grace Lim; Karen Crowley; Sharee Livingston; Emily McGahey et al. · A&amp;A · 2026-07-21</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>The ELEVATE Project identified key barriers and facilitators to shared decision-making in anesthesia for cesarean delivery, highlighting that patient-centered approaches and improved anesthetic options can enhance maternal autonomy and satisfaction without compromising safety.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a6')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The ELEVATE Project addressed how anesthesiologists can better engage pregnant patients in anesthetic choices for cesarean delivery and what evidence-based solutions can improve this process. The work involved identification of factors that either hinder or support informed consent and patient preference incorporation in perioperative anesthetic planning for cesarean delivery.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>The ELEVATE Project is reported as a structured roadmap and consensus effort synthesizing research findings and expert recommendations on anesthesia for cesarean delivery. The study examined barriers to patient-centered anesthesia decision-making and proposed evidence-based and practical solutions to elevate the quality and inclusivity of anesthetic choice. The exact study design, patient cohort size, setting details, and primary statistical outcomes are not provided in the available material.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Specific numerical primary outcome data are not reported in the accessible source text. The project identified multiple barriers to shared decision-making—including time constraints, knowledge gaps among providers, limited patient education, and inequitable access to anesthetic modalities—alongside facilitators such as structured decision aids, improved preoperative counseling, and integration of patient preferences into practice protocols. The findings underscore that both neuraxial and general anesthetic options carry distinct maternal and neonatal safety profiles, and that patient autonomy improves satisfaction regardless of final modality chosen.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>At the bedside, this means investing time in preoperative discussions that explore each patient&#x27;s values, fears, and preferences before cesarean delivery. Offer realistic choices when safe (neuraxial versus general anesthesia), use plain language and decision aids to improve understanding, and document patient preference clearly. For patients with contraindications to one modality, clearly explain why, but for those with options, framing anesthesia as a shared decision—not a clinician directive—enhances perceived control and satisfaction.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Cesarean delivery is common and high-stakes; maternal experience with anesthesia shapes postoperative recovery, bonding, and satisfaction. Adopting patient-centered approaches aligns with modern obstetric practice values and may reduce anxiety-driven requests for changes intraoperatively.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Specific numerical outcomes, study population characteristics, and implementation feasibility across diverse hospital systems are not detailed in the available source material. Generalizability to resource-limited settings and applicability to urgent or emergency cesarean delivery—where time for shared decision-making is constrained—remain unclear.</p></div>
+      <div class="links"><a href="https://doi.org/10.1213/ane.0000000000008018" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a7">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">RAPM</span><span class="badge b-if">IF 3.5</span></div>
+      <div class="title">Anatomic basis of the PENG block: dissection, cryo-cross-sections, and histology challenge a pericapsular target</div>
+      <div class="meta">Philippe Gautier; Xavier Sala-Blanch; Miguel Angel Reina; Admir Hadzic et al. · RAPM · 2026-07-24</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>PENG block injectate spreads predominantly within the iliopsoas muscle rather than to the hip capsule as originally theorized; small intramuscular nerve branches suggest blockade works via intramuscular neural involvement, not the proposed pericapsular mechanism.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a7')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Investigators performed ultrasound-guided PENG blocks in 10 cryopreserved cadavers using standard technique (22-gauge needle, in-plane approach to the iliopubic ramus), injecting 20 mL of solution labeled with methylene blue or heparinized erythrocytes. They then dissected, sectioned, and examined tissue histologically to map exactly where the local anesthetic spread.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Cadaveric anatomical study with 10 specimens. A single PENG injection per cadaver was performed, followed by gross dissection, cryo-cross-sectional imaging, and microscopic analysis to characterize injectate distribution and nerve involvement. No in-vivo patient cohort or clinical outcomes were assessed.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Gross dissection showed methylene blue staining near the femoral nerve and its branches, but the obturator nerve was not stained. Cryo-sectioning and histology revealed the injectate was predominantly located in subepimysial and intramuscular planes within the iliopsoas muscle compartment, without consistent involvement of the hip joint capsule. Microscopy identified small nerve branches embedded within adipose-containing connective tissue planes within the muscle, suggesting intramuscular nerves are exposed to local anesthetic.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>The PENG block does not work via the pericapsular mechanism originally proposed. Instead, blockade appears to occur through intramuscular anesthesia of small nerve branches within the iliopsoas muscle itself. This finding suggests the block&#x27;s efficacy for hip analgesia may rely on spread and neural uptake within the muscle compartment rather than fascial plane mechanics. The potential involvement of femoral nerve branches raises questions about whether femoral nerve contributions to analgesia are consistent or incidental. Clinicians should recognize that block success likely depends on adequate intramuscular spread, not necessarily on achieving a specific periarticular layer.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>The PENG block&#x27;s anatomical mechanism had been incompletely understood; this cadaveric evidence clarifies that anatomists and clinicians have been targeting the wrong plane conceptually, even though the block can work clinically. Understanding the true mechanism helps explain variable outcomes and informs future technique refinement.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a cadaveric study in only 10 specimens with no assessment of clinical anesthetic quality, duration, or patient outcomes. Findings reflect static anatomy and do not capture how injectate dynamics, muscle tone, or patient positioning in vivo might alter spread. Results are descriptive and qualitative; no statistical comparisons or quantitative volumetric analysis was reported. The work cannot directly predict clinical efficacy or complications in living patients.</p></div>
+      <div class="links"><a href="https://doi.org/10.1136/rapm-2026-107853" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a8">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">CJA</span><span class="badge b-if">IF 3.3</span></div>
+      <div class="title">Choosing Wisely Canada climate-conscious recommendations for critical care medicine</div>
+      <div class="meta">Marko Balan; Thomas F. Bodley; Amanallah Montazeripouragha; Iman Baharmand et al. · CJA · 2026-07-21</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>A Canadian multidisciplinary working group developed seven evidence-based, climate-conscious recommendations for critical care that balance environmental sustainability with patient safety, addressing waste reduction across gloves, ventilator circuits, supplies, medications, and equipment reuse.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a8')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>A national multidisciplinary working group convened to develop climate-conscious recommendations for critical care medicine under the Choosing Wisely Canada framework. The group sought to identify safe strategies to reduce the environmental footprint of ICU practice without compromising patient care or outcomes.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>This was a consensus development process involving a 23-member multidisciplinary working group (clinicians, educators, and trainees) that met between November 2023 and May 2024. The group used a three-stage structured anonymous voting process informed by content expertise and literature review to generate and refine recommendations. No control group, randomized design, or comparative outcome measurement was employed; this was a guideline development exercise rather than a comparative effectiveness trial.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Starting from a preliminary list of 28 recommendations generated during two early 2024 meetings, the working group refined and finalized seven recommendations in May 2024. These seven recommendations are: (1) avoid unnecessary disposable glove use, (2) change ventilator tubing and circuits only when visibly soiled, (3) avoid stocking surplus supplies in patient rooms, (4) prefer oral/enteral medications over intravenous preparations when clinically appropriate, (5) use reusable equipment instead of single-use options when available, (6) remove isolation precautions when deemed safe by infection control, and (7) de-prescribe unnecessary medications when patients transfer out of the ICU. No comparative efficacy data, safety event rates, or quantified environmental impact metrics are reported in this abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>These recommendations are practical touchpoints for daily ICU decision-making: audit your glove use, consolidate routine ventilator circuit changes to scheduled intervals rather than prophylactic changes, minimize bedside supply hoarding, default to enteral routes for medications when feasible, preferentially select reusable equipment, apply infection control guidelines stringently without over-isolation, and actively review and discontinue redundant medications at transfer. Each recommendation is framed as safe practice informed by evidence, not as novel restrictions. Implementation requires local protocol alignment and team buy-in but does not require new technology or significant workflow redesign.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Critical care generates substantial environmental waste and carbon emissions; clinician guidance on where waste reduction is both safe and impactful empowers frontline teams to act on climate responsibility without sacrificing evidence-based care. These recommendations operationalize the link between sustainability and stewardship.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This abstract reports a consensus process, not a comparative trial; no patient outcomes, safety events, or quantified environmental savings are presented. Recommendations derive from expert opinion and literature review but lack outcome validation in the critical care setting. Generalizability to non-Canadian healthcare systems with different supply chains, infection control standards, and medication formularies is not addressed.</p></div>
+      <div class="links"><a href="https://doi.org/10.1007/s12630-026-03148-w" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a9">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">IJOA</span><span class="badge b-if">IF 2.3</span></div>
+      <div class="title">Anaesthetic management of obstetric patients with Chiari 1 malformation with or without syringomyelia: a multidisciplinary consensus statement from the Obstetric Anaesthetists’ Association (OAA)</div>
+      <div class="meta">Yavor Metodiev; Andrew Brodbelt; Natasha Kennedy; Helen Johnston et al. · IJOA · 2026-08-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>An OAA expert consensus identified 8 recommendations and 10 statements (low-to-moderate certainty) for peripartum anaesthetic care of obstetric patients with stable Chiari 1 malformation ± syringomyelia, based on critical review of only 49 relevant articles from 1187 screened.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a9')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>A multidisciplinary expert panel convened by the Obstetric Anaesthetists&#x27; Association conducted a structured narrative review to establish consensus on anaesthetic management of pregnant and labouring patients with Chiari 1 malformation with or without syringomyelia. The group aimed to clarify the safety of neuraxial procedures and standardize care, which had been variable across institutions and based largely on institutional perception of risk rather than robust evidence.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Multidisciplinary expert consensus statement using structured narrative review methodology. Literature search identified 1187 articles; 49 were deemed relevant and included. Recommendations and statements were graded using US Preventive Services Task Force methodology. Scope included antenatal care, mode of delivery, labour analgesia, caesarean anaesthesia, and neuraxial complication management. Not reported: specific patient numbers, prospective or retrospective cohort design, or formal statistical comparisons.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The expert group produced 8 recommendations and 10 statements, all assigned low or moderate level of certainty. The panel found almost no published evidence on peripartum anaesthetic management of obstetric patients experiencing significant or rare symptoms of Chiari malformation. Consequently, recommendations and statements were derived only for patients on the less severe symptom spectrum. The abstract does not report event rates, complication frequencies, or comparative safety data.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For pregnant patients with stable or asymptomatic Chiari 1 malformation (with or without syringomyelia), most can be managed within routine obstetric anaesthetic protocols—including neuraxial techniques—provided careful assessment and follow-up are performed. However, the panel explicitly did not provide evidence-based guidance for patients with significant or rare symptoms; such cases require individualized multidisciplinary discussion. Clinicians managing these patients should reference the full consensus document for the specific 8 recommendations and 10 statements.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Labour ward anaesthetists will encounter these patients. Previous management variation and lack of robust guidance created unnecessary uncertainty and inconsistency. This consensus provides a structured, evidence-informed framework—albeit with modest certainty—to reduce institutional variation and support shared decision-making around neuraxial analgesia and anaesthesia in this population.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Evidence quality is low-to-moderate; only 49 of 1187 screened articles were relevant, reflecting a sparse literature. Recommendations apply only to patients with stable or no symptoms; patients with significant or rare manifestations of Chiari malformation fall outside the scope and require case-by-case evaluation. The abstract alone does not provide the specific recommendations or statements needed for immediate clinical application.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.ijoa.2026.105189" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="foot">
+    Anesthesia Journal Digest · summaries generated by AI (Claude) from the article
+    source text.<br><a href="index.html">← All Deep Dive editions</a>
+  </div>
+</div>
+<script>
+  function toggleCard(id){
+    var c = document.getElementById(id);
+    var open = c.classList.toggle('open');
+    c.querySelector('.lab-text').textContent = open ? 'Hide summary' : 'Read full summary';
+  }
+</script>
+</body>
+</html>
