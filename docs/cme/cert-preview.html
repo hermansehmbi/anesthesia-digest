@@ -31,7 +31,7 @@
     <button type="button" id="previewBtn">Generate Sample Certificate</button>
     <div class="meta" id="meta"></div>
     <p class="note">This is a design preview only. Real certificates are issued from the
-       weekly quiz after you submit your answers.</p>
+       monthly quiz after you submit your answers.</p>
   </main>
 <script>
 
@@ -110,7 +110,7 @@ function generateCertificate(opts){
   var dateStr = now.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
   var timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
   var stamp = dateStr + ' at ' + timeStr;
-  var weekOf = (opts.weekOf || dateStr);   // the literature week this self-assessment covers
+  var periodOf = (opts.periodOf || dateStr);   // the literature period this self-assessment covers
 
   var doc = new JsPDF({orientation:'landscape', unit:'pt', format:'letter'});
   var W = doc.internal.pageSize.getWidth();
@@ -147,7 +147,7 @@ function generateCertificate(opts){
   doc.line(W / 2 - nameW / 2, 236, W / 2 + nameW / 2, 236);
 
   doc.setFont('times', 'normal'); doc.setFontSize(13); doc.setTextColor(ink[0], ink[1], ink[2]);
-  doc.text('completed a self-assessment based on the week of ' + weekOf, W / 2, 266, {align:'center'});
+  doc.text('completed a self-assessment based on the ' + periodOf, W / 2, 266, {align:'center'});
   doc.text('anesthesia literature (' + total + ' questions), with a score of', W / 2, 284, {align:'center'});
 
   doc.setFont('times', 'bold'); doc.setFontSize(20); doc.setTextColor(30, 110, 70);
@@ -187,7 +187,7 @@ function generateCertificate(opts){
       score: 8,
       total: 10,
       completedAt: new Date(),
-      weekOf: "June 02, 2025"
+      periodOf: "June 2025"
     });
     if (info){
       document.getElementById("meta").textContent =

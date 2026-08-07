@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Monthly Review & Self-Assessment (August 07, 2026)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root { --navy:#1a5276; --blue:#2e86c1; --green:#1e8449; --red:#c0392b;
+          --bg:#f4f6f9; --card:#ffffff; --line:#e3e8ee; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         background:var(--bg); color:#2c3e50; font-size:16px; line-height:1.6; }
+  header { background:linear-gradient(135deg,var(--navy),var(--blue)); color:#fff;
+           padding:28px 20px; text-align:center; }
+  header h1 { margin:0; font-size:25px; font-family:Georgia,serif; }
+  header p { margin:8px 0 0; font-size:15px; opacity:.92; }
+  main { max-width:780px; margin:0 auto; padding:18px 16px 70px; }
+  .intro { background:#eef5fb; border:1px solid #d6e6f5; border-radius:10px;
+           padding:16px 18px; font-size:15px; color:#34516b; margin-bottom:20px; }
+  .question { background:var(--card); border:1px solid var(--line); border-radius:12px;
+             padding:20px 20px 18px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .qnum { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+          color:var(--blue); }
+  .qnum .of { color:#9bb1c4; font-weight:600; }
+  .qtext { font-size:18px; font-weight:600; margin:8px 0 16px; line-height:1.5; }
+  .option { display:flex; align-items:flex-start; gap:12px; padding:13px 14px;
+            border:1px solid var(--line); border-radius:9px; margin:9px 0; cursor:pointer;
+            transition:background .12s,border-color .12s; }
+  .option:hover { background:#f7fafd; }
+  .option input { margin-top:4px; flex:none; width:18px; height:18px; }
+  .opt-letter { font-weight:700; color:var(--navy); flex:none; font-size:16px; }
+  .opt-text { font-size:16px; }
+  .option.correct { border-color:var(--green); background:#eafaf1; }
+  .option.incorrect { border-color:var(--red); background:#fdedec; }
+  .result { margin-top:14px; padding:14px 16px; border-radius:9px; font-size:15.5px;
+            line-height:1.65; }
+  .result.right { background:#eafaf1; border:1px solid #abe2c1; }
+  .result.wrong { background:#fdedec; border:1px solid #f3b7b1; }
+  .result .verdict { font-weight:700; display:block; margin-bottom:6px; font-size:16px; }
+  .result .src { display:block; margin-top:10px; font-size:13.5px; color:#5b6b7a; }
+  .result .src a { color:var(--blue); }
+  .actions { position:sticky; bottom:0; background:linear-gradient(180deg,rgba(244,246,249,0),var(--bg) 32%);
+             padding:18px 0 10px; text-align:center; }
+  button { font:inherit; border:none; border-radius:26px; padding:15px 30px; font-weight:700;
+           font-size:16px; cursor:pointer; }
+  .btn-submit { background:var(--blue); color:#fff; }
+  .btn-submit:disabled { background:#9bb9d1; cursor:default; }
+  .btn-cert { background:var(--green); color:#fff; margin-left:8px; }
+  .scorebar { display:none; background:var(--navy); color:#fff; border-radius:12px;
+              padding:18px 20px; text-align:center; margin-bottom:20px; }
+  .scorebar .pct { font-size:34px; font-weight:800; }
+  .scorebar .detail { font-size:15px; opacity:.92; margin-top:2px; }
+  .namebox { display:none; margin-top:16px; }
+  .namebox label { display:block; font-size:14px; opacity:.92; margin-bottom:7px; }
+  .namebox input { font:inherit; font-size:16px; padding:12px 14px; border-radius:8px;
+                   border:1px solid var(--line); width:340px; max-width:86%; color:#2c3e50; }
+  .certinfo { display:none; margin-top:12px; font-size:13px; opacity:.92; font-family:monospace; }
+  .warn { color:var(--red); font-size:15px; margin-top:12px; display:none; }
+  footer { text-align:center; font-size:12.5px; color:#9bb1c4; padding:26px 16px 44px; }
+  footer a { color:#9bb1c4; }
+  @media (max-width:520px) {
+    .qtext { font-size:17px; }
+    .btn-cert { margin:10px 0 0; }
+    .actions button { width:100%; }
+    .namebox input { width:100%; max-width:100%; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>&#127891; Anesthesia Digest — Monthly Review &amp; Self-Assessment</h1>
+    <p>August 07, 2026 · 9 single-best-answer questions</p>
+  </header>
+  <main>
+    <div class="scorebar" id="scorebar">
+      <div class="pct" id="scorePct">0%</div>
+      <div class="detail" id="scoreDetail"></div>
+      <div class="namebox" id="namebox">
+        <label for="participant">Enter your full name &amp; credentials for the certificate</label>
+        <input type="text" id="participant" placeholder="e.g. Dr. Jane Smith, MD, FRCPC" autocomplete="name">
+      </div>
+      <div class="certinfo" id="certinfo"></div>
+    </div>
+
+    <div class="intro">
+      Answer all the questions, then press <strong>Submit Test</strong> to see your score and the
+      explanations. This is a self-assessment tool to support your own learning. Time spent reading
+      and reflecting on the literature may be eligible for self-reporting under
+      <strong>RCPSC MOC Section&nbsp;2 (Self-Learning)</strong> — confirm your own eligibility.
+    </div>
+
+    <form id="quizForm">
+    <section class="question" id="card0" data-index="0">
+      <div class="qnum">Question 1 <span class="of">of 9</span></div>
+      <div class="qtext">A 68-year-old man with COPD and obesity undergoes a 4-hour abdominal resection under general anesthesia with endotracheal intubation. Intraoperatively, you use lung-protective ventilation and carefully manage fluids. At the end of surgery, he meets standard extubation criteria by clinical assessment alone. Which additional step best reduces his risk of unplanned postoperative reintubation?</div>
+      <div class="options">
+        <label class="option" for="q0A">
+          <input type="radio" id="q0A" name="q0" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Empirically administer noninvasive ventilation for 24 hours postoperatively regardless of respiratory status</span>
+        </label>
+        <label class="option" for="q0B">
+          <input type="radio" id="q0B" name="q0" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Delay extubation by 12 hours to allow additional time for spontaneous recovery</span>
+        </label>
+        <label class="option" for="q0C">
+          <input type="radio" id="q0C" name="q0" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Perform an immediate arterial blood gas; if pH &gt; 7.35, proceed with extubation</span>
+        </label>
+        <label class="option" for="q0D">
+          <input type="radio" id="q0D" name="q0" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Apply formal objective extubation readiness criteria (rapid shallow breathing index, negative inspiratory force, cough strength) before extubation rather than relying on clinical judgment alone</span>
+        </label>
+      </div>
+      <div class="result" id="result0" hidden></div>
+    </section>
+    <section class="question" id="card1" data-index="1">
+      <div class="qnum">Question 2 <span class="of">of 9</span></div>
+      <div class="qtext">You are weaning a 58-year-old patient with cardiogenic shock from VA-ECMO after meeting standard weaning criteria. A colleague suggests adding a 24-hour infusion of levosimendan to improve the likelihood of successful weaning. Based on recent evidence, what is your best response?</div>
+      <div class="options">
+        <label class="option" for="q1A">
+          <input type="radio" id="q1A" name="q1" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Levosimendan is indicated; it improves VA-ECMO weaning success and has an excellent safety profile</span>
+        </label>
+        <label class="option" for="q1B">
+          <input type="radio" id="q1B" name="q1" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Do not use levosimendan; the WEANILEVO trial found no benefit in weaning success and it was associated with significantly more acute kidney injury and longer ICU stays</span>
+        </label>
+        <label class="option" for="q1C">
+          <input type="radio" id="q1C" name="q1" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Levosimendan can be used if renal function is preserved; kidney injury is the only serious adverse effect</span>
+        </label>
+        <label class="option" for="q1D">
+          <input type="radio" id="q1D" name="q1" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Levosimendan may help; although weaning success was similar, it showed lower mortality at 30 days in the WEANILEVO trial</span>
+        </label>
+      </div>
+      <div class="result" id="result1" hidden></div>
+    </section>
+    <section class="question" id="card2" data-index="2">
+      <div class="qnum">Question 3 <span class="of">of 9</span></div>
+      <div class="qtext">You are counseling a 72-year-old patient with multiple comorbidities scheduled for elective major colonic surgery about his risk of postoperative surgical site infection. He asks whether you can give him a precise infection risk estimate using the American College of Surgeons Surgical Risk Calculator. What is the most appropriate response?</div>
+      <div class="options">
+        <label class="option" for="q2A">
+          <input type="radio" id="q2A" name="q2" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">The calculator works well for SSI prediction but is unreliable for other infections; use it only for SSI risk</span>
+        </label>
+        <label class="option" for="q2B">
+          <input type="radio" id="q2B" name="q2" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">The calculator provides highly accurate individual risk prediction with c-statistics consistently &gt;0.80</span>
+        </label>
+        <label class="option" for="q2C">
+          <input type="radio" id="q2C" name="q2" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">The calculator is more accurate than clinical judgment and should always override bedside assessment</span>
+        </label>
+        <label class="option" for="q2D">
+          <input type="radio" id="q2D" name="q2" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">The calculator has modest and highly variable discriminative ability (median c-statistic 0.61 for SSI); it cannot reliably stratify individual patients into precise risk categories and should not be used as a standalone tool to guide prophylaxis decisions</span>
+        </label>
+      </div>
+      <div class="result" id="result2" hidden></div>
+    </section>
+    <section class="question" id="card3" data-index="3">
+      <div class="qnum">Question 4 <span class="of">of 9</span></div>
+      <div class="qtext">You are anesthetizing an 78-year-old cognitively intact patient for a 3-hour elective hip arthroplasty with sevoflurane. A colleague expresses concern about postoperative delirium and asks whether minimizing sevoflurane exposure might prevent it based on cholinesterase activity and brain changes. What does current evidence suggest?</div>
+      <div class="options">
+        <label class="option" for="q3A">
+          <input type="radio" id="q3A" name="q3" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Sevoflurane causes nucleus basalis atrophy, which directly causes postoperative delirium in elderly patients</span>
+        </label>
+        <label class="option" for="q3B">
+          <input type="radio" id="q3B" name="q3" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">There is no association between sevoflurane exposure and brain structural changes</span>
+        </label>
+        <label class="option" for="q3C">
+          <input type="radio" id="q3C" name="q3" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Lower postoperative butyryl-cholinesterase activity was associated with nucleus basalis atrophy, but this atrophy did not correlate with actual delirium or cognitive dysfunction in the BioCog cohort; caution about prolonged sevoflurane is warranted but delirium prevention cannot yet be claimed</span>
+        </label>
+        <label class="option" for="q3D">
+          <input type="radio" id="q3D" name="q3" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Prolonged sevoflurane exposure is strongly associated with postoperative delirium; shorter operative times should be prioritized</span>
+        </label>
+      </div>
+      <div class="result" id="result3" hidden></div>
+    </section>
+    <section class="question" id="card4" data-index="4">
+      <div class="qnum">Question 5 <span class="of">of 9</span></div>
+      <div class="qtext">You are managing a 45-year-old patient who develops acute anaphylaxis 10 minutes after propofol induction during elective surgery. Immediate epinephrine is given and the reaction is controlled. After stabilization, which management approach is most strongly supported by recent French expert consensus guidelines for perioperative immediate hypersensitivity reactions?</div>
+      <div class="options">
+        <label class="option" for="q4A">
+          <input type="radio" id="q4A" name="q4" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Manage based on structured expert consensus guidance; note that only 6 of 70 recommendations achieved high GRADE evidence, so most guidance relies on expert consensus and should be adapted to your local protocols and the individual patient</span>
+        </label>
+        <label class="option" for="q4B">
+          <input type="radio" id="q4B" name="q4" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Defer allergy testing and rechallenge until 6 weeks postoperatively in all cases</span>
+        </label>
+        <label class="option" for="q4C">
+          <input type="radio" id="q4C" name="q4" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Avoid any further use of intravenous anesthetics for this patient in the future</span>
+        </label>
+        <label class="option" for="q4D">
+          <input type="radio" id="q4D" name="q4" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Administer a test dose of propofol during the same anesthetic to confirm tolerance, as guidelines now recommend</span>
+        </label>
+      </div>
+      <div class="result" id="result4" hidden></div>
+    </section>
+    <section class="question" id="card5" data-index="5">
+      <div class="qnum">Question 6 <span class="of">of 9</span></div>
+      <div class="qtext">You are preparing for cesarean delivery of a 32-year-old primigravida with no medical contraindications. She expresses anxiety about spinal anesthesia and asks about general anesthesia instead. How should you best apply findings from the ELEVATE Project to this consultation?</div>
+      <div class="options">
+        <label class="option" for="q5A">
+          <input type="radio" id="q5A" name="q5" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Defer to her stated preference without further discussion, as patient autonomy is the sole priority</span>
+        </label>
+        <label class="option" for="q5B">
+          <input type="radio" id="q5B" name="q5" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Engage in shared decision-making: explore her values and fears, explain that both neuraxial and general anesthesia carry distinct maternal and neonatal safety profiles, offer realistic choices when safe, use plain language, and document her preference clearly</span>
+        </label>
+        <label class="option" for="q5C">
+          <input type="radio" id="q5C" name="q5" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Provide a standardized script outlining only the risks of her preferred modality</span>
+        </label>
+        <label class="option" for="q5D">
+          <input type="radio" id="q5D" name="q5" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Inform her that neuraxial anesthesia is always superior and recommend it regardless of her preference</span>
+        </label>
+      </div>
+      <div class="result" id="result5" hidden></div>
+    </section>
+    <section class="question" id="card6" data-index="6">
+      <div class="qnum">Question 7 <span class="of">of 9</span></div>
+      <div class="qtext">During an anatomical review of the PENG block, you learn that the injectate predominantly spreads within the iliopsoas muscle rather than reaching the hip joint capsule. A resident asks what this finding means for clinical technique. What is the most accurate interpretation?</div>
+      <div class="options">
+        <label class="option" for="q6A">
+          <input type="radio" id="q6A" name="q6" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">The PENG block works via the pericapsular mechanism originally described, so technique is unchanged</span>
+        </label>
+        <label class="option" for="q6B">
+          <input type="radio" id="q6B" name="q6" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">The block works through intramuscular anesthesia of small nerve branches within the iliopsoas muscle, not the pericapsular mechanism; block success likely depends on adequate intramuscular spread rather than achieving a specific periarticular layer</span>
+        </label>
+        <label class="option" for="q6C">
+          <input type="radio" id="q6C" name="q6" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">The block does not work and should be abandoned in clinical practice</span>
+        </label>
+        <label class="option" for="q6D">
+          <input type="radio" id="q6D" name="q6" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">The block requires modification to inject directly into the hip capsule for efficacy</span>
+        </label>
+      </div>
+      <div class="result" id="result6" hidden></div>
+    </section>
+    <section class="question" id="card7" data-index="7">
+      <div class="qnum">Question 8 <span class="of">of 9</span></div>
+      <div class="qtext">You are reviewing ICU ventilator practices with your critical care team. A junior colleague routinely changes ventilator circuits every 24 hours prophylactically, and another frequently keeps excess disposable supplies stocked at each patient&#x27;s bedside. Based on the Choosing Wisely Canada climate-conscious recommendations for critical care, which practice change would be most appropriate?</div>
+      <div class="options">
+        <label class="option" for="q7A">
+          <input type="radio" id="q7A" name="q7" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Maintain both current practices; they ensure patient safety and infection control</span>
+        </label>
+        <label class="option" for="q7B">
+          <input type="radio" id="q7B" name="q7" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">Eliminate all supply stocking to reduce waste regardless of clinical impact</span>
+        </label>
+        <label class="option" for="q7C">
+          <input type="radio" id="q7C" name="q7" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Change ventilator tubing and circuits only when visibly soiled, and avoid stocking surplus supplies in patient rooms unless clinically necessary</span>
+        </label>
+        <label class="option" for="q7D">
+          <input type="radio" id="q7D" name="q7" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Use only single-use equipment and disposables to minimize contamination risk</span>
+        </label>
+      </div>
+      <div class="result" id="result7" hidden></div>
+    </section>
+    <section class="question" id="card8" data-index="8">
+      <div class="qnum">Question 9 <span class="of">of 9</span></div>
+      <div class="qtext">You are assessing a 36-year-old pregnant patient at 28 weeks gestation with stable, asymptomatic Chiari 1 malformation without significant neurological symptoms. She is planning vaginal labor and asks whether neuraxial analgesia is safe. Based on the OAA consensus statement, what guidance best applies?</div>
+      <div class="options">
+        <label class="option" for="q8A">
+          <input type="radio" id="q8A" name="q8" value="A">
+          <span class="opt-letter">A</span>
+          <span class="opt-text">Neuraxial techniques are absolutely contraindicated in all patients with Chiari malformation</span>
+        </label>
+        <label class="option" for="q8B">
+          <input type="radio" id="q8B" name="q8" value="B">
+          <span class="opt-letter">B</span>
+          <span class="opt-text">No evidence exists; decision-making must rely entirely on individual institutional practice without any expert guidance</span>
+        </label>
+        <label class="option" for="q8C">
+          <input type="radio" id="q8C" name="q8" value="C">
+          <span class="opt-letter">C</span>
+          <span class="opt-text">Neuraxial techniques are safe; she can proceed with routine obstetric anesthetic protocols including neuraxial analgesia, provided careful assessment and follow-up are performed</span>
+        </label>
+        <label class="option" for="q8D">
+          <input type="radio" id="q8D" name="q8" value="D">
+          <span class="opt-letter">D</span>
+          <span class="opt-text">Neuraxial anesthesia should be used only if general anesthesia is contraindicated</span>
+        </label>
+      </div>
+      <div class="result" id="result8" hidden></div>
+    </section>
+    </form>
+
+    <p class="warn" id="warn">Please answer all questions before submitting.</p>
+
+    <div class="actions">
+      <button type="button" class="btn-submit" id="submitBtn">Submit Test</button>
+      <button type="button" class="btn-cert" id="certBtn" style="display:none;">Download Certificate</button>
+    </div>
+  </main>
+  <footer>
+    Anesthesia Journal Digest · AI-generated self-assessment · Not affiliated with any journal.<br>
+    <a href="index.html">&#8592; All monthly quizzes</a>
+  </footer>
+
+<script>
+
+function ad2(n){ return ('0' + n).slice(-2); }
+
+// FNV-1a 32-bit hash -> short uppercase base36 code (deterministic & auditable).
+function adHash(str){
+  var h = 0x811c9dc5 >>> 0;
+  for (var i = 0; i < str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return ('0000000' + h.toString(36).toUpperCase()).slice(-7);
+}
+
+function makeCertId(d){
+  var rnd = Math.floor(Math.random() * 0x10000).toString(16).toUpperCase();
+  rnd = ('000' + rnd).slice(-4);
+  return 'AD-' + d.getFullYear() + ad2(d.getMonth() + 1) + ad2(d.getDate()) + '-' + rnd;
+}
+
+function adVerCode(name, ymd, score, total, certId){
+  return adHash(name + '|' + ymd + '|' + score + '/' + total + '|' + certId);
+}
+
+function drawCorners(doc, x1, y1, x2, y2, color){
+  doc.setDrawColor(color[0], color[1], color[2]);
+  doc.setLineWidth(1);
+  var s = 26, o = 44;
+  var pts = [[x1+o,y1+o,1,1],[x2-o,y1+o,-1,1],[x1+o,y2-o,1,-1],[x2-o,y2-o,-1,-1]];
+  for (var i = 0; i < pts.length; i++){
+    var px = pts[i][0], py = pts[i][1], dx = pts[i][2], dy = pts[i][3];
+    doc.line(px, py, px + dx * s, py);
+    doc.line(px, py, px, py + dy * s);
+    doc.circle(px, py, 2.2, 'F');
+    doc.circle(px + dx * s, py, 1.4, 'F');
+    doc.circle(px, py + dy * s, 1.4, 'F');
+  }
+}
+
+function drawSeal(doc, cx, cy, gold, wax){
+  // Rosette of petals, then a stamped disc with initials.
+  doc.setFillColor(wax[0], wax[1], wax[2]);
+  var R = 30;
+  for (var a = 0; a < 360; a += 24){
+    var r = a * Math.PI / 180;
+    var x1 = cx + Math.cos(r) * R,            y1 = cy + Math.sin(r) * R;
+    var x2 = cx + Math.cos(r + 0.27) * (R*0.66), y2 = cy + Math.sin(r + 0.27) * (R*0.66);
+    var x3 = cx + Math.cos(r - 0.27) * (R*0.66), y3 = cy + Math.sin(r - 0.27) * (R*0.66);
+    doc.triangle(x1, y1, x2, y2, x3, y3, 'F');
+  }
+  doc.setFillColor(wax[0], wax[1], wax[2]);
+  doc.circle(cx, cy, R * 0.72, 'F');
+  doc.setDrawColor(gold[0], gold[1], gold[2]);
+  doc.setLineWidth(1.3); doc.circle(cx, cy, R * 0.72, 'S');
+  doc.setLineWidth(0.7); doc.circle(cx, cy, R * 0.55, 'S');
+  doc.setFont('times', 'bold'); doc.setFontSize(12); doc.setTextColor(255, 246, 236);
+  doc.text('AD', cx, cy - 1, {align:'center'});
+  doc.setFontSize(5); doc.text('SELF-ASSESSMENT', cx, cy + 9, {align:'center'});
+}
+
+// opts: {name, score, total, completedAt(Date), certId?, verCode?}
+// Returns {certId, verCode}. Builds and downloads the PDF.
+function generateCertificate(opts){
+  var ns = window.jspdf || {};
+  var JsPDF = ns.jsPDF;
+  if (!JsPDF){ alert('Certificate library failed to load. Check your internet connection and try again.'); return null; }
+
+  var name  = (opts.name || '').trim();
+  var score = opts.score, total = opts.total;
+  var now   = opts.completedAt || new Date();
+  var certId = opts.certId || makeCertId(now);
+  var ymd = now.getFullYear() + '-' + ad2(now.getMonth() + 1) + '-' + ad2(now.getDate());
+  var pct = Math.round(score / total * 100);
+  var ver = opts.verCode || adVerCode(name, ymd, score, total, certId);
+  var dateStr = now.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
+  var timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+  var stamp = dateStr + ' at ' + timeStr;
+  var periodOf = (opts.periodOf || dateStr);   // the literature period this self-assessment covers
+
+  var doc = new JsPDF({orientation:'landscape', unit:'pt', format:'letter'});
+  var W = doc.internal.pageSize.getWidth();
+  var H = doc.internal.pageSize.getHeight();
+  var navy = [26,82,118], gold = [176,141,87], ink = [44,62,80], wax = [140,32,32];
+
+  // Parchment background
+  doc.setFillColor(252, 250, 244); doc.rect(0, 0, W, H, 'F');
+
+  // Decorative double border
+  doc.setDrawColor(navy[0], navy[1], navy[2]); doc.setLineWidth(4);
+  doc.rect(24, 24, W - 48, H - 48);
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1.4);
+  doc.rect(34, 34, W - 68, H - 68);
+  drawCorners(doc, 24, 24, W - 24, H - 24, gold);
+
+  // Title + flourish
+  doc.setFont('times', 'bold'); doc.setFontSize(34); doc.setTextColor(navy[0], navy[1], navy[2]);
+  doc.text('Certificate of Completion', W / 2, 108, {align:'center'});
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(1);
+  doc.line(W / 2 - 160, 122, W / 2 + 160, 122);
+  doc.circle(W / 2 - 168, 122, 2, 'F'); doc.circle(W / 2 + 168, 122, 2, 'F');
+
+  doc.setFont('times', 'italic'); doc.setFontSize(16); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Self-Assessment Activity', W / 2, 148, {align:'center'});
+
+  doc.setFont('times', 'normal'); doc.setFontSize(13);
+  doc.text('This certifies that', W / 2, 192, {align:'center'});
+
+  doc.setFont('times', 'bold'); doc.setFontSize(26); doc.setTextColor(navy[0], navy[1], navy[2]);
+  doc.text(name || '—', W / 2, 226, {align:'center'});
+  var nameW = Math.min(460, Math.max(220, doc.getTextWidth(name || '—') + 70));
+  doc.setDrawColor(gold[0], gold[1], gold[2]); doc.setLineWidth(0.8);
+  doc.line(W / 2 - nameW / 2, 236, W / 2 + nameW / 2, 236);
+
+  doc.setFont('times', 'normal'); doc.setFontSize(13); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('completed a self-assessment based on the ' + periodOf, W / 2, 266, {align:'center'});
+  doc.text('anesthesia literature (' + total + ' questions), with a score of', W / 2, 284, {align:'center'});
+
+  doc.setFont('times', 'bold'); doc.setFontSize(20); doc.setTextColor(30, 110, 70);
+  doc.text(score + ' / ' + total + '    (' + pct + '%)', W / 2, 314, {align:'center'});
+
+  doc.setFont('times', 'normal'); doc.setFontSize(12); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Completed: ' + stamp, W / 2, 340, {align:'center'});
+
+  drawSeal(doc, W / 2, 384, gold, wax);
+
+  // Bottom block — everything sits clearly INSIDE the inner border (which is at
+  // H-34) with margin. Disclaimer is drawn line-by-line, then the ID row, so
+  // nothing overruns or hides behind the frame.
+  doc.setFont('times', 'italic'); doc.setFontSize(8.5); doc.setTextColor(110, 110, 110);
+  var disc = 'This is a self-assessment completion record. Time spent reading and reflecting on the literature may be eligible for self-reporting under RCPSC MOC Section 2 (Self-Learning); confirm your own eligibility.';
+  var lines = doc.splitTextToSize(disc, W - 160);
+  var lh = 11;                          // line spacing (pt)
+  var discLast = H - 74;                // baseline of the LAST disclaimer line
+  var discFirst = discLast - (lines.length - 1) * lh;
+  for (var li = 0; li < lines.length; li++){
+    doc.text(lines[li], W / 2, discFirst + li * lh, {align:'center'});
+  }
+
+  // Certificate ID (left) + verification code (right) on one row, above the frame.
+  doc.setFont('courier', 'normal'); doc.setFontSize(9.5); doc.setTextColor(ink[0], ink[1], ink[2]);
+  doc.text('Certificate ID:  ' + certId, 72, H - 50);
+  doc.text('Verification:  ' + ver, W - 72, H - 50, {align:'right'});
+
+  doc.save('Certificate_of_Completion_' + certId + '.pdf');
+  return {certId: certId, verCode: ver};
+}
+
+
+  var QUIZ = [{"correct": "D", "rationale": "The review emphasizes that objective extubation readiness criteria\u2014rather than clinical judgment alone\u2014help prevent reintubation in high-risk patients. This patient has multiple risk factors (age, COPD, obesity, prolonged surgery), making formal assessment tools essential. Empiric postoperative noninvasive ventilation is discussed as an option for borderline cases, not routine use. Simple time delays and single blood gas checks lack the specificity of validated readiness indices. Applying structured criteria is the evidence-based approach to reduce reintubation risk.", "source_article": "Unplanned postoperative reintubation: a narrative review of risk factors, predictive tools, and preventive strategies", "source_journal": "BJA", "source_url": "https://doi.org/10.1016/j.bja.2026.06.018"}, {"correct": "B", "rationale": "The WEANILEVO trial randomized 80 patients to levosimendan or placebo and found no difference in weaning failure (25% in both groups). However, levosimendan significantly increased acute kidney injury at day 30 (62.5% vs 38.5%, P=0.03) and prolonged ICU stay (12 vs 6 days median). While mortality showed numerically lower rates with levosimendan, this did not reach statistical significance. The risk-benefit profile does not support its use. Options A and C overstate benefit; option C incorrectly suggests selective use based on renal function.", "source_article": "Short- and Long-term Efficacy and Safety of Levosimendan in Veno-arterial Extracorporeal Membrane Oxygenation Weaning: The WEANILEVO Randomized Double-Blind Multicenter Trial", "source_journal": "Anesthesiology", "source_url": "https://doi.org/10.1097/aln.0000000000006143"}, {"correct": "D", "rationale": "The systematic review identified 267 postoperative infection prediction models; the ACS SRC\u2014the most frequently validated\u2014showed median c-statistics of 0.61 for SSI (range 0.43\u20130.85). A c-statistic near 0.6 is only marginally better than random chance. Wide performance variation across settings indicates inconsistent precision. The review explicitly states these models cannot reliably stratify individual patients and should not guide standalone clinical decisions like prophylaxis timing. Options B and C overstate the tool's reliability; option A contradicts the evidence showing similarly modest performance across infection types.", "source_article": "Predicting postoperative infections: prediction models and their evaluation", "source_journal": "EJA", "source_url": "https://doi.org/10.1097/eja.0000000000002470"}, {"correct": "C", "rationale": "The BioCog secondary analysis found that lower postoperative BuChE activity associated with smaller nucleus basalis volume (0.0141 mm\u00b3 per U/L), and prolonged sevoflurane exposure predicted both BuChE inhibition and NBM atrophy. Critically, however, neither BuChE nor NBM atrophy correlated with POD or POCD occurrence. The finding suggests caution about prolonged volatile exposure but does not establish causation of delirium. Options D and B overstate the link to clinical outcomes; option B ignores the anatomical associations the study did identify.", "source_article": "Associations between blood cholinesterase activity and postoperative basal forebrain cholinergic system atrophy: A secondary analysis of the BioCog cohort with exploration of potential mechanisms", "source_journal": "JCA", "source_url": "https://doi.org/10.1016/j.jclinane.2026.112282"}, {"correct": "A", "rationale": "The French guideline development process produced 70 recommendations: only 6 achieved high GRADE evidence, 16 moderate evidence, and 48 were expert opinion. This reflects the inherent difficulty of conducting controlled trials during anaphylaxis. Clinicians should use high-grade recommendations strongly but tailor moderate and expert recommendations to local protocols and individual factors. Options D and D represent extreme positions without evidence support. Option B ignores the consensus framework entirely. Recognizing the evidence hierarchy and applying guidelines flexibly is the correct approach.", "source_article": "Guidelines: Diagnosis and management of perioperative immediate hypersensitivity reactions 2025", "source_journal": "ACCPM", "source_url": "https://doi.org/10.1016/j.accpm.2026.101867"}, {"correct": "B", "rationale": "The ELEVATE Project identified barriers and facilitators to shared decision-making in cesarean anesthesia. Key findings emphasize that patient-centered approaches\u2014including structured preoperative discussion, exploration of values and fears, clear explanation of distinct safety profiles, and documentation of preference\u2014enhance satisfaction and autonomy without compromising safety. This patient has no medical contraindications, so both modalities are genuinely available. Option D overrides autonomy; option A skips essential counseling; option C provides incomplete information. Structured shared decision-making is the evidence-informed approach.", "source_article": "Elevating Anesthesia Choices for Cesarean Delivery: A Roadmap for Patient-Centered Research and Solutions With Key Findings and Recommendations From the ELEVATE Project", "source_journal": "A&A", "source_url": "https://doi.org/10.1213/ane.0000000000008018"}, {"correct": "B", "rationale": "The cadaveric dissection and histological study of 10 specimens showed methylene blue staining predominantly in subepimysial and intramuscular planes within the iliopsoas, not the hip capsule. Microscopy identified small nerve branches within adipose-connective tissue within the muscle itself. This clarifies that blockade occurs through intramuscular neural involvement, not the originally proposed pericapsular mechanism. The block remains effective; the mechanism explanation changes. Options A and B misinterpret the finding; option D suggests changing technique when the current approach produces the intended intramuscular spread.", "source_article": "Anatomic basis of the PENG block: dissection, cryo-cross-sections, and histology challenge a pericapsular target", "source_journal": "RAPM", "source_url": "https://doi.org/10.1136/rapm-2026-107853"}, {"correct": "C", "rationale": "The Choosing Wisely Canada working group developed seven evidence-based, climate-conscious recommendations balancing environmental sustainability with safety. Two directly address your scenario: (1) change ventilator tubing/circuits only when visibly soiled\u2014not prophylactically\u2014and (2) avoid stocking surplus supplies in patient rooms. These recommendations were refined through structured voting and reflect consensus that routine prophylactic changes and excessive bedside supply accumulation lack strong clinical justification. Options A, C, and D fail to apply the balanced, evidence-informed approach the guidelines advocate.", "source_article": "Choosing Wisely Canada climate-conscious recommendations for critical care medicine", "source_journal": "CJA", "source_url": "https://doi.org/10.1007/s12630-026-03148-w"}, {"correct": "C", "rationale": "The OAA multidisciplinary consensus review of 49 relevant articles (from 1187 screened) produced 8 recommendations and 10 statements graded as low-to-moderate certainty. For patients with stable or asymptomatic Chiari 1 malformation (with or without syringomyelia), the panel found that most can be managed within routine obstetric anesthetic protocols\u2014including neuraxial techniques\u2014with careful assessment and follow-up. The panel explicitly did not provide guidance for patients with significant or rare symptoms; those require individualized multidisciplinary discussion. Options A and C are overly restrictive; option B ignores the expert consensus available for stable cases.", "source_article": "Anaesthetic management of obstetric patients with Chiari 1 malformation with or without syringomyelia: a multidisciplinary consensus statement from the Obstetric Anaesthetists' Association (OAA)", "source_journal": "IJOA", "source_url": "https://doi.org/10.1016/j.ijoa.2026.105189"}];
+  var QUIZ_DATE = "August 07, 2026";
+  var QUIZ_MONTH = "August 2026";
+  var TOTAL = 9;
+  var graded = false;
+  var lastScore = 0;
+
+  function escapeHtml(s){
+    return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  document.getElementById("submitBtn").addEventListener("click", function(){
+    var unanswered = 0;
+    for (var i = 0; i < TOTAL; i++){
+      if (!document.querySelector('input[name="q' + i + '"]:checked')) unanswered++;
+    }
+    if (unanswered > 0 && !graded){
+      document.getElementById("warn").style.display = "block";
+      return;
+    }
+    document.getElementById("warn").style.display = "none";
+    grade();
+  });
+
+  function grade(){
+    var correct = 0;
+    for (var i = 0; i < TOTAL; i++){
+      var chosen = document.querySelector('input[name="q' + i + '"]:checked');
+      var ans = QUIZ[i].correct;
+      var picked = chosen ? chosen.value : null;
+      if (picked === ans) correct++;
+
+      var labels = document.querySelectorAll('#card' + i + ' .option');
+      labels.forEach(function(lab){
+        var val = lab.querySelector("input").value;
+        lab.querySelector("input").disabled = true;
+        if (val === ans) lab.classList.add("correct");
+        else if (chosen && val === picked) lab.classList.add("incorrect");
+      });
+
+      var res = document.getElementById("result" + i);
+      var right = picked === ans;
+      var srcHtml = "";
+      if (QUIZ[i].source_article){
+        var label = (QUIZ[i].source_journal ? QUIZ[i].source_journal + " — " : "") + QUIZ[i].source_article;
+        var url = QUIZ[i].source_url || "#";
+        srcHtml = '<span class="src">Source: <a href="' + url + '" target="_blank" rel="noopener">' +
+                  escapeHtml(label) + '</a></span>';
+      }
+      res.className = "result " + (right ? "right" : "wrong");
+      res.innerHTML = '<span class="verdict">' +
+        (right ? "&#10003; Correct" : "&#10007; Your answer: " + (picked || "—") +
+                 " · Correct answer: " + ans) + '</span>' +
+        escapeHtml(QUIZ[i].rationale) + srcHtml;
+      res.hidden = false;
+    }
+
+    lastScore = correct;
+    graded = true;
+    var pct = Math.round((correct / TOTAL) * 100);
+    document.getElementById("scorePct").textContent = pct + "%";
+    document.getElementById("scoreDetail").textContent = correct + " of " + TOTAL + " correct";
+    document.getElementById("scorebar").style.display = "block";
+    document.getElementById("namebox").style.display = "block";
+    document.getElementById("submitBtn").textContent = "Re-check Answers";
+    document.getElementById("certBtn").style.display = "inline-block";
+    document.getElementById("scorebar").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  document.getElementById("certBtn").addEventListener("click", function(){
+    if (!graded) return;
+    var name = (document.getElementById("participant").value || "").trim();
+    if (!name){
+      var inp = document.getElementById("participant");
+      inp.style.borderColor = "#ffd27f";
+      inp.focus();
+      alert("Please enter your full name and credentials before downloading the certificate.");
+      return;
+    }
+    var info = generateCertificate({name:name, score:lastScore, total:TOTAL, completedAt:new Date(), periodOf:QUIZ_MONTH});
+    if (info){
+      var box = document.getElementById("certinfo");
+      box.style.display = "block";
+      box.textContent = "Certificate ID " + info.certId + "  ·  Verification " + info.verCode;
+    }
+  });
+</script>
+</body>
+</html>
