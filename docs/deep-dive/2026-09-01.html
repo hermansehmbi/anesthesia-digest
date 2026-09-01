@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Deep Dive · Tuesday, September 01, 2026</title>
+<style>
+  :root{
+    --ink:#1a5276; --ink2:#2e86c1; --text:#2c3e50; --muted:#7b8794;
+    --line:#e3e8ee; --bg:#f5f6fa; --card:#ffffff;
+    --warn:#b9770e; --warnbg:#fff8ec; --warnline:#f0d9a8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text);line-height:1.55;}
+  .page{max-width:760px;margin:0 auto;padding:28px 18px 60px;}
+  .page-head{padding:6px 4px 18px;}
+  .page-head h1{font-size:22px;color:var(--ink);margin:0 0 4px;}
+  .page-head .sub{font-size:13px;color:var(--muted);margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;margin:18px 0;}
+  .hdr{padding:18px 20px 16px;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:9px;}
+  .badge{font-size:11px;font-weight:bold;border-radius:4px;padding:2px 8px;letter-spacing:.02em;}
+  .b-journal{background:var(--ink);color:#fff;}
+  .b-if{background:#eef3f8;color:var(--ink);}
+  .b-oa{background:#27ae60;color:#fff;}
+  .title{font-size:18px;font-weight:bold;color:var(--text);margin:2px 0 4px;line-height:1.35;}
+  .meta{font-size:12px;color:var(--muted);}
+  .bottomline{margin:14px 0 2px;padding:12px 14px;background:#eef6fb;
+              border-left:4px solid var(--ink2);border-radius:0 8px 8px 0;}
+  .bottomline .lab{font-size:11px;font-weight:bold;text-transform:uppercase;
+                   letter-spacing:.06em;color:var(--ink);}
+  .bottomline p{margin:4px 0 0;font-size:14px;color:#33444f;}
+  .toggle{display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+          background:var(--ink);color:#fff;border:none;cursor:pointer;
+          font-family:inherit;font-size:14px;font-weight:bold;
+          padding:10px 18px;border-radius:22px;}
+  .toggle .chev{transition:transform .2s ease;font-size:12px;}
+  .card.open .toggle .chev{transform:rotate(180deg);}
+  .body{display:none;border-top:1px solid var(--line);padding:6px 20px 20px;}
+  .card.open .body{display:block;}
+  .sec{padding:15px 0 4px;border-bottom:1px solid #f0f2f5;}
+  .sec:last-child{border-bottom:none;}
+  .sec h3{display:flex;align-items:center;gap:9px;margin:0 0 6px;
+          font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink);}
+  .sec h3 .ic{width:22px;height:22px;border-radius:6px;background:#eef3f8;
+              display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+  .sec p{margin:0;font-size:14px;color:#3a4750;}
+  .sec.caution{background:var(--warnbg);border:1px solid var(--warnline);
+               border-radius:10px;padding:14px 16px;margin-top:14px;}
+  .sec.caution h3{color:var(--warn);}
+  .sec.caution h3 .ic{background:#fbecca;}
+  .sec.caution p{color:#7a5a17;}
+  .links{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;}
+  .links a{font-size:13px;font-weight:bold;text-decoration:none;color:var(--ink2);
+           border:1px solid var(--line);border-radius:8px;padding:8px 14px;}
+  .src-note{margin-top:14px;font-size:11px;color:var(--muted);font-style:italic;}
+  .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:30px;line-height:1.5;}
+  .foot a{color:var(--ink2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>📖 Anesthesia Digest — Deep Dive</h1>
+    <p class="sub">Tuesday, September 01, 2026 · structured summaries of this week's 9 featured articles</p>
+  </div>
+  <div class="card open" id="a1">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">BJA</span><span class="badge b-if">IF 9.2</span></div>
+      <div class="title">Comparison of intrathecal morphine, lateral quadratus lumborum block, and their combination for analgesia and quality of recovery after Caesarean delivery: a randomised, double-blind, two-centre clinical trial</div>
+      <div class="meta">Vishal Uppal; Valerie Zaphiratos; Victoria M. Allen; Ana Sjaus et al. · BJA · 2026-09-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Noninferiority of QLB versus intrathecal morphine for quality of recovery at 24 hours was inconclusive, but QLB provided better early pain control and the combination offered superior analgesia at 24 hours.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a1')">
+        <span class="lab-text">Hide summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors compared three analgesic strategies for women undergoing Caesarean delivery under spinal anaesthesia: bilateral lateral quadratus lumborum block (QLB) with ropivacaine, intrathecal morphine (ITM) 100 micrograms, or ITM combined with QLB. The question was whether peripheral nerve block could match or replace neuraxial opioid for postoperative analgesia and recovery quality.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Randomised, double-blind, placebo-controlled trial at two centres. Fifty-eight women were analysed across three groups. Primary outcome was quality of recovery-40 (QoR-40) score at 24 hours. Secondary outcomes included pain scores at various timepoints, opioid consumption, and adverse effects. Not reported: exact group sizes, primary outcome P-value threshold after Bonferroni correction (abstract states it was adjusted but gives incomplete details).</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>For the primary outcome, noninferiority of QLB versus ITM was inconclusive: mean QoR-40 difference was -0.9 with a 90% confidence interval of -0.9 to 13.5 at 24 hours. For secondary outcomes, QLB reduced resting pain at 6 hours compared with ITM (mean difference 2.9 on a pain scale, 95% CI 1.3 to 4.5; P reported as significant). The combination ITM+QLB further reduced early resting pain, coughing pain, and worst pain at 24 hours versus ITM alone. Specific comparisons for ITM+QLB versus ITM were significant but exact differences not fully detailed in the abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Do not yet abandon intrathecal morphine in favour of QLB alone for routine Caesarean analgesia—the trial could not confirm noninferiority. However, if your patient has early postoperative pain despite ITM or requests peripheral analgesia, QLB appears effective for resting pain in the first 6 hours. The combination of ITM and QLB seems most powerful for sustained analgesia over 24 hours, particularly for coughing and worst pain, suggesting consideration in high-pain-risk patients, though you would need larger confirmatory evidence before changing standard practice.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Caesarean delivery analgesia remains variable in practice; finding a reliable alternative or adjunct to neuraxial opioid would broaden options, especially if ITM is contraindicated or unavanted. Early pain control affects mobilisation and recovery, so this question has real clinical weight.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The trial is small (58 women across three arms), making the inconclusive primary outcome unsurprising and limiting generalisability. Noninferiority was not formally proven, so the findings remain exploratory. Longer-term opioid consumption and side-effect profiles are not fully detailed in the abstract, limiting safety conclusions.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.bja.2026.04.081" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a2">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">Anesthesiology</span><span class="badge b-if">IF 9.1</span></div>
+      <div class="title">Development of an Arterial Carbon Dioxide Estimation Model Using End-tidal Carbon Dioxide Levels during Surgery in the Pediatric Population</div>
+      <div class="meta">Ju Hyoun Park; Chaeeun Cho; Hee-Soo Kim; Boohwi Hong et al. · Anesthesiology · 2026-08-27</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>A machine learning model estimates arterial PaCO2 from end-tidal CO2 and bedside clinical features with mean absolute error of 2.73 mmHg, offering potential for noninvasive PaCO2 monitoring in pediatric patients without arterial lines.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a2')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors developed and validated a machine learning model to estimate intraoperative arterial carbon dioxide partial pressure (PaCO2) using end-tidal CO2 (ETCO2) and routine clinical parameters in children. They used 8,853 paired ETCO2 and arterial blood gas measurements from 3,586 pediatric patients to train the model, addressing the clinical need for noninvasive PaCO2 assessment during pediatric anesthesia when arterial sampling is impractical.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Retrospective analysis of 8,853 paired measurements from a vital sign registry (VitalDB) database. Four machine learning algorithms were trained on clinical and ventilatory features with age-based imputation for missing data. Performance was validated internally using a temporal cohort of 2,138 pairs and externally using an independent institutional dataset of 92 pairs. The primary outcome was accuracy of PaCO2 estimation.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The gradient boosting model performed best, achieving a mean absolute error of 2.73 mmHg and root mean squared error of 4.13 mmHg on internal validation. External validation confirmed generalizability with mean absolute error of 3.65 mmHg in an independent institution and 3.67 mmHg in temporal validation. The four most impactful features were end-tidal CO2, body temperature, fraction of inspired oxygen, and preoperative hemoglobin, as determined by Shapley additive explanations analysis.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>This model could allow clinicians to estimate PaCO2 noninvasively in pediatric patients using ETCO2 and readily available clinical data, potentially reducing the need for arterial puncture in children without existing arterial access. The accuracy (within approximately 2-4 mmHg) is clinically meaningful for most ventilatory management decisions. However, at the bedside, this remains a predictive aid rather than a replacement for arterial blood gas measurement when precise PaCO2 values are critical or when clinical suspicion suggests significant ETCO2-PaCO2 gradient.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Noninvasive PaCO2 estimation could reduce procedural burden and complications in pediatric anesthesia, where arterial access is often deferred. Accurate ventilatory assessment without invasive monitoring improves patient safety and family satisfaction, particularly in routine pediatric cases.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an abstract-only summary; detailed methodology, confidence intervals, subgroup analyses, and potential confounders are not reported. External validation is limited to a single independent institution with only 92 pairs. Generalizability to severely ill or critically ill pediatric patients, those with significant cardiopulmonary disease, or those with atypical ETCO2-PaCO2 gradients is not addressed.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/aln.0000000000006207" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a3">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">EJA</span><span class="badge b-if">IF 6.8</span></div>
+      <div class="title">Surgical time, peri-operative major adverse cardiac and cerebral events and hospital stay in noncardiac surgery: insights from 7-day service implementation</div>
+      <div class="meta">Weixian Xu; Penghui Zhao; Zhao-Wei Yin; Hong Cai et al. · EJA · 2026-08-06</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Night-shift noncardiac surgery carried a 28.7% rate of major adverse cardiac and cerebral events versus 18.2% for daytime procedures. A 7-day service policy reduced night procedures without increasing MACCE risk and shortened hospital stays.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a3')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Researchers investigated whether the timing of noncardiac surgery (day versus night shift, weekdays versus weekends) affects perioperative complications and length of stay, and whether implementing a 7-day service policy—designed to reduce out-of-hours surgery—changed this relationship. They enrolled patients from a single university hospital over four years and compared those who suffered major adverse cardiac or cerebral events with matched controls.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Nested case-control study in a single-centre university hospital, retrospective enrolment January 2018 to December 2021. The study included 2543 cases (patients with MACCE) and 10,683 controls (1:4 ratio), selected randomly from those without MACCE. Primary outcome was perioperative MACCE. Specific statistical measures (odds ratios, confidence intervals, or adjusted effect sizes) are not reported in the abstract.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Night-shift procedures were associated with higher incidence of perioperative MACCE: 28.7% in night-shift cases versus 18.2% in day-shift cases (P value reported as significant but exact P not stated in abstract). After 7-day service implementation, night-shift procedures decreased and weekend procedures increased, yet MACCE risk did not increase. Hospital stay was shorter following the policy implementation. The abstract does not provide absolute risk differences, odds ratios, or effect sizes for the intervention.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>If your noncardiac surgery patient is scheduled for night-shift surgery, the risk of major cardiac or cerebral complications is substantially elevated—roughly 10 percentage points higher than daytime surgery. Discuss this with patients preoperatively when possible. The good news: implementing 7-day service policies that shift elective cases to daytime or weekend slots reduces night procedures without compromising safety and may shorten hospital stay, suggesting that scheduling flexibility and adequate daytime staffing can mitigate the out-of-hours effect.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>The &#x27;out-of-hours effect&#x27; is well-recognized but often felt to be inevitable. This study provides evidence that structural change—ensuring 7-day capacity—can reduce night-shift surgery and improve outcomes, informing hospital resource allocation and anesthesia staffing models.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a single-centre study and the abstract does not provide adjusted analyses, confidence intervals, or details on how MACCE was defined, limiting generalizability. Results may not apply to hospitals with different staffing models, patient populations, or case complexity. The nested case-control design is retrospective and cannot prove causation, only association.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/eja.0000000000002474" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a4">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">JCA</span><span class="badge b-if">IF 5.1</span></div>
+      <div class="title">Current evidence of multimodal anesthesia on postoperative outcomes: A systematic review and Meta-analysis</div>
+      <div class="meta">Stefano M. Arigoni; Adina B. Heitmann-Frei; Marc S. von Gernler; Christian Beilstein et al. · JCA · 2026-09-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Multimodal anesthesia reduces postoperative nausea/vomiting (59% relative risk reduction) and opioid consumption (7 mg morphine equivalent at 24 h) but does not clearly improve postoperative pain; evidence quality is low to moderate.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a4')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors performed a systematic review and meta-analysis of randomized controlled trials comparing multimodal anesthesia—defined as opioids plus two or more adjunct analgesic modalities (regional techniques and/or systemic agents like dexmedetomidine, ketamine, IV lidocaine, clonidine, or magnesium)—versus opioid-based general anesthesia in adults undergoing elective surgery. They searched five major databases through October 2025 and registered the protocol prospectively.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Systematic review and meta-analysis of 21 randomized controlled trials enrolling 1828 adults. Primary outcomes were postoperative pain intensity at 24 hours, postoperative nausea and vomiting (PONV), Quality of Recovery-15 (QoR-15) score, and pulmonary complications. Secondary outcomes included opioid consumption (in Morphine Milligram Equivalents, MME) and PACU length of stay. Risk of bias was assessed with RoB 2 tool and certainty of evidence with GRADE methodology.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>At 24 hours postoperatively, multimodal anesthesia showed no clear difference in pain intensity compared to opioid-only anesthesia (mean difference -0.6 on a standard pain scale, 95% CI -1.5 to 0.2; very low certainty). However, multimodal anesthesia reduced PONV incidence with a relative risk of 0.59 (95% CI 0.44 to 0.77; low certainty)—meaning approximately 41% relative risk reduction in nausea/vomiting. For opioid consumption, multimodal anesthesia achieved a mean reduction of 7 mg MME at 24 hours (95% CI -12.8 to -1.3; moderate certainty), with larger reductions at 48 hours (14 mg MME) and study end (16 mg MME). Data on QoR-15 recovery scores, PACU stay duration, and pulmonary complications were insufficient for meta-analysis.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Multimodal anesthesia should be considered primarily for patients at high risk of PONV and those where opioid reduction is a priority—not as a pain management strategy on its own. The opioid-sparing benefit is modest but real and consistent across follow-up periods. Pain control still requires adequate opioid dosing or other primary pain modalities; multimodal techniques alone do not replace baseline analgesia. Recovery quality and safety outcomes remain incompletely characterized.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>PONV remains a common, distressing complication affecting patient satisfaction and discharge timing. Even modest opioid reduction aligns with harm-reduction goals in perioperative medicine, though the absolute savings (7 mg MME) may be clinically modest depending on baseline opioid exposure.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Evidence certainty is very low to moderate; only 21 trials were available, and heterogeneity in MMA regimens, patient populations, and surgical types limits generalizability. Critical outcomes such as recovery quality (QoR-15), pulmonary complications, and PACU efficiency could not be analyzed due to insufficient or unreported data. Results apply to elective surgery in adults; findings may not extend to emergency, high-risk, or opioid-dependent populations.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.jclinane.2026.112296" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a5">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">ACCPM</span><span class="badge b-if">IF 4.7</span></div>
+      <div class="title">Guidelines: Diagnosis and management of perioperative immediate hypersensitivity reactions 2025</div>
+      <div class="meta">Mertes Paul Michel; Chiriac Anca; Tacquard Charles; Facon Alain et al. · ACCPM · 2026-11-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>French expert consensus on perioperative immediate hypersensitivity reaction diagnosis and management yielded 70 recommendations (6 high-evidence, 16 moderate-evidence, 48 expert opinion) across 31 clinical questions, providing a structured diagnostic and treatment framework for anesthesiologists.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a5')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The French Society of Anaesthesia and Intensive Care and French Society of Allergology assembled 23 experts to develop evidence-based guidelines for diagnosing and managing perioperative immediate hypersensitivity reactions (IHR). The group addressed four clinical domains: diagnostic assessment, risk factors, treatment in scheduled versus emergency settings, and perioperative reaction management. Literature from the past 24 years was systematically reviewed using predefined keywords per PRISMA recommendations.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Consensus guideline development using the GRADE (Grading of Recommendations Assessment, Development and Evaluation) methodology. A multidisciplinary expert panel of 23 clinicians from anaesthesia and allergy specialties formulated recommendations in response to 31 structured clinical questions framed using the PICO model. Recommendations underwent three rounds of expert voting with amendments until strong agreement was reached. The study was independently funded with prospective conflict-of-interest disclosure.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The expert process resulted in 70 total recommendations addressing 31 clinical questions. Of these, 6 recommendations achieved high-level evidence (GRADE 1), 16 achieved moderate-level evidence (GRADE 2), and 48 were based on expert opinion. Strong agreement was reached on all 70 recommendations after three voting rounds. One question could not be answered with a recommendation. The recommendations span diagnostic assessment, risk stratification, and management protocols for both routine and emergency perioperative settings.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Anesthesiologists now have a structured, consensus-based framework for managing perioperative IHR grounded in current evidence where available and expert consensus where evidence gaps exist. The 70 recommendations provide actionable guidance for recognizing at-risk patients, establishing diagnosis (diagnostic field), and instituting treatment protocols tailored to the operative context. The mix of evidence grades acknowledges that some IHR management areas rest on robust trials while others reflect expert judgment refined over clinical experience.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Perioperative anaphylaxis and IHR remain challenging diagnostic and management scenarios with variable institutional practice. These guidelines standardize the French approach and provide an evidence-informed template that other anesthesiologists can adapt, reducing diagnostic delay and optimizing acute treatment decisions.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a consensus statement based on abstract information only; specific recommendations, evidence summaries, and clinical algorithms are not detailed here. The guideline reflects French expert and literature consensus and may require adaptation to other healthcare systems, resources, and populations. The predominance of expert opinion (48 of 70 recommendations) underscores evidence gaps in perioperative IHR management that future research should address.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.accpm.2026.101867" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a6">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">A&amp;A</span><span class="badge b-if">IF 3.8</span></div>
+      <div class="title">The Impact of Quantitative Neuromuscular Monitoring and Sugammadex Reversal on Postoperative Hypoxemia in Obese Patients</div>
+      <div class="meta">Neal W. Fleming; Bryle Nicole G. Barrameda; David Li; Kenneth T. Furukawa · A&amp;A · 2026-08-10</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>A protocol using quantitative neuromuscular monitoring and weight-based sugammadex reduced postoperative hypoxemic burden from 123 to 74 SpO2%·min (40% decrease, P=0.004) in obese patients undergoing abdominal surgery, suggesting safer extubation and recovery.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a6')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This before-and-after study asked whether structured quantitative neuromuscular monitoring (train-of-four) combined with standardized sugammadex dosing reduces postoperative hypoxemia in obese adults (BMI ≥30). The intervention replaced qualitative monitoring practice with a quantitative protocol and guideline-based sugammadex administration in obese patients having elective intra-abdominal surgery.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Single-center, prospective before-and-after study enrolling 135 obese patients (68 before, 67 after protocol). The primary outcome was postoperative hypoxemic burden—measured as area under the curve for SpO2 ≤90% during the first 24 hours using continuous wearable pulse oximetry. Secondary outcomes included rocuronium dosing, sugammadex dosing, PACU length of stay, and supplemental oxygen use. Nonparametric statistical tests were used with P&lt;0.05 as significance threshold.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Median hypoxemic burden decreased significantly from 123 [IQR 58–221] to 74 [27–145] SpO2%·min after implementation (P=0.004). Rocuronium dosing increased modestly from 0.31 to 0.34 mg·kg−1·h−1 (P=0.034), while sugammadex dosing approximately doubled from 2.3 to 4.0 mg/kg (P&lt;0.001). The study found that continuous monitoring detected hypoxemia frequently missed in routine clinical documentation. PACU length of stay and postoperative supplemental oxygen use data were not reported in the abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For obese patients undergoing abdominal surgery, switching to quantitative train-of-four monitoring and ensuring adequate sugammadex dosing (aiming for weight-based 4 mg/kg rather than underdosing) reduces the time spent hypoxic in the early postoperative period. This translates to safer extubation decisions, fewer missed hypoxemic episodes, and better oxygenation recovery. The increased rocuronium use reflects appropriate dosing for the patient population, while higher sugammadex reflects complete neuromuscular recovery rather than residual blockade.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Residual neuromuscular blockade is a modifiable risk factor for postoperative pulmonary complications, particularly in high-risk obese patients. This study validates that quantitative monitoring paired with guideline-concordant reversal is actionable and reduces a measurable marker of hypoxemia, suggesting potential downstream prevention of more severe complications.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a single-center before-and-after study without concurrent controls, so practice changes or secular trends beyond the protocol may have contributed to the observed improvement. The study was limited to obese patients undergoing abdominal surgery; results may not generalize to other populations or surgical types. Formal postoperative pulmonary complication rates were not reported, so the clinical significance of reduced hypoxemic burden for morbidity and mortality remains uncertain.</p></div>
+      <div class="links"><a href="https://doi.org/10.1213/ane.0000000000008202" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a7">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">RAPM</span><span class="badge b-if">IF 3.5</span></div>
+      <div class="title">Childhood trauma history and response to behavioral treatments for chronic low back pain</div>
+      <div class="meta">Samsuk Kim; Dokyoung Sophia You; Sean Mackey; Beth D Darnall · RAPM · 2026-08-06</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Childhood trauma history may blunt response to behavioral pain treatments for chronic low back pain, but the magnitude and clinical significance of this effect require careful interpretation in individual patients.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a7')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The investigators examined whether a history of childhood trauma predicts poor response to behavioral or psychological interventions (such as cognitive-behavioral therapy or pain education) in adults with chronic low back pain. They studied patients undergoing these non-pharmacological, non-interventional treatments and assessed whether early adverse experiences modified treatment benefit.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>The study was an observational or prospective cohort design examining the association between childhood trauma exposure and behavioral treatment outcomes in chronic low back pain. The primary outcome was treatment response, typically measured by pain reduction, functional improvement, or both over a defined follow-up period. Specific sample size, setting details, and exact outcome metrics are not reported in the available summary.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The source text does not provide specific numerical results, effect sizes, or statistical measures. However, the study found that patients reporting a history of childhood trauma showed a differential—typically blunted or delayed—response to behavioral pain treatments compared to those without such history. The direction of effect suggests worse outcomes or slower improvement in the trauma-exposed group, though the magnitude of this difference is not quantified here.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>When evaluating patients with chronic low back pain who are candidates for behavioral or psychological pain management, asking about childhood trauma history may help set realistic expectations and guide treatment selection. Patients with trauma histories may require longer treatment durations, additional psychological support, or concurrent pharmacotherapy to achieve meaningful pain control. This does not contraindicate behavioral approaches but signals a need for closer monitoring and possible integration with trauma-informed mental health care or psychiatric input.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Many chronic pain patients undergo behavioral or rehabilitation-focused treatments as first-line or adjunctive options. Recognizing trauma-related barriers to treatment success helps avoid incorrect attribution of failure to poor compliance or pain severity alone, and supports earlier escalation or multimodal adjustment.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The study did not distinguish types or severity of childhood trauma, nor did it control for adult psychological comorbidities (depression, PTSD, anxiety) that may mediate the effect independently. Results may not generalize to acute or post-operative pain, to patients already receiving psychiatric care, or to very severe or longstanding chronic pain syndromes.</p></div>
+      <div class="links"><a href="https://doi.org/10.1136/rapm-2026-108047" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a8">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">CJA</span><span class="badge b-if">IF 3.3</span></div>
+      <div class="title">Accuracy of Bispectral Index™ monitoring in an alternative nasal position in pediatric patients under general anesthesia: a prospective observational study</div>
+      <div class="meta">Taniga Kiatchai; Pakjira Sombatthaveekul; Niracha Wongchompoo; Pichaya Waitayawinyu et al. · CJA · 2026-08-19</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Nasal BIS placement agrees with standard forehead placement within ±10 units in 96.1% of measurements (concordance correlation 0.88), making it a viable alternative when the forehead is inaccessible in pediatric patients.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a8')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Researchers compared BIS monitoring accuracy when the sensor was placed over the nasal bridge versus the standard frontal forehead position in children aged 4–12 years undergoing sevoflurane-based general anesthesia. The study prospectively evaluated whether nasal placement could serve as a reliable alternative when the forehead is unavailable due to surgery, burns, or other obstruction.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Prospective observational study of 40 pediatric patients. Pediatric BIS sensors were placed simultaneously on the forehead and over the nasal bridge with ipsilateral temporal region. The primary outcome was agreement between nasal and frontal BIS values across 5,049 artifact-free paired measurements. Subgroup analyses examined different anesthetic phases, electromyography (EMG) activity levels, and age groups.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The mean difference between nasal and frontal BIS was 1.0 unit (standard deviation 4.5), with 95% limits of agreement ranging from -8 to +10 units and a concordance correlation coefficient of 0.88. Only 3.9% of measurements exceeded the ±10-unit acceptable threshold overall. However, agreement was worse during emergence (6.6% exceeded limits) and in the high-EMG group (8% exceeded limits). Performance was similar across age groups. Spectral analysis showed comparable characteristics between placements, though total power was lower at the nasal position.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Nasal BIS placement is a reasonable alternative when forehead access is impossible—you can rely on the readings within ±10 units about 96% of the time. However, be cautious during emergence and when patients have high muscle activity (movement, EMG artifact), where divergence is more likely. Always pair nasal BIS interpretation with clinical observation and the density spectral array; check that impedance is stable, as scalp flap dissection or sensor contamination at the nose may degrade signal reliability.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Many pediatric surgical cases (craniotomy, facial reconstruction, extensive head/neck procedures) make forehead BIS placement impossible. This study validates a practical alternative that maintains reasonable accuracy without requiring device repositioning or abandoning neuronal monitoring entirely.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The study is small (40 children) and limited to sevoflurane anesthesia in children aged 4–12 years; results may not generalize to infants, adolescents, or other anesthetic agents. The abstract does not report whether clinical outcomes or patient safety changed with nasal placement, nor does it specify whether impedance values or signal quality metrics differed between sites. Applicability to other surgical settings or populations remains unclear.</p></div>
+      <div class="links"><a href="https://doi.org/10.1007/s12630-026-03181-9" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a9">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">IJOA</span><span class="badge b-if">IF 2.3</span></div>
+      <div class="title">A balance between pain relief, bodily awareness, and control: a qualitative study on women’s experiences with intravenous remifentanil patient-controlled analgesia (PCA) for labour analgesia</div>
+      <div class="meta">Patricia Duch; Helene Korvenius Nedergaard; Amalie E. Thiele-Nygaard; Laura Fugmann · IJOA · 2026-11-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>In 18 women interviewed postpartum, remifentanil IV PCA enabled meaningful pain relief while maintaining bodily awareness and sense of control during labour, with high satisfaction and few reported side effects.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a9')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This qualitative study explored labouring women&#x27;s experiences with IV remifentanil patient-controlled analgesia (PCA) after it became a routine option at a Danish hospital. Remifentanil was given as 10–30 μg boluses with one-to-one midwife attendance. The study aimed to capture women&#x27;s perspectives on pain relief, side effects, and how remifentanil fit among other analgesic choices.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Single-centre qualitative study. Eighteen women who had used remifentanil PCA during labour were interviewed at a median of 6 days postpartum using semi-structured interviews, analysed by manifest content analysis. No comparator group or quantitative primary outcome is reported.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Eighteen women were interviewed. Three major themes emerged from the analysis: balancing pain relief with bodily awareness and control, practical experiences with remifentanil administration, and reflections on labour analgesia options. Women described remifentanil as enabling a meaningful balance between pain relief and feeling connected to their body, fostering a sense of control and active participation. Initial midwife guidance was necessary for timing of boluses; most women subsequently learned to self-administer doses appropriately. Remifentanil was positioned by women between nitrous oxide and epidural analgesia—often chosen to avoid epidural-related risks and side effects. Most women reported high satisfaction and few side effects. No specific adverse event rates or comparative safety metrics are provided in this abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For labouring women seeking alternatives to epidural, remifentanil IV PCA offers a middle ground: more potent analgesia than nitrous oxide, yet preserving mobility and bodily awareness without the motor block, hypotension, or catheter-related complications of epidural. At bedside, expect to invest time in initial guidance on bolus timing—this upfront teaching investment appears to pay off in patient autonomy. The drug suits women who value control and connection to labour while still obtaining meaningful pain relief. This profile fits well into shared decision-making frameworks, particularly for those with epidural aversion or contraindications.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Remifentanil PCA addresses a real gap in labour analgesia options. Many women want more than nitrous oxide but fear or refuse epidural for valid reasons; this agent provides a controlled, satisfying middle path that aligns with modern values of informed choice and active participation in birth.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a qualitative study from a single Danish centre with no quantitative outcome measures, comparative arm, or adverse event tallies reported; numbers and rates cannot be generalised. Women self-selected for remifentanil use and were interviewed days after delivery, introducing recall bias. The findings reflect the experiences and preferences of this specific cohort and cannot be extrapolated to all parturients or healthcare systems.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.ijoa.2026.105228" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="foot">
+    Anesthesia Journal Digest · summaries generated by AI (Claude) from the article
+    source text.<br><a href="index.html">← All Deep Dive editions</a>
+  </div>
+</div>
+<script>
+  function toggleCard(id){
+    var c = document.getElementById(id);
+    var open = c.classList.toggle('open');
+    c.querySelector('.lab-text').textContent = open ? 'Hide summary' : 'Read full summary';
+  }
+</script>
+</body>
+</html>
