@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Deep Dive · Thursday, October 01, 2026</title>
+<style>
+  :root{
+    --ink:#1a5276; --ink2:#2e86c1; --text:#2c3e50; --muted:#7b8794;
+    --line:#e3e8ee; --bg:#f5f6fa; --card:#ffffff;
+    --warn:#b9770e; --warnbg:#fff8ec; --warnline:#f0d9a8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text);line-height:1.55;}
+  .page{max-width:760px;margin:0 auto;padding:28px 18px 60px;}
+  .page-head{padding:6px 4px 18px;}
+  .page-head h1{font-size:22px;color:var(--ink);margin:0 0 4px;}
+  .page-head .sub{font-size:13px;color:var(--muted);margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;margin:18px 0;}
+  .hdr{padding:18px 20px 16px;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:9px;}
+  .badge{font-size:11px;font-weight:bold;border-radius:4px;padding:2px 8px;letter-spacing:.02em;}
+  .b-journal{background:var(--ink);color:#fff;}
+  .b-if{background:#eef3f8;color:var(--ink);}
+  .b-oa{background:#27ae60;color:#fff;}
+  .title{font-size:18px;font-weight:bold;color:var(--text);margin:2px 0 4px;line-height:1.35;}
+  .meta{font-size:12px;color:var(--muted);}
+  .bottomline{margin:14px 0 2px;padding:12px 14px;background:#eef6fb;
+              border-left:4px solid var(--ink2);border-radius:0 8px 8px 0;}
+  .bottomline .lab{font-size:11px;font-weight:bold;text-transform:uppercase;
+                   letter-spacing:.06em;color:var(--ink);}
+  .bottomline p{margin:4px 0 0;font-size:14px;color:#33444f;}
+  .toggle{display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+          background:var(--ink);color:#fff;border:none;cursor:pointer;
+          font-family:inherit;font-size:14px;font-weight:bold;
+          padding:10px 18px;border-radius:22px;}
+  .toggle .chev{transition:transform .2s ease;font-size:12px;}
+  .card.open .toggle .chev{transform:rotate(180deg);}
+  .body{display:none;border-top:1px solid var(--line);padding:6px 20px 20px;}
+  .card.open .body{display:block;}
+  .sec{padding:15px 0 4px;border-bottom:1px solid #f0f2f5;}
+  .sec:last-child{border-bottom:none;}
+  .sec h3{display:flex;align-items:center;gap:9px;margin:0 0 6px;
+          font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink);}
+  .sec h3 .ic{width:22px;height:22px;border-radius:6px;background:#eef3f8;
+              display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+  .sec p{margin:0;font-size:14px;color:#3a4750;}
+  .sec.caution{background:var(--warnbg);border:1px solid var(--warnline);
+               border-radius:10px;padding:14px 16px;margin-top:14px;}
+  .sec.caution h3{color:var(--warn);}
+  .sec.caution h3 .ic{background:#fbecca;}
+  .sec.caution p{color:#7a5a17;}
+  .links{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;}
+  .links a{font-size:13px;font-weight:bold;text-decoration:none;color:var(--ink2);
+           border:1px solid var(--line);border-radius:8px;padding:8px 14px;}
+  .src-note{margin-top:14px;font-size:11px;color:var(--muted);font-style:italic;}
+  .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:30px;line-height:1.5;}
+  .foot a{color:var(--ink2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>📖 Anesthesia Digest — Deep Dive</h1>
+    <p class="sub">Thursday, October 01, 2026 · structured summaries of this week's 7 featured articles</p>
+  </div>
+  <div class="card open" id="a1">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">BJA</span><span class="badge b-if">IF 9.2</span></div>
+      <div class="title">Ketamine administration and postoperative mortality after major cancer surgery: a propensity-matched population-based study</div>
+      <div class="meta">Tomer Talmy; Stephane Ledot; Barak Cohen; Ron Eshel et al. · BJA · 2026-10-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Perioperative ketamine did not reduce 3-year mortality after major cancer surgery (16.7% vs 16.0%; HR 1.04), contradicting preclinical antitumour hopes and aligning with other studies showing no survival benefit from specific anaesthetic agents in oncology.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a1')">
+        <span class="lab-text">Hide summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors asked whether intraoperative ketamine administration improves long-term survival in cancer patients undergoing major solid tumour surgery. They studied adults aged 18 or older who had cancer surgery between 2014 and 2023, comparing those who received ketamine on the day of surgery with those who did not.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Retrospective cohort study using the TriNetX US Collaborative Network, including 176,149 eligible patients of whom 29,547 matched pairs were analysed after propensity score matching (1:1). Matching balanced groups on patient characteristics, comorbidities, cancer type, and surgery type. Primary outcome was 3-year mortality; secondary outcome was 5-year mortality.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Ketamine administration was not associated with lower 3-year mortality: 16.7% in the ketamine group versus 16.0% in the control group (hazard ratio 1.04, 95% CI 1.00–1.09, q=0.187). There was no difference in 5-year mortality. Sensitivity analyses and subgroup analyses by cancer type and perioperative exposures all showed no survival benefit. In an exploratory post-hoc analysis, ketamine was associated with lower rates of chemotherapy, radiotherapy, or palliative care initiation at 6 months or later (HR 0.82), but this was not the primary outcome and must be interpreted cautiously.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For your cancer patients, the use or non-use of perioperative ketamine should not be based on hopes for improved survival. Choose ketamine for its established perioperative benefits—analgesia, haemodynamic stability, airway preservation—rather than as an oncologic intervention. This does not argue against ketamine use; it simply removes the additional survival rationale sometimes cited in the cancer literature.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Preclinical work suggested ketamine might have antitumour properties, raising enthusiasm for its use in cancer anaesthesia. This large pragmatic study closes that loop and shows no clinical translation of that promise, helping distinguish hype from reality in anaesthetic choice for oncology.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a retrospective observational study from electronic health records; unmeasured confounding and selection bias cannot be fully ruled out despite propensity matching. Results apply to patients in US health systems and may not generalise to other populations or healthcare settings. The exploratory finding on cancer progression markers was not the primary hypothesis and requires validation in prospective work.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.bja.2026.06.033" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a2">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">Anesthesiology</span><span class="badge b-if">IF 9.1</span></div>
+      <div class="title">Effect of Preoperative Intravenous Crystalloid Bolus on Postinduction Blood Pressure: A Randomized Blinded Intervention Trial</div>
+      <div class="meta">Michael Eichinger; Christian Reiterer; Michael Eichlseder; Alexander Pichler et al. · Anesthesiology · 2026-09-25</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Preoperative crystalloid bolus 60 minutes before induction did NOT reduce postinduction hypotension (median time-weighted average MAP &lt;65 mmHg: 0.0 mmHg in both groups, P=0.368) in high-risk patients, challenging the routine use of preoperative fluid loading.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a2')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors asked whether giving patients a crystalloid bolus within 60 minutes before anesthetic induction could prevent or reduce the severity of postinduction hypotension in older adults with cardiovascular risk factors undergoing major noncardiac surgery. They enrolled 504 patients (247 intervention, 257 control) at two Austrian academic medical centers.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Prospective, randomized, single-blind clinical trial. The intervention group received a preoperative IV crystalloid bolus (dose and type not specified in abstract); the control group received standard care. The primary outcome was time-weighted average mean arterial pressure below 65 mmHg during the first 20 minutes after induction or until surgical incision.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Of 504 analyzed patients, the intervention and control groups showed no significant difference in the primary outcome. The median time-weighted average MAP &lt;65 mmHg was 0.0 mmHg (IQR 0.0–0.56) in the crystalloid group and 0.0 mmHg (IQR 0.0–0.84) in the standard care group (P=0.368). In other words, most patients in both groups experienced either no hypotension or minimal time below the threshold, and preoperative fluid made no measurable difference.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>At the bedside, this suggests that routinely giving a crystalloid bolus 60 minutes before induction is not an effective strategy to prevent postinduction hypotension in patients with cardiovascular risk factors. Standard hemodynamic monitoring, vasopressor availability, and careful titration of induction agents remain the cornerstones of management. This does not argue against judicious perioperative fluid therapy or against fluids in clearly hypovolemic or high-risk patients, but it does question the blanket use of preoperative crystalloid loading as hypotension prophylaxis.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postinduction hypotension is common and associated with adverse outcomes, making it a natural target for prevention. This trial provides level 1 evidence that a simple, low-risk intervention (preoperative fluids) does not reliably work, which can help avoid unnecessary or ineffective fluid administration and refocus attention on proven preventive measures such as reduced induction drug doses, vasopressor readiness, and individualized anesthetic technique.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an abstract-only review; full methodology details, bolus volume and type, secondary outcomes, and safety data are not available. Results apply to high-risk patients aged 45 and older in a major surgery setting and may not generalize to younger patients, emergency surgery, or those with different baseline hemodynamic status.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/aln.0000000000006308" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a3">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">EJA</span><span class="badge b-if">IF 6.8</span></div>
+      <div class="title">Comparison of the efficacy of different interventions for rebound pain after brachial plexus block in upper extremity surgery</div>
+      <div class="meta">Wenhui Ma; Lihai Chen; Di Zhou; Jiayu Jin et al. · EJA · 2026-09-17</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Continuous nerve block reduced rebound pain incidence to the lowest level (odds ratio 0.04 vs placebo) and lowered pain scores at 12 and 24 hours; dexamethasone and dexmedetomidine also showed benefit, but continuous block ranked first.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a3')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This network meta-analysis compared six interventions—dexamethasone, esketamine, dexmedetomidine, liposomal bupivacaine, continuous nerve block, and combined nerve block (multiple approaches)—to prevent or treat rebound pain after brachial plexus block in upper extremity surgery. The authors searched four major databases through October 2025 and included randomised controlled trials (RCTs) directly comparing these strategies to placebo or standard care.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Bayesian network meta-analysis of 22 RCTs involving 1699 patients. Primary outcome was rebound pain incidence (severe transient pain after block subsidence); secondary outcomes included pain scores at 12 and 24 hours postoperatively. Comparator was placebo or standard anesthesia without the study intervention. The analysis used SUCRA (Surface Under the Cumulative Ranking) to rank interventions.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Compared with placebo, continuous nerve block had the strongest effect, reducing rebound pain incidence (odds ratio 0.04, 95% CI 0.01–0.33)—roughly a 96% relative reduction. Dexamethasone (OR 0.22, 95% CI 0.11–0.42) and dexmedetomidine (OR 0.23, 95% CI 0.08–0.68) also significantly reduced rebound pain. For pain scores, dexamethasone and continuous nerve block lowered 12-hour pain by approximately 2.5 and 3.1 points respectively on an unspecified scale. Combined nerve block (multiple approaches) reduced 24-hour pain scores by about 0.86 points. SUCRA ranking placed continuous nerve block as most favourable overall, though the authors emphasise these are relative probabilities requiring further validation, not absolute efficacy claims.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For patients undergoing upper extremity surgery with brachial plexus block, continuous perineural infusion appears to be the most effective strategy to prevent rebound pain and lower early postoperative pain. Single-shot blocks can be enhanced with dexamethasone or dexmedetomidine if continuous catheter placement is not feasible. However, the authors advise caution: these findings are exploratory and hypothesis-generating. Use this evidence to individualise block selection for high-risk patients (e.g., those with opioid sensitivity or prolonged surgery), but do not regard it as definitive guidance for all cases.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Rebound pain after peripheral nerve block subsidence is a significant source of patient dissatisfaction and can worsen analgesia if unmanaged. Having evidence-based options to mitigate it—especially continuous catheters and adjunctive agents—improves perioperative outcomes and allows matching strategy to patient risk.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an abstract-only summary with limited transparency on individual trial quality, heterogeneity, and subgroup analyses. The certainty of evidence is described as limited; findings are presented as exploratory rather than definitive. Results may not generalise to all brachial plexus approaches, surgical types, or patient populations, and the clinical relevance of small pain score reductions remains uncertain.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/eja.0000000000002486" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a4">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">JCA</span><span class="badge b-if">IF 5.1</span></div>
+      <div class="title">Opioid-sparing anesthesia based on opioid-free principles for early recovery after total knee arthroplasty: A randomized controlled trial</div>
+      <div class="meta">Jingwang Liu; Jiaxin Liu; Peng Liu; Wenzhi Li et al. · JCA · 2026-09-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Opioid-free anesthesia with esketamine and dexmedetomidine improved 24-h Quality of Recovery scores by 5 points over opioid-based anesthesia in knee replacement, but this gain falls short of clinical meaningfulness and was driven mainly by less nausea.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a4')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Researchers compared two anesthetic strategies for elective total knee arthroplasty: an opioid-sparing approach (OSA) using esketamine and dexmedetomidine as the primary analgesic backbone versus conventional opioid-based anesthesia (OBA). Both groups received femoral nerve block and small doses of oxycodone at incision and closure, plus identical postoperative multimodal analgesia. Ninety-eight adult patients were randomized across a single center from July 2025 to February 2026.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Randomized controlled trial with blinding of patients, surgeons, and outcome assessors. Primary outcome was 24-hour postoperative Quality of Recovery-15 (QoR-15) score. Secondary outcomes included 48-hour QoR-15, functional scores (Oxford Knee Score, EQ-5D-3L) at 1 and 3 months, high pain at 1 month, chronic postsurgical pain at 3 months, and exploratory measures of inflammation (CRP) and postoperative nausea and vomiting (PONV).</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>At 24 hours, OSA patients had higher QoR-15 scores than OBA patients (118.4 versus 113.3; adjusted difference 5.12 points, P = 0.029). This persisted at 48 hours (adjusted difference 5.54 points, P = 0.007). The OSA group experienced significantly lower PONV (P = 0.025) and lower postoperative CRP levels (P = 0.001), suggesting reduced inflammatory response. At 1 month, Oxford Knee Score was higher in OSA patients (adjusted difference 2.31 points, P = 0.022), but no significant differences emerged in pain scores or other secondary outcomes at either timepoint. Chronic postsurgical pain at 3 months was not significantly different between groups.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>While the QoR-15 difference favors opioid-free anesthesia statistically, the authors themselves note the 5-point gain does not reach the minimal clinically important difference threshold, making its real-world value uncertain. The more tangible benefit appears to be a genuine reduction in postoperative nausea—a common complaint that improves patient satisfaction. Consider this approach if PONV prevention is a priority for your patient, but do not expect dramatic improvements in recovery quality or long-term functional outcomes. Standard opioid-based anesthesia remains a reasonable choice.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Opioid reduction is a legitimate clinical goal, but this trial demonstrates that swapping opioids for alternative agents does not automatically translate into meaningfully better recovery—a reality that tempering enthusiasm for wholesale protocol change is important.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Single-center trial with modest sample size (98 patients); results apply only to elective unilateral knee replacement in a similar population. The study used a specific drug combination (esketamine and dexmedetomidine) that may not reflect all opioid-free strategies. Generalizability to other surgery types or different patient demographics is unknown. Whether the observed benefits persist beyond 3 months remains unclear.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.jclinane.2026.112307" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a5">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">ACCPM</span><span class="badge b-if">IF 4.7</span></div>
+      <div class="title">Guidelines: Diagnosis and management of perioperative immediate hypersensitivity reactions 2025</div>
+      <div class="meta">Mertes Paul Michel; Chiriac Anca; Tacquard Charles; Facon Alain et al. · ACCPM · 2026-11-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>A French expert panel developed 70 recommendations for diagnosing and managing perioperative immediate hypersensitivity reactions using GRADE methodology, with strong consensus reached; only 6 recommendations met high evidence standards, while 48 remain expert opinion.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a5')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The French Society of Anaesthesia and Intensive Care and the French Society of Allergology convened 23 experts to develop evidence-based guidelines for perioperative immediate hypersensitivity reactions. The panel addressed four key areas: diagnostic assessment, risk factors, treatment in scheduled versus emergency situations, and management approaches. An extensive 24-year literature search was conducted using predefined keywords and PRISMA recommendations.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Guideline development using the GRADE methodology. A panel of 23 French experts answered 31 specific clinical questions formulated using the PICO model (Population, Intervention, Comparison, Outcome). Literature evidence was graded using GRADE, and recommendations underwent three rounds of expert voting with amendments until strong agreement was achieved. No industry funding was involved in the development process.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The expert group formulated 70 recommendations addressing 31 clinical questions. Of these 70 recommendations: 6 achieved high level of evidence (GRADE 1), 16 had low level of evidence (GRADE 2), and 48 were classified as expert opinions. One question could not yield a recommendation. Strong agreement was reached on all 70 recommendations after the voting and amendment process.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Clinicians now have a consensus-based framework for managing perioperative hypersensitivity reactions, though the evidence foundation varies significantly. The 6 high-evidence recommendations should form the cornerstone of practice where available. The 48 expert opinion recommendations reflect clinical experience and judgment where robust trials are lacking—practitioners should recognize these as consensus guidance rather than level-1 evidence, and remain alert to institutional variation or emerging data. This guideline provides a systematic approach to a relatively rare but potentially life-threatening intraoperative emergency.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Perioperative immediate hypersensitivity reactions demand rapid diagnosis and treatment, yet clinical practice varies widely. A unified, expert-endorsed framework—even where evidence is limited—reduces diagnostic delays and improves consistency of care across centers and countries.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is a guideline derived from expert consensus and literature review, not a prospective outcomes trial. The results reflect primarily French expert opinion and may not generalize to all healthcare systems or regional practice patterns. The abstract does not report which specific clinical questions or drugs were prioritized, limiting ability to assess the guideline&#x27;s scope or applicability to specific perioperative scenarios. The low proportion of high-evidence recommendations (6 of 70) reflects the inherent difficulty of conducting randomized trials in rare, acute perioperative events.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.accpm.2026.101867" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a6">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">A&amp;A</span><span class="badge b-if">IF 3.8</span></div>
+      <div class="title">Barriers to Quality Perioperative Care and Postoperative Mortality Variations in Elective Abdominal Surgery: A Mixed-Methods Study</div>
+      <div class="meta">Carolina L. Schiavo; Savio C. Passos; Stela M. Castro; Liana M.T.A. Azi et al. · A&amp;A · 2026-09-25</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Hospital-level factors account for a 58% increased mortality risk in elective abdominal surgery patients with identical baseline characteristics; four modifiable barriers—lack of postoperative care standards, nurse understaffing, communication gaps, and fragmented pathways—distinguish higher-mortality hospitals.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a6')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors investigated why postoperative mortality varies across hospitals in Brazil despite similar patient populations. They combined quantitative analysis of 107,372 elective abdominal surgery patients from 10 hospitals with qualitative interviews, direct observation, and care pathway mapping to identify process barriers associated with mortality variations.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Mixed-methods study using secondary cohort data (ExCareBR) analyzed with multilevel modeling to quantify hospital-level effects, paired with rapid qualitative assessment and triangulation. The primary outcome was 30-day postoperative mortality. The study examined 10 hospitals across various Brazilian regions; not reported whether comparison was prospective or retrospective.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The median odds ratio (MOR) of 1.58 (IQR 1.47–1.70) demonstrated substantial hospital-level variability: patients with identical baseline and procedural risk factors were up to 58% more likely to die in higher-risk hospitals than lower-risk hospitals. Qualitative analysis identified four consistent barriers in higher-mortality hospitals: (1) absence of standardized postoperative care structures preventing appropriate care escalation; (2) inadequate nurse staffing in surgical wards; (3) poor communication between preoperative, intraoperative, and postoperative phases; and (4) fragmented perioperative pathways within the public health system. The authors emphasized that postoperative period deficiencies were the primary driver of mortality differences.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>This finding shifts focus from patient selection to system redesign. Anesthesiologists cannot control hospital choice for most patients, but understanding that the postoperative environment is the critical vulnerability should inform handoff practices: ensure explicit escalation protocols exist at your institution, confirm nurse availability in recovery areas, use structured communication tools (briefings, checklists) between operating room and ward teams, and advocate for integrated perioperative pathways. In resource-limited settings especially, these process fixes are as important as technical skill.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Mortality variation attributable to hospital systems rather than patient acuity reveals an actionable gap. Strengthening postoperative organization, staffing, and communication can reduce preventable deaths without expensive new technologies—particularly relevant in low-resource healthcare systems.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Results are specific to Brazil&#x27;s public health system and elective abdominal surgery; generalizability to other regions, surgical types, or private settings is unclear. The abstract does not report effect modification by patient subgroups, specific mortality rates, or whether barriers were independent or interdependent.</p></div>
+      <div class="links"><a href="https://doi.org/10.1213/ane.0000000000008247" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a7">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">IJOA</span><span class="badge b-if">IF 2.3</span></div>
+      <div class="title">Labor and delivery outcomes with remifentanil patient-controlled analgesia versus labor epidural analgesia among women with and without obesity: a retrospective population-based cohort study (2015–2024)</div>
+      <div class="meta">Katja Režonja; Miha Lučovnik; Ivan Verdenik; Tomislav Mirković et al. · IJOA · 2026-11-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Remifentanil PCA reduced intrapartum cesarean and operative vaginal delivery rates versus epidural in both normal and obese women, but was associated with higher postpartum hemorrhage—a trade-off requiring individualized counseling and close monitoring.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a7')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Researchers compared labor analgesia outcomes in women receiving remifentanil patient-controlled intravenous analgesia (PCA) versus labor epidural analgesia, stratified by body mass index (BMI &lt;30 and ≥30 kg/m²). The clinical question was whether remifentanil PCA is safe and effective for pain relief across different BMI groups during spontaneous or induced labor at term.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Retrospective population-based cohort study in Slovenia (2015–2024) including 52,118 women with singleton, term, cephalic pregnancies: 46,448 with BMI &lt;30 kg/m² and 5,670 with BMI ≥30 kg/m². Primary outcomes were intrapartum cesarean delivery and operative vaginal delivery. Multivariable logistic regression adjusted for maternal and obstetric confounders. The abstract does not report specific odds ratios, confidence intervals, or absolute event rates.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Remifentanil PCA was associated with lower risks of intrapartum cesarean delivery and operative vaginal delivery compared to epidural in both BMI groups (P ≤0.001). However, remifentanil PCA carried higher risks of postpartum hemorrhage across both groups. Among women with BMI &lt;30 kg/m², remifentanil was also associated with higher risks of blood transfusion and third- or fourth-degree perineal tears, and lower odds of an Apgar score (specific cutoff not reported). Neonatal outcomes were otherwise comparable between groups. Specific event rates and effect sizes are not provided in the abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>Remifentanil PCA appears more effective than epidural at reducing operative delivery, offering a potential advantage for vaginal birth goals. However, the increased postpartum hemorrhage risk—particularly in non-obese women—requires frank discussion with patients before anesthesia and heightened vigilance for bleeding and need for transfusion during and after labor. The choice between remifentanil and epidural should account for individual hemorrhage risk factors, transfusion availability, and patient preferences regarding mode of delivery.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postpartum hemorrhage is a leading cause of maternal morbidity and mortality; any analgesic choice that increases this risk demands careful risk stratification and cannot be viewed simply as a &#x27;better&#x27; alternative to epidural despite lower operative delivery rates.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an observational study with potential for residual confounding and selection bias; the authors explicitly caution that causality cannot be inferred. The abstract provides no effect sizes or absolute event rates, making quantitative risk assessment impossible. Results are from a single European healthcare system and may not generalize to other populations or practice settings.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.ijoa.2026.105275" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="foot">
+    Anesthesia Journal Digest · summaries generated by AI (Claude) from the article
+    source text.<br><a href="index.html">← All Deep Dive editions</a>
+  </div>
+</div>
+<script>
+  function toggleCard(id){
+    var c = document.getElementById(id);
+    var open = c.classList.toggle('open');
+    c.querySelector('.lab-text').textContent = open ? 'Hide summary' : 'Read full summary';
+  }
+</script>
+</body>
+</html>
