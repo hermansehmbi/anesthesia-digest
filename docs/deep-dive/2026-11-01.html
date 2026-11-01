@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesia Digest — Deep Dive · Sunday, November 01, 2026</title>
+<style>
+  :root{
+    --ink:#1a5276; --ink2:#2e86c1; --text:#2c3e50; --muted:#7b8794;
+    --line:#e3e8ee; --bg:#f5f6fa; --card:#ffffff;
+    --warn:#b9770e; --warnbg:#fff8ec; --warnline:#f0d9a8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text);line-height:1.55;}
+  .page{max-width:760px;margin:0 auto;padding:28px 18px 60px;}
+  .page-head{padding:6px 4px 18px;}
+  .page-head h1{font-size:22px;color:var(--ink);margin:0 0 4px;}
+  .page-head .sub{font-size:13px;color:var(--muted);margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;margin:18px 0;}
+  .hdr{padding:18px 20px 16px;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:9px;}
+  .badge{font-size:11px;font-weight:bold;border-radius:4px;padding:2px 8px;letter-spacing:.02em;}
+  .b-journal{background:var(--ink);color:#fff;}
+  .b-if{background:#eef3f8;color:var(--ink);}
+  .b-oa{background:#27ae60;color:#fff;}
+  .title{font-size:18px;font-weight:bold;color:var(--text);margin:2px 0 4px;line-height:1.35;}
+  .meta{font-size:12px;color:var(--muted);}
+  .bottomline{margin:14px 0 2px;padding:12px 14px;background:#eef6fb;
+              border-left:4px solid var(--ink2);border-radius:0 8px 8px 0;}
+  .bottomline .lab{font-size:11px;font-weight:bold;text-transform:uppercase;
+                   letter-spacing:.06em;color:var(--ink);}
+  .bottomline p{margin:4px 0 0;font-size:14px;color:#33444f;}
+  .toggle{display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+          background:var(--ink);color:#fff;border:none;cursor:pointer;
+          font-family:inherit;font-size:14px;font-weight:bold;
+          padding:10px 18px;border-radius:22px;}
+  .toggle .chev{transition:transform .2s ease;font-size:12px;}
+  .card.open .toggle .chev{transform:rotate(180deg);}
+  .body{display:none;border-top:1px solid var(--line);padding:6px 20px 20px;}
+  .card.open .body{display:block;}
+  .sec{padding:15px 0 4px;border-bottom:1px solid #f0f2f5;}
+  .sec:last-child{border-bottom:none;}
+  .sec h3{display:flex;align-items:center;gap:9px;margin:0 0 6px;
+          font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink);}
+  .sec h3 .ic{width:22px;height:22px;border-radius:6px;background:#eef3f8;
+              display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+  .sec p{margin:0;font-size:14px;color:#3a4750;}
+  .sec.caution{background:var(--warnbg);border:1px solid var(--warnline);
+               border-radius:10px;padding:14px 16px;margin-top:14px;}
+  .sec.caution h3{color:var(--warn);}
+  .sec.caution h3 .ic{background:#fbecca;}
+  .sec.caution p{color:#7a5a17;}
+  .links{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;}
+  .links a{font-size:13px;font-weight:bold;text-decoration:none;color:var(--ink2);
+           border:1px solid var(--line);border-radius:8px;padding:8px 14px;}
+  .src-note{margin-top:14px;font-size:11px;color:var(--muted);font-style:italic;}
+  .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:30px;line-height:1.5;}
+  .foot a{color:var(--ink2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>📖 Anesthesia Digest — Deep Dive</h1>
+    <p class="sub">Sunday, November 01, 2026 · structured summaries of this week's 8 featured articles</p>
+  </div>
+  <div class="card open" id="a1">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">BJA</span><span class="badge b-if">IF 9.2</span></div>
+      <div class="title">The role of fibrinogen concentrate in the reduction of allogeneic blood product requirements: a systematic review and meta-analysis</div>
+      <div class="meta">Niels Rahe-Meyer; Roseny Rodrigues; Dietmar Fries; Dirk Steffen Schmidt et al. · BJA · 2026-11-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Fibrinogen concentrate reduces transfusion requirements in adults with acquired hypofibrinogenaemia by 28–44% across red cells, plasma, and platelets, with no increase in mortality or thrombosis, supporting its use as a blood-sparing strategy.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a1')">
+        <span class="lab-text">Hide summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This systematic review and meta-analysis evaluated whether fibrinogen concentrate (FC) reduces the need for allogeneic blood products in patients with acquired fibrinogen deficiency across multiple clinical settings. The authors searched comparative studies enrolling adults and children who received FC for hypofibrinogenaemia and measured transfusion requirements, mortality, thromboembolic events, and hospital stay.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Systematic review and meta-analysis of 58 comparative studies (N=13,530 patients) registered with PROSPERO. Studies spanned multiple clinical settings and compared FC to other treatments for acquired hypofibrinogenaemia. Primary outcomes included blood product transfusion volumes and patient safety outcomes (mortality, thromboembolism, length of stay). Separate analyses were performed for adults and paediatric patients.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>In adults receiving FC for acquired hypofibrinogenaemia, transfusion requirements were significantly lower than with other treatments: red blood cell units were reduced by 28% (IRR 0.72; 95% CI 0.59–0.89; P=0.002), fresh frozen plasma by 31% (IRR 0.69; 95% CI 0.54–0.89; P=0.004), and platelet units by 44% (IRR 0.56; 95% CI 0.33–0.95; P=0.03). Results were largely driven by cardiac surgery studies. RCT subanalysis confirmed significant reductions in both use and quantity of blood products with FC. No significant differences in mortality or thromboembolic events were detected between FC and other treatments in adults. No significant differences in any measured outcomes were found in paediatric patients.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For adults with acquired hypofibrinogenaemia—particularly in cardiac surgery—FC appears to be an effective blood-sparing intervention that reduces transfusion burden without increasing mortality or clotting complications. When hypofibrinogenaemia is documented or suspected in a bleeding patient, FC should be considered as part of a goal-directed transfusion strategy to minimize exposure to allogeneic products. The absence of harm signals supports its safety profile in this population.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Reducing transfusion requirements decreases infection risk, immunomodulation, circulatory overload, and cost while sparing limited blood bank resources. This meta-analysis provides evidence that FC is a rational, safe choice when fibrinogen supplementation is indicated.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Results are largely driven by cardiac surgery cohorts, so generalizability to medical bleeding, trauma, or obstetric settings remains unclear. Paediatric data showed no significant benefit, limiting applicability to children. Only abstract-level data are available; heterogeneity among studies, bias assessment details, and study quality metrics are not reported here.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.bja.2026.07.047" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a2">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">Anesthesiology</span><span class="badge b-if">IF 9.1</span></div>
+      <div class="title">Hypotension Prediction Index versus Mean Arterial Pressure Alarm for Preventing Intraoperative Hypotension in Elective Noncardiac Surgery: A Randomized Controlled Trial</div>
+      <div class="meta">Anna A. Florax; Marijn P. Mulder; Roland P. van Ieperen; Libera Fresiello et al. · Anesthesiology · 2026-10-13</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>A simple 72 mmHg MAP alarm was noninferior to the Hypotension Prediction Index (HPI) for preventing intraoperative hypotension, with nearly identical primary outcomes and no difference in complications, offering a cost-effective, broadly available alternative.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a2')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors tested whether a fixed mean arterial pressure (MAP) alarm at 72 mmHg could match the performance of the Hypotension Prediction Index (HPI)—a proprietary algorithm designed to alert before hypotension occurs. They enrolled adults undergoing moderate- to high-risk elective noncardiac surgery with invasive arterial monitoring and randomized them to one of these two alarm strategies to prevent intraoperative MAP below 65 mmHg.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Single-center, blinded, randomized controlled trial with 143 participants in the final analysis. The primary outcome was area under the threshold for MAP less than 65 mmHg (reported as mmHg·min). Secondary outcomes included incidence and severity of hypotension and hypertension, alarm duration, acute kidney injury, myocardial injury, 30-day mortality, length of stay, and medication/fluid administration.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The median area under the hypotension threshold was 3.75 [IQR 0.00–22.62] mmHg·min in the MAP group and 4.00 [0.00–19.00] in the HPI group. After log-transformation, the mean difference was 0.03 (95% CI −0.24 to 0.29), with the lower confidence bound remaining above the predefined noninferiority margin of −0.4, confirming noninferiority. No significant differences were found in secondary hemodynamic metrics, alarm characteristics, patient outcomes (including acute kidney injury, myocardial injury, or mortality), or cumulative doses of vasoactive agents and fluids administered.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>At the bedside, a simple MAP alarm set to 72 mmHg—a threshold available on any standard monitor—prevented intraoperative hypotension just as well as the HPI during moderate- to high-risk noncardiac surgery. You can confidently use the MAP alarm approach without sacrificing patient safety or requiring specialized equipment. This simplifies workflow and eliminates cost and licensing barriers, particularly valuable in settings where HPI is unavailable or prohibitively expensive.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Intraoperative hypotension is common and linked to organ injury and worse outcomes. This trial validates a pragmatic, universally accessible strategy that requires no additional technology, making proactive hemodynamic management feasible in any operating room.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Single-center design limits generalizability. The study was limited to moderate- to high-risk elective noncardiac surgery patients with invasive arterial monitoring, so findings may not apply to lower-risk cases, emergency surgery, or patients without arterial lines. Specifics on patient demographics, anesthetic techniques, and actual hypotensive events rates are not reported in the abstract, making it difficult to assess clinical heterogeneity or event frequency.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/aln.0000000000006338" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a3">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">EJA</span><span class="badge b-if">IF 6.8</span></div>
+      <div class="title">Antibiotic prophylaxis with vancomycin and gentamicin and the occurrence of acute kidney injury after cardiac surgery with cardiopulmonary bypass</div>
+      <div class="meta">Stefan Andrei; Sophie Provenchère; Anne Boutten; Kevin Boussion et al. · EJA · 2026-10-20</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Vancomycin and gentamicin prophylaxis was associated with nearly double the risk of acute kidney injury after cardiac surgery with CPB (29% vs. 15%), particularly in patients with preoperative AKI risk factors.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a3')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors investigated whether combined vancomycin and gentamicin (VGA) prophylaxis—used when cephalosporins are contraindicated—increases the risk of postoperative acute kidney injury in patients undergoing cardiac surgery with cardiopulmonary bypass. They compared VGA recipients to those who received cephalosporins and stratified analysis by preoperative AKI risk status.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Retrospective single-centre cohort study of 8198 cardiac surgery patients (April 2013 to December 2021). Primary outcome was acute kidney injury defined by KDIGO criteria within 7 postoperative days. VGA group (n=729, 9%) versus cephalosporin group (n=7469, 91%). Subgroup analyses stratified by preoperative AKI risk factors (insulin-dependent diabetes, cirrhosis, acute endocarditis, preoperative critical state, emergency surgery, or cardiac transplantation). Specific effect size and adjusted odds ratio not reported in abstract.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The overall AKI incidence was 16% across the cohort. AKI occurred more frequently in the VGA group: 29% versus 15% in the cephalosporin group (P&lt;0.001, indicating high statistical significance). VGA prophylaxis remained independently associated with increased AKI risk on multivariate analysis. The association was driven primarily by patients with preoperative risk factors for AKI, though the magnitude of effect in high-risk versus low-risk subgroups is not detailed in the abstract.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>When cephalosporins cannot be used, VGA prophylaxis carries substantially higher AKI risk—nearly double—in cardiac surgery patients. This should prompt careful consideration of alternatives (e.g., fluoroquinolones, clindamycin, or others) whenever feasible, especially in high-risk patients (those with diabetes, cirrhosis, sepsis, or emergency presentation). If VGA is unavoidable, heightened vigilance for AKI through perioperative fluid management, drug dosing, and postoperative renal function monitoring becomes more critical.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postoperative AKI prolongs ICU and hospital stay and increases mortality. In cardiac surgery, where AKI already affects 1 in 6 patients, an antibiotic choice that adds significant additional risk is worth reconsidering. Most cardiac centers can identify cephalosporin alternatives; this study reinforces that effort.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Single-centre retrospective design may not reflect practice variation or risk profiles at other institutions. The abstract does not provide adjusted odds ratios, confidence intervals, or detailed subgroup effect sizes, limiting precise risk quantification. Indication for VGA use (e.g., true allergy prevalence and severity) and perioperative factors (fluid balance, vasopressor use) are not described, so residual confounding by indication cannot be ruled out.</p></div>
+      <div class="links"><a href="https://doi.org/10.1097/eja.0000000000002519" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a4">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">JCA</span><span class="badge b-if">IF 5.1</span></div>
+      <div class="title">External oblique intercostal plane block improves early postoperative analgesia after open liver surgery: A randomized, double-blind, controlled trial</div>
+      <div class="meta">Jiali Tang; Jiarui Chen; Rong Ma; Yuelun Zhang et al. · JCA · 2027-01-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Ultrasound-guided external oblique intercostal plane block significantly reduced resting pain scores at 3 hours after open liver surgery compared to standard IV analgesia alone, with no complications and shorter hospital stay.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a4')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>Researchers tested whether an ultrasound-guided external oblique intercostal (EOI) plane block—a fascial plane block targeting intercostal nerve cutaneous branches while sparing the sympathetic trunk—could improve pain control after open liver surgery. They enrolled 74 patients undergoing open liver surgery and randomized them to receive either the EOI plane block with 30 mL of 0.375% ropivacaine or no block, with both groups receiving standard postoperative patient-controlled IV analgesia.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Double-blind randomized controlled trial with 74 patients (37 per group) scheduled for open liver surgery. Primary outcome was resting numerical rating scale (NRS) pain score at 3 hours postoperatively. Secondary outcomes included cumulative opioid consumption, frequency of analgesia interventions, opioid side effects, functional recovery, hospital length of stay, and ropivacaine plasma concentrations at multiple time points up to 180 minutes.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>The block group achieved significantly lower resting NRS pain scores at 3 hours compared to controls—the primary outcome favoring the EOI plane block. The block group also had a shorter hospital length of stay. However, there were no significant differences in cumulative opioid consumption, frequency of analgesia interventions at any timepoint (3, 6, 24, 48, 72 hours), or opioid-related side effects between groups. No block-related complications occurred, and ropivacaine plasma concentrations remained below the toxicity threshold throughout the study period.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>The EOI plane block meaningfully reduces early postoperative pain at 3 hours after open liver surgery and appears associated with earlier hospital discharge. However, the lack of difference in total opioid consumption and analgesia intervention frequency suggests the block provides analgesia primarily in the immediate postoperative window rather than a sustained multiday analgesic benefit. Use this block as part of a comprehensive multimodal regimen for open liver surgery patients when early pain control and potentially shorter stay matter, but do not expect it to substantially reduce total opioid requirements.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Inadequate early postoperative pain control after major hepatic surgery impairs mobilization and recovery. A safe, effective regional technique that reduces pain in the critical first 3 postoperative hours—with no complications and no systemic toxicity—offers a practical addition to existing analgesia protocols, particularly given the shorter hospital stay observed.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an abstract-only report; detailed effect sizes, confidence intervals, and exact pain score differences are not provided. The study enrolled only 74 patients at what appears to be a single center, so generalizability to different surgical populations and institutions remains unclear. The block&#x27;s benefit diminishes after 3 hours, so patients with prolonged or severe late postoperative pain may not derive sustained benefit.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.jclinane.2026.112337" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a5">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">ACCPM</span><span class="badge b-if">IF 4.7</span></div>
+      <div class="title">Impact of patient positioning on the occurrence of perioperative respiratory adverse events in children -a cluster randomised trial – The POSSUM trial</div>
+      <div class="meta">Heather Patterson; David Sommerfield; Aine Sommerfield; Neil Hauser et al. · ACCPM · 2026-11-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Routine 30-degree head elevation did not reduce perioperative respiratory adverse events overall in children (14% vs 15%, p=0.42), but intubated patients showed a 28% to 18% reduction in events when head-elevated versus flat (p=0.017).</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a5')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The POSSUM trial asked whether positioning children at 30 degrees head elevation (HE30) in the pre- and postoperative period, compared to no head elevation (NHE), would reduce perioperative respiratory adverse events (PRAE)—the leading cause of critical incidents in pediatric anesthesia. They studied children undergoing general anesthesia across two phases: Phase One was a prospective cluster-randomized trial with alternating weekly positioning protocols; Phase Two was a 4-week observation of routine clinical practice.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Prospective cluster-randomized controlled trial with an observational follow-up phase. Phase One enrolled 1935 children (959 HE30, 976 NHE). Phase Two collected data from 905 children under usual clinical care. Primary outcome was overall incidence of PRAE. Study design and setting details are not fully reported in the abstract.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>In Phase One, overall PRAE incidence was 14% in the HE30 group and 15% in the NHE group (p=0.42)—no significant difference. However, in the subgroup of children managed with a tracheal tube, PRAE occurred in 28% of NHE patients versus 18% of HE30 patients (p=0.017), with a multivariable odds ratio of 1.75 (95% CI 1.01–3.02, p=0.04). Phase Two (routine practice) showed no difference in PRAE incidence between phases (both 14%, OR 0.93, 95% CI 0.74–1.17, p=0.53). Staff preferred NHE and 15-degree head elevation during Phase Two.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>A blanket policy of 30-degree head elevation for all children does not broadly reduce respiratory complications and conflicts with clinical preference. However, intubated children may benefit from head elevation, showing a 10-percentage-point absolute reduction in PRAE. For your intubated pediatric patients, positioning at 30 degrees head elevation merits consideration as a simple adjunct, particularly if respiratory risk factors are present. For non-intubated children undergoing anesthesia, positioning can follow clinical judgment without concern that flat positioning increases overall PRAE risk.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Respiratory complications in anesthetized children are common and serious. Any low-cost, non-invasive intervention that reduces them in specific high-risk subgroups—such as intubated patients—warrants attention and integration into practice.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an abstract-only summary; full methodologic details, patient demographics, definitions of PRAE, and severity breakdowns are not reported. The study enrolled only in-hours patients in Phase One, and staff preference diverged from the intervention in Phase Two, which may limit real-world applicability. Generalizability to your population and practice setting is unclear.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.accpm.2026.101889" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a6">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">A&amp;A</span><span class="badge b-if">IF 3.8</span></div>
+      <div class="title">Effects of Ketamine and Esketamine on Postoperative Delirium After General Anesthesia: A Meta-Analysis and Meta-Regression Analysis</div>
+      <div class="meta">Shuying Li; Wenqin Zhou; Ping Li; Yajiao Hu · A&amp;A · 2026-10-16</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Ketamine and esketamine each reduced postoperative delirium risk by roughly 30-40% versus control, but trial sequential analysis indicates the evidence remains inconclusive and larger studies are needed before routine clinical recommendation.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a6')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This meta-analysis evaluated whether perioperative ketamine or esketamine reduces the incidence of postoperative delirium (POD) in surgical patients. The authors searched major databases through January 2025 for randomized controlled trials comparing either agent against placebo or standard care. The primary question was whether these NMDA antagonists prevent POD and what dosing strategies work best.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Systematic review and meta-analysis of 25 randomized controlled trials (3344 patients total: 9 trials of ketamine, 16 of esketamine). Primary outcome was POD incidence reported as risk ratio. The analysis included subgroup stratification by dose, administration route, and timing of POD assessment, along with trial sequential analysis to evaluate whether current evidence is sufficient.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Ketamine reduced POD risk to 0.69 (95% CI 0.49-0.98, P = 0.04) and esketamine to 0.58 (95% CI 0.36-0.95, P = 0.03) compared with control. In absolute terms, this represents roughly a 30-40% relative risk reduction. Benefit was more pronounced with higher doses (ketamine &gt;0.5 mg/kg bolus or &gt;1.0 mg/kg cumulative; esketamine &gt;0.25 mg/kg bolus or &gt;0.5 mg/kg cumulative), bolus-plus-infusion administration, and in major surgery. The effect appeared when delirium was assessed 2 to 7 days postoperatively but not within 24 hours. However, trial sequential analysis indicated current evidence remains inconclusive due to insufficient sample size. Dizziness risk increased (RR 1.45, 95% CI 1.14-1.84, P = 0.002), while postoperative depressive symptoms decreased (RR 0.78, 95% CI 0.63-0.96, based on only 2 studies with 493 patients).</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>While the point estimates suggest moderate POD reduction, the trial sequential analysis signals that we cannot yet confidently recommend these agents for routine delirium prevention. If you do consider ketamine or esketamine, optimize the dose (higher regimens showed clearer benefit), favor bolus-plus-infusion over bolus alone, and target high-risk patients undergoing major surgery. Expect an increased incidence of postoperative dizziness. Assess delirium beyond the immediate 24-hour window, where the signal is weakest.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postoperative delirium, especially in older surgical patients, carries significant morbidity and cost. Currently, pharmacologic prevention options are limited, so any agent showing potential benefit warrants scrutiny—but inconclusive evidence and real adverse effects (dizziness) demand caution before adoption becomes standard practice.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>The trial sequential analysis explicitly states the evidence is inconclusive, implying that current studies are underpowered to reach definitive conclusions. The abstract does not report patient characteristics, age, or comorbidity details, so applicability to specific high-risk groups remains unclear. The finding on depressive symptoms is based on only 2 studies and should not drive clinical decisions.</p></div>
+      <div class="links"><a href="https://doi.org/10.1213/ane.0000000000008380" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a7">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">RAPM</span><span class="badge b-if">IF 3.5</span><span class="badge b-oa">OPEN ACCESS</span></div>
+      <div class="title">Impact of opioid-free general anesthesia with locoregional blocks during breast cancer surgery on systemic inflammatory response: results from a randomized controlled trial</div>
+      <div class="meta">Brescia, F., Favero, A., Segatto, I., Massarut, S., Zanier, C., Fabiani, F., Nadalini, E., Morabito, A., Montico, M., Zucchetto, A., Zanussi, S., Baldassarre, G., Belletti, B. · RAPM · 2026-10-05</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Opioid-free general anesthesia with locoregional blocks reduced postoperative neutrophil-to-lymphocyte ratio (NLR) compared to conventional opioid-based anesthesia in breast cancer surgery, with stable NLR versus significant increases at 1 and 24 hours post-op, without worsening pain control.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a7')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>The authors compared two anesthetic approaches in breast cancer patients undergoing quadrantectomy: conventional opioid-based general anesthesia (GA) versus opioid-free general anesthesia combined with locoregional blocks (OfGA). They randomized 68 patients total (34 per arm) and measured blood samples pre-surgery and at 1 and 24 hours post-operatively to assess systemic inflammation.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Randomized controlled trial with 34 patients per arm. Primary outcome was neutrophil-to-lymphocyte ratio (NLR). Secondary endpoints included side effects, pain management, and inflammatory cytokines. Setting and specific surgical techniques not reported in abstract.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>GA patients showed significant NLR increases: median change +0.13 (IQR 0.01-0.62, p&lt;0.0001) at 1 hour and +0.64 (IQR 0.28-1.03, p&lt;0.0001) at 24 hours post-surgery. OfGA patients had stable or minimally increased NLR: median change -0.08 (IQR -0.21-0.17, not significant) at 1 hour and +0.11 (IQR -0.11-0.36, not significant) at 24 hours. Circulating inflammatory cytokines aligned with these trends, showing greater increases in the GA arm. Pain management was similar in both groups, but OfGA was better tolerated with fewer side effects.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>For breast cancer patients undergoing quadrantectomy, opioid-free anesthesia with regional blocks appears to dampen the acute postoperative inflammatory surge without sacrificing analgesia or increasing side effects. At the bedside, this suggests OfGA may be a viable alternative when regional blockade is technically feasible and patient factors permit. However, the clinical significance of reduced NLR—whether it translates to better wound healing, reduced complications, or improved recovery—remains unknown and the authors acknowledge this gap.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>Postoperative inflammation is implicated in complications and recovery delays. If opioid-sparing techniques genuinely reduce inflammation without compromising pain control or tolerability, they could become standard in selected cancer surgery populations, particularly important given growing concerns about perioperative opioid exposure.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>Abstract only; specific regional techniques, local anesthetic doses, and opioid use in the GA arm not reported. Study limited to quadrantectomy; generalizability to other breast procedures or patient populations uncertain. No follow-up beyond 24 hours or clinical outcome data (infection, complications, length of stay) provided.</p></div>
+      <div class="links"><a href="http://rapm.bmj.com/cgi/content/short/51/10/1151?rss=1" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="card" id="a8">
+    <div class="hdr">
+      <div class="tags"><span class="badge b-journal">IJOA</span><span class="badge b-if">IF 2.3</span></div>
+      <div class="title">Labor and delivery outcomes with remifentanil patient-controlled analgesia versus labor epidural analgesia among women with and without obesity: a retrospective population-based cohort study (2015–2024)</div>
+      <div class="meta">Katja Režonja; Miha Lučovnik; Ivan Verdenik; Tomislav Mirković et al. · IJOA · 2026-11-01</div>
+      <div class="bottomline">
+        <span class="lab">Bottom line</span>
+        <p>Remifentanil PCA reduced intrapartum cesarean and operative vaginal delivery rates versus epidural analgesia in both normal-weight and obese women, but was associated with higher postpartum hemorrhage risk.</p>
+      </div>
+      <button class="toggle" onclick="toggleCard('a8')">
+        <span class="lab-text">Read full summary</span> <span class="chev">▾</span>
+      </button>
+    </div>
+    <div class="body">
+<div class="sec"><h3><span class="ic">🔬</span> What they did</h3><p>This retrospective cohort study compared labor and delivery outcomes in women who received either remifentanil patient-controlled analgesia (IV) or labor epidural analgesia during spontaneous or induced term labor. The analysis was stratified by maternal body mass index (normal weight vs. BMI ≥30 kg/m²) to assess whether obesity affected the safety and efficacy profile of each analgesic technique.</p></div><div class="sec"><h3><span class="ic">📐</span> Design</h3><p>Retrospective population-based cohort study conducted in Slovenia from 2015 to 2024, including 52,118 women (46,448 with normal BMI and 5,670 with BMI ≥30 kg/m²). Women received either remifentanil PCA or labor epidural for analgesia during labor. Primary outcomes were intrapartum cesarean delivery and operative vaginal delivery, analyzed using multivariable logistic regression adjusted for relevant maternal and obstetric confounders.</p></div><div class="sec"><h3><span class="ic">📊</span> What they found</h3><p>Remifentanil PCA was associated with significantly lower risks of intrapartum cesarean delivery and operative vaginal delivery compared to labor epidural in both body mass index groups (all P ≤0.001); exact effect sizes not reported in abstract. However, remifentanil PCA was associated with higher risks of postpartum hemorrhage across both BMI groups. Among normal-weight women, remifentanil PCA was also associated with higher risks of blood transfusion and third- or fourth-degree perineal tears. In normal-weight women, remifentanil PCA was associated with lower odds of an Apgar score below threshold (specific cutoff not stated). Neonatal outcomes were otherwise comparable between groups.</p></div><div class="sec"><h3><span class="ic">💡</span> What it means</h3><p>If these observational findings reflect true effects, remifentanil PCA may offer a surgical-outcome advantage over epidural by reducing operative delivery rates, independent of maternal obesity. However, the trade-off includes materially higher postpartum hemorrhage risk, particularly in normal-weight women. This means careful patient selection and counseling about hemorrhage risk are essential; remifentanil PCA should not be reflexively chosen solely to avoid operative delivery without discussion of bleeding risk. Neonatal safety appears reassuring.</p></div><div class="sec"><h3><span class="ic">⭐</span> Why it matters</h3><p>As remifentanil PCA gains adoption for labor analgesia—partly because it preserves motor function and may facilitate ambulation—understanding its comparative safety profile is crucial for informed consent and case selection, especially in women at baseline hemorrhage risk.</p></div><div class="sec caution"><h3><span class="ic">⚠️</span> Limitations</h3><p>This is an observational study vulnerable to selection bias and residual confounding; women choosing remifentanil PCA may differ systematically from those choosing epidural in ways not fully captured by adjustment. The findings should not be interpreted as causal and require prospective validation before practice change. Results may not generalize beyond the Slovenian healthcare context.</p></div>
+      <div class="links"><a href="https://doi.org/10.1016/j.ijoa.2026.105275" target="_blank" rel="noopener">Read the full article ↗</a></div>
+      <div class="src-note">Summary generated from the abstract (full text not open access). AI-generated; verify against the source before clinical use.</div>
+    </div>
+  </div>
+  <div class="foot">
+    Anesthesia Journal Digest · summaries generated by AI (Claude) from the article
+    source text.<br><a href="index.html">← All Deep Dive editions</a>
+  </div>
+</div>
+<script>
+  function toggleCard(id){
+    var c = document.getElementById(id);
+    var open = c.classList.toggle('open');
+    c.querySelector('.lab-text').textContent = open ? 'Hide summary' : 'Read full summary';
+  }
+</script>
+</body>
+</html>
